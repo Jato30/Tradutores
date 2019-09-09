@@ -47,7 +47,9 @@ MULOP			"*"|"/"
 
 {PALAVRA-CHAVE}		{printf("Palavra-chave: %s\n", yytext); num_char += strlen(yytext);}
 {ID}				{printf("Identificador: %s\n", yytext); num_char += strlen(yytext);}
-{NUM}				{printf("Numero: %s\n", yytext); num_char += strlen(yytext);}
+{INT}				{printf("Inteiro: %s\n", yytext); num_char += strlen(yytext);}
+{FLOAT}				{printf("Float: %s\n", yytext); num_char += strlen(yytext);}
+{CHAR}				{printf("Char: %s\n", yytext); num_char += strlen(yytext);}
 
 {RELOP}				{printf("Operador Relacional: %s\n", yytext); num_char += strlen(yytext);}
 {ATROP}				{printf("Operador Atribuicao: %s\n", yytext); num_char += strlen(yytext);}
