@@ -9,7 +9,7 @@
 	//Hash tab;
 	int num_char = 0;
 	int erro = 0;
-	Simbolo tabela;
+	TabSimbolos tabela;
 %}
 
 PALAVRA-CHAVE	if|else|for|float|int|char|shape|point|return
@@ -66,8 +66,8 @@ MULOP			"*"|"/"
 {ACESSO-MEMB}		{printf("Operador de acesso a membro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 {FIM-EXPRESS}		{printf("Fim de expressao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 
-{INI-SUBESCRIT}		{printf("Abre de colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{FIM-SUBESCRIT}		{printf("Fecha de Colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{INI-SUBESCRIT}		{printf("Abre colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{FIM-SUBESCRIT}		{printf("Fecha colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 
 {LITERAL}			{printf("String constante: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 
@@ -98,11 +98,15 @@ int main(int argc, char** argv){
 	}
 
 	//InicializaHash(tab);
+	cria(&tabela);
 	yylex();
 
 	printf("\nNumero total de linhas: %d\n", yylineno);
 	if(erro > 0){
 		printf("Total de erros encontrados: %d\n", erro);
+	}
+	else{
+		printTab(tabela);
 	}
 
 	return 0;
