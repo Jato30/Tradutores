@@ -3,11 +3,13 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include "TabSimbolo.h"
 	//#include "sintatico.tab.h"
 	//#include "hash.h"
 	//Hash tab;
 	int num_char = 0;
 	int erro = 0;
+	Simbolo tabela;
 %}
 
 PALAVRA-CHAVE	if|else|for|float|int|char|shape|point|return
@@ -45,29 +47,29 @@ MULOP			"*"|"/"
 
 %%
 
-{PALAVRA-CHAVE}		{printf("Palavra-chave: %s\n", yytext); num_char += strlen(yytext);}
-{ID}				{printf("Identificador: %s\n", yytext); num_char += strlen(yytext);}
-{INT}				{printf("Inteiro: %s\n", yytext); num_char += strlen(yytext);}
-{FLOAT}				{printf("Float: %s\n", yytext); num_char += strlen(yytext);}
-{CHAR}				{printf("Char: %s\n", yytext); num_char += strlen(yytext);}
+{PALAVRA-CHAVE}		{printf("Palavra-chave: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{ID}				{printf("Identificador: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{INT}				{printf("Inteiro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{FLOAT}				{printf("Float: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{CHAR}				{printf("Char: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 
-{RELOP}				{printf("Operador Relacional: %s\n", yytext); num_char += strlen(yytext);}
-{ATROP}				{printf("Operador Atribuicao: %s\n", yytext); num_char += strlen(yytext);}
-{ADDOP}				{printf("Operador Adicao: %s\n", yytext); num_char += strlen(yytext);}
-{MULOP}				{printf("Operador Multiplicacao: %s\n", yytext); num_char += strlen(yytext); }
+{RELOP}				{printf("Operador Relacional: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{ATROP}				{printf("Operador Atribuicao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{ADDOP}				{printf("Operador Adicao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{MULOP}				{printf("Operador Multiplicacao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 
-{INI-PARAM}			{printf("Inicio de parametro: %s\n", yytext); num_char += strlen(yytext);}
-{FIM-PARAM}			{printf("Fim de parametro: %s\n", yytext); num_char += strlen(yytext);}
-{INI-INSTRUC}		{printf("Inicio de instrucao: %s\n", yytext); num_char += strlen(yytext);}
-{FIM-INSTRUC}		{printf("Fim de instrucao: %s\n", yytext); num_char += strlen(yytext);}
-{SEPARA-ARG}		{printf("Separador de argumento: %s\n", yytext); num_char += strlen(yytext);}
-{ACESSO-MEMB}		{printf("Operador de acesso a membro: %s\n", yytext); num_char += strlen(yytext);}
-{FIM-EXPRESS}		{printf("Fim de expressao: %s\n", yytext); num_char += strlen(yytext);}
+{INI-PARAM}			{printf("Inicio de parametro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{FIM-PARAM}			{printf("Fim de parametro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{INI-INSTRUC}		{printf("Inicio de instrucao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{FIM-INSTRUC}		{printf("Fim de instrucao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{SEPARA-ARG}		{printf("Separador de argumento: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{ACESSO-MEMB}		{printf("Operador de acesso a membro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{FIM-EXPRESS}		{printf("Fim de expressao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 
-{INI-SUBESCRIT}		{printf("Abre de colchetes: %s\n", yytext); num_char += strlen(yytext);}
-{FIM-SUBESCRIT}		{printf("Fecha de Colchetes: %s\n", yytext); num_char += strlen(yytext);}
+{INI-SUBESCRIT}		{printf("Abre de colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{FIM-SUBESCRIT}		{printf("Fecha de Colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 
-{LITERAL}			{printf("String constante: %s\n", yytext); num_char += strlen(yytext);}
+{LITERAL}			{printf("String constante: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
 
 
 {COMENT-LINHA}		{printf("Comentario!! Ignorando: %s\n", yytext);}
