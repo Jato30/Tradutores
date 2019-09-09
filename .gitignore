@@ -1,3 +1,4 @@
 main
 lex.yy.c
 *.out
+*.exe

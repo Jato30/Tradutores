@@ -1,335 +1,182 @@
-#ifndef __HASH_H__
-#define __HASH_H__
-
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <string.h>
 
-
-#define tam 677
-#define FALSE 0
-#define TRUE !(FALSE)
-
-
-
-/*	Prototipos das funcaoes */
-typedef struct chave{
-	char* val;
-	int qtd;
-	struct chave *prox;
-} Registro;
-
-typedef Registro* Hash[tam];
-
-int FuncaoHash(int seed);
-void InicializaHash(Hash tab);
-void ImprimeColisao(Hash tab, int pos);
-void BuscaHashPos(Hash tab, int pos);
-int BuscaHashChave(Hash tab, char* chave);
-void InsereHashChave(Hash tab, char* chave);
-void ImprimeHash(Hash tab);
-void RemoveHashPos(Hash tab, int pos);
-void RemoveHashChave(Hash tab, int pos);
-
-void CriaArquivo(FILE* arquivo);
-void ReescreveArquivo(FILE* arquivo);
-void EscreveArquivo(FILE* arquivo, int n);
-int CarregaArquivo(FILE* arquivo, Hash tab);
-
-
-
-/*
- *	FuncaoHash
- *
- * Recebe um inteiro n e retorna o
- * resto da divisao do valor dessa variavel pelo tamanho da tabela
+/**
+ * Estrutura da entrada da tabela Hash
 */
-int FuncaoHash(int seed){
-	int pos = ((2 * seed + 3) * seed + 4) * seed + 5;
-	return (pos % tam);
-}
+typedef struct entrada_hash{
+	int chave;
+	char *val;
+	struct entrada_hash *prox;
+} entrada_hash;
 
-/*
- *	InicializaHash
- *
- * Recebe uma tabela Hash e define NULL em todas as posicoes
+/**
+ * Estrutura da tabela Hash
 */
-void InicializaHash(Hash tab){
-	int i;
-	for(i = 0; i < tam; i++){
-		tab[i] = NULL;
+typedef struct tabela_hash {
+	int tam;
+	int qtd_entradas;
+	entrada_hash **entradas;
+} Hash;
+
+Hash *InicializaHash();
+
+int FuncaoHash(Hash *tabela, int chave);
+int InsereHash(Hash *tabela, int chave, char *val);
+int RemoveHash(Hash *tabela, int chave);
+int DestroiHash(Hash *tabela);
+
+
+
+/**
+ * Inicializa tabela hash
+ * @return Ponteiro para a tabela hash ou NULL se falhar
+*/
+Hash *InicializaHash(){
+	//printf("Inicializando tabela hash com tamanho: %d\n", tam);
+	int tam = 1;
+	
+	if(tam <= 0){
+		return NULL;
 	}
+
+	// aloca tabela
+	Hash *tabela = malloc(sizeof(Hash));
+	if(tabela == NULL){
+		return NULL;
+	}
+
+	// alocate lista de entradas na tabela
+	tabela->entradas = malloc(sizeof(entrada_hash*) * tam);
+	if(tabela->entradas == NULL){
+		return NULL;
+	}
+
+	// inicializa todas as entradas
+	for(int i = 0; i < tam; i ++){
+		tabela->entradas[i] = NULL;
+	}
+
+	tabela->tam = tam;
+	tabela->qtd_entradas = 0;
+
+	return tabela;
 }
 
-/*
- *	ImprimeColisao
- *
- * Recebe uma tabela Hash e um inteiro pos
- * Imprime todos os elementos colididos na mesma posicao
-*/
-void ImprimeColisao(Hash tab, int pos){
-	Registro* aux = tab[pos];
-	if(aux != NULL){
-		printf("\"%s\"", aux->val);
 
-		while(aux->prox != NULL){
-			printf(" -> \"%s\"", aux->prox->val);
-			aux = aux->prox;
+/**
+ * Funcao Hash para calcular o indice na tabela
+ */
+int FuncaoHash(Hash *tabela, int chave){
+	return chave % tabela->tam;
+}
+
+
+/**
+ * Insere a chave e o valor na tabela
+ *
+ * @return indice da entrada que esta sendo inserida, -1 em caso de erro
+ */
+int InsereHash(Hash *tabela, int chave, char *val){
+	if(tabela == NULL){
+		return -1;
+	}
+
+	int i = hash(tabela, chave);
+	entrada_hash *entrada = tabela->entradas[i];
+
+	while(entrada){
+		if(entrada->chave == chave){
+			// entrada com a mesma chave quer dizer que o valor ja existe
+			free(entrada->val);
+			entrada->val = malloc(strlen(val) * sizeof(char));
+
+			if(entrada->val == NULL){
+				return -1;
+			}
+			strcpy(entrada->val, val);
+			return i;
 		}
-	}
-	else{
-		printf("Esta posicao esta vazia!\n");
-		return;
+		entrada = entrada->prox;
 	}
 
+	// aloca entrada
+	entrada_hash *nova_entrada = malloc(sizeof(entrada_hash));
+	if(nova_entrada == NULL){
+		return -1;
+	}
+
+	// define os valores da entrada
+	nova_entrada->chave = chave;
+	nova_entrada->val = malloc(strlen(val) * sizeof(char));
+
+	if(entrada->val == NULL){
+		return -1;
+	}
+	strcpy(entrada->val, val);
+	entrada->prox = tabela->entradas[i];
+
+	// insere entrada no inicio da linked list
+	tabela->entradas[i] = entrada;
+	return i;
 }
 
-/*
- *	BuscaHashPos
- *
- * Recebe uma tabela Hash tab e um inteiro pos
- * Retorna a(s) entrada(s) da tabela tab na posicao pos
-*/
-void BuscaHashPos(Hash tab, int pos){
-	if(0 > pos || pos > tam){
-		printf("Posicao nao encontrada!\n");
-		return;
-	}
-	else{
-		ImprimeColisao(tab, pos);
-	}
-}
 
-/*
- *	BuscaHashChave
+/**
+ * Remove entrada pela chave da tabela
  *
- * Recebe uma tabela Hash tab e um inteiro pos
- * Retorna a posicao da chave na tabela tab, -1 se nao encontrar.
-*/
-int BuscaHashChave(Hash tab, char* chave){
-	int i, pos = -1;
-	Registro* aux;
+ * @return indice da entrada que sera removida, -1 se falhar
+ */
+int RemoveHash(Hash *tabela, int chave){
+	if(tabela == NULL){
+		return -1;
+	}
 
-	for(i = 0; i < tam; i++){
-		aux = tab[i];
-		if(aux == NULL){
-			continue;
-		}
-		else{
-			do{
-				if(strcmp(aux->val, chave) == 0){
-					pos = i;
-					free(aux);
-					aux = NULL;
-				}
-				else{
-					aux = aux->prox;
-				}
-			} while(aux == NULL);
-		}
-		if(pos != -1){
+	int i = hash(tabela, chave);
+	entrada_hash *entrada = tabela->entradas[i];
+
+	// encontra a entrada na linked list
+	while(entrada){
+		if(entrada->chave == chave){
 			break;
 		}
+		entrada = entrada->prox;
 	}
 
-	return pos;
+	// atualiza tabela
+	tabela->entradas[i] = entrada->prox;
+
+	free(entrada->val);
+	free(entrada);
+	return i;
 }
 
-/*
- *	InsereHashChave
- * 
- * Recebe uma tabela Hash tab e uma string chave.
- * Insere chave na tabela tab na posicao dada por FuncaoHash,
- * tratando as colisoes com encadeamento direto.
-*/
-void InsereHashChave(Hash tab, char* chave){
-	int i = 0, pos = BuscaHashChave(tab, chave);
 
-	if(pos < 0){
-		srand(time(NULL));
-		pos = FuncaoHash((int) rand());
+/**
+ * Destroi e desaloca tabela
+ *
+ * @return 0 se bem sucedido, -1 se nao
+ */
+int DestroiHash(Hash *tabela){
+	//printf("destroying hash tabela with tam: %d\n", tabela->tam);
 
-		Registro* aux = tab[pos];
-
-		while(aux != NULL){
-			aux = aux->prox;
-		}
-		if(aux == NULL){
-			aux = (Registro*) malloc(sizeof(Registro));
-			aux->qtd = 0;
-			strcpy(aux->val, chave);
-			aux->prox = tab[pos];
-			tab[pos] = aux;
-		}
+	if(tabela == NULL){
+		return -1;
 	}
-	else{
-		printf("Chave ja existe na posicao %d\n", pos);
-		tab[pos]->qtd++;
-	}
-}
 
-/*
- *	ImprimeHash
- * Recebe uma tabela Hash tab
- * Imprime todos os elementos da tabela
-*/
-void ImprimeHash(Hash tab){
-	int i = 0, cont = 0;
-	for(i = 0; i < tam; i++){
-		if(tab[i] != NULL){
-			printf("\n \"%s\"(%d)", tab[i]->val, tab[i]->qtd);
-			Registro* aux = tab[i]->prox;
+	for(int i = 0; i < tabela->tam; i++){
+		entrada_hash *entrada = tabela->entradas[i];
 
-			while(aux != NULL){
-				printf(" -> \"%s\"(%d)", aux->val, aux->qtd);
-				aux = aux->prox;
-			}
+		while(entrada){
+			entrada_hash *temp = entrada;
+			
+			free(temp->val);
+			free(temp);
+
+			entrada = entrada->prox;
 		}
 	}
+	
+	return 0;
 }
-
-/*
- *	RemoveHash
- *
- * Recebe uma tabela Hash tab e um inteiro pos
- * mostra o valor das chaves da posicao pos na tabela tab e o usuario escolhe qual deseja apagar
- * 
- * OBS: talvez nem precise de eliminacao, mas se precisar, vai ter que ser por chave, nao por posicao
-*/
-void RemoveHash(Hash tab, int pos){
-	// int ex;
-	// if(0 > pos || pos > tam){
-	// 	printf("\nEsta posicao nao existe na tabela!");
-	// }
-	// else{
-	// 	if(tab[pos] == NULL){
-	// 		printf("Esta chave esta vazia!");
-	// 	}
-	// 	else{
-	// 		printf("\n\n\n");
-	// 		ImprimeColisao(tab,pos);
-	// 		printf("\n\nQual registro deseja apagar =  ");
-	// 		scanf("%d",&ex);
-
-	// 		if(tab[pos]->val == ex){
-	// 			if(tab[pos]->prox == NULL){
-	// 				tab[pos] = NULL;
-	// 				return;
-	// 			}
-	// 			if(tab[pos]->prox != NULL){
-	// 				tab[pos]->val = tab[pos]->prox->val;
-	// 				tab[pos]->prox = tab[pos]->prox->prox;
-	// 				return;
-	// 			} 
-	// 		}
-	// 		else{
-	// 			if(tab[pos]->val != ex){    
-	// 				if(tab[pos]->prox == NULL){
-	// 					printf("\nRegistro nao encontrado!");
-	// 					//getc();
-	// 					return;
-	// 				}
-	// 				else{
-	// 					Registro* ant = NULL;
-	// 					Registro* aux = tab[pos]->prox;
-	// 					while(aux->prox != NULL  && aux->val != ex){
-	// 						ant = aux;
-	// 						aux = aux->prox;
-	// 					}
-	// 					if(aux->val != ex){
-	// 						printf("\nRegistro nao encontrado!\n");
-	// 						return;
-	// 					}
-	// 					else{
-	// 						if(ant == NULL){
-	// 							tab[pos]->prox = aux->prox;
-	// 						}
-	// 						else{
-	// 							ant->prox = aux->prox;
-	// 						}
-	// 						aux = NULL;
-	// 						free(aux);
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-}
-
-/*
- *	CriaArquivo
- *
- * Recebe um ponteiro para arquivo FILE
- * Abre o arquivo ./hash.txt para leitura. Se nao existir, cria e abre para escrita
-*/
-void CriaArquivo(FILE* arquivo){
-	arquivo = fopen("hash.txt", "r");
-	if(arquivo == NULL){
-		arquivo = fopen("hash.txt", "w");
-		fclose(arquivo);
-	}
-	else{
-		return;
-	}
-}
-
-/*
- *	ReescreveArquivo
- *
- * Recebe ponteiro para arquivo FILE
- * Limpa o conteudo do arquivo
-*/
-void ReescreveArquivo(FILE* arquivo){
-	arquivo = fopen("hash.txt", "w");
-	fclose(arquivo);
-}
-
-/*
- *	EscreveArquivo
- *
- * Recebe ponteiro para arquivo FILE e um inteiro n.
- * Escreve o novo registro n no arquivo
-*/
-void EscreveArquivo(FILE* arquivo, int n){
-	arquivo = fopen("hash.txt", "a");
-	fprintf(arquivo, "%3d\n", n);
-	fclose(arquivo);
-}
-
-/*
- *	CarregaArquivo
- *
- * Recebe ponteiro para arquivo FILE e uma tabela Hash.
- * Insere na tabela Hash os elementos que estao no arquivo.
- * Retorna 0 para erro e != 0 para sucesso
-*/
-int CarregaArquivo(FILE* arquivo, Hash tab){
-	int elemento;
-
-	arquivo = fopen("hash.txt", "r");
-	fseek(arquivo, 0, SEEK_END);
-
-	if(ftell(arquivo) == 0){
-		return FALSE;
-	}
-	fseek(arquivo,0,SEEK_SET);
-	if(arquivo == NULL){
-		return FALSE;
-	}
-	else{
-		while(!feof(arquivo)){
-			fscanf(arquivo, "%d", &elemento);
-			// InsereHashChave(tab, elemento);
-		}
-		//system("cls");
-	}
-
-	fclose(arquivo);
-	return TRUE;
-}
-
-
-
-#endif // __HASH_H__

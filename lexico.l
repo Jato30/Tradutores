@@ -2,21 +2,34 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "hash.h"
+	#include <string.h>
+	//#include "hash.h"
+	//Hash tab;
 	int num_char = 0;
-	Hash tab;
 %}
 
 PALAVRA-CHAVE	if|else|for|float|int|char|shape|point|return
-CONST-STRING	"\"".*"\""
+LITERAL			"\"".*"\""
+COMENT-LINHA	"//".*
+COMENT-BLOCO	"/*"(.|\n)*"*/"
 ID				({LETRA})+({LETRA}|{DIGITO}|"_")*
 NUM				"-"?({DIGITO}+|({DIGITO}+"."{DIGITO}+"E"?{DIGITO}*))
 LETRA			[a-zA-Z]
 DIGITO			[0-9]
 
 
-SEPARADOR		","|";"
-DELIMITADOR		"["|"]"|"("|")"|"{"|"}"
+SEPARA-ARG		","
+ACESSO-MEMB		"."|"->"
+FIM-EXPRESS		";"
+PRE-PROCESS		"#".*
+
+INI-SUBESCRIT	"["
+FIM-SUBESCRIT	"]"
+INI-PARAM		"("
+FIM-PARAM		")"
+INI-INSTRUC		"{"
+FIM-INSTRUC		"}"
+
 
 RELOP			"<"|">"|"<="|">="|"=="|"!="|"!"
 ATROP			"="|"+="|"-="|"*="|"/="|"%="
@@ -26,28 +39,37 @@ MULOP			"*"|"/"
 
 %%
 
-{PALAVRA-CHAVE}		{
-						printf("Palavra-chave: %s\n", yytext);
-						InsereHashChave(tab, yytext);
-					}
-{ID}				{printf("Identificador: %s\n", yytext);}
-{NUM}				{printf("Numero: %s\n", yytext);}
+{PALAVRA-CHAVE}		{printf("Palavra-chave: %s\n", yytext); num_char += strlen(yytext);}
+{ID}				{printf("Identificador: %s\n", yytext); num_char += strlen(yytext);}
+{NUM}				{printf("Numero: %s\n", yytext); num_char += strlen(yytext);}
 
-{RELOP}				{printf("Operador Relacional: %s\n", yytext);}
-{ATROP}				{printf("Operador Atribuicao: %s\n", yytext);}
-{ADDOP}				{printf("Operador Adicao: %s\n", yytext);}
-{MULOP}				{printf("Operador Multiplicacao: %s\n", yytext);}
+{RELOP}				{printf("Operador Relacional: %s\n", yytext); num_char += strlen(yytext);}
+{ATROP}				{printf("Operador Atribuicao: %s\n", yytext); num_char += strlen(yytext);}
+{ADDOP}				{printf("Operador Adicao: %s\n", yytext); num_char += strlen(yytext);}
+{MULOP}				{printf("Operador Multiplicacao: %s\n", yytext); num_char += strlen(yytext);}
+
+{INI-PARAM}			{printf("Inicio de parametro: %s\n", yytext); num_char += strlen(yytext);}
+{FIM-PARAM}			{printf("Fim de parametro: %s\n", yytext); num_char += strlen(yytext);}
+{INI-INSTRUC}		{printf("Inicio de instrucao: %s\n", yytext); num_char += strlen(yytext);}
+{FIM-INSTRUC}		{printf("Fim de instrucao: %s\n", yytext); num_char += strlen(yytext);}
+{SEPARA-ARG}		{printf("Separador de argumento: %s\n", yytext); num_char += strlen(yytext);}
+{ACESSO-MEMB}		{printf("Operador de acesso a membro: %s\n", yytext); num_char += strlen(yytext);}
+{FIM-EXPRESS}		{printf("Fim de expressao: %s\n", yytext); num_char += strlen(yytext);}
+{PRE-PROCESS}		{printf("Instrucao de pre-processamento: %s\n", yytext); num_char += strlen(yytext);}
+{INI-SUBESCRIT}		{printf("Abre de colchetes: %s\n", yytext); num_char += strlen(yytext);}
+{FIM-SUBESCRIT}		{printf("Fecha de Colchetes: %s\n", yytext); num_char += strlen(yytext);}
+
+{LITERAL}			{printf("String constante: %s\n", yytext); num_char += strlen(yytext);}
+
+{COMENT-LINHA}		{printf("Comentario!! Ignorando: %s\n", yytext);}
+{COMENT-BLOCO}		{printf("Comentario!! Ignorando: %s\n", yytext);}
 
 
-{SEPARADOR}			{printf("Separador: %s\n", yytext);}
-{DELIMITADOR}		{printf("Delimitador: %s\n", yytext);}
 
-{CONST-STRING}		{printf("String constante: %s\n", yytext);}
-
-\n					{yylineno++;}
+\n					{yylineno++; num_char = 0;}
 
 [ \t\r]				;
-.					printf("Caractere nao reconhecido: %s linha[%d]\n", yytext, yylineno);
+.					printf("\t[ERRO] Caractere nao reconhecido: %s linha[%d:%d]\n", yytext, yylineno, num_char);
 
 
 %%
@@ -56,32 +78,30 @@ int yywrap(){
 	return 1;
 }
 
-// PARA COMPILAR SEM MAIN, UTILIZE A FLAG -ll
-void main( argc, argv )
-int argc;
-char **argv;
-	{
-	InicializaHash(tab);
-	++argv, --argc;	/* skip over program name */
-	if ( argc > 0 )
-		yyin = fopen( argv[0], "r" );
-	else
-		yyin = stdin;
+// PARA COMPILAR SEM MAIN, UTILIZE A FLAG -ll (pegar entrada padrao)
+int main(int argc, char** argv){
 
+	if(argc > 1){
+		yyin = fopen( argv[1], "r");
+	}
+	else{
+		yyin = stdin;
+	}
+
+	//InicializaHash(tab);
 	yylex();
 
 	printf("\nNumero total de linhas: %d\n", yylineno);
+
+	return 0;
 }
 
 
 
-/* INI-PARAM		"("
-FIM-PARAM		")"
-INI-INSTRUC		"{"
-FIM-INSTRUC		"}"
-FIM-EXPRESS		";"
-{INI-PARAM}			{printf("Inicio de parametro: %s\n", yytext);}
-{FIM-PARAM}			{printf("Fim de parametro: %s\n", yytext);}
-{INI-INSTRUC}		{printf("Inicio de instrucao: %s\n", yytext);}
-{FIM-INSTRUC}		{printf("Fim de instrucao: %s\n", yytext);}
-{FIM-EXPRESS}		{printf("Fim de expressao: %s\n", yytext);}*/
+/* 
+SEPARADOR		","|";"|"."
+DELIMITADOR		"["|"]"|"("|")"|"{"|"}"
+
+{SEPARADOR}			{printf("Separador: %s\n", yytext); num_char += strlen(yytext);}
+{DELIMITADOR}		{printf("Delimitador: %s\n", yytext); num_char += strlen(yytext);}
+*/
