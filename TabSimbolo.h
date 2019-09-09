@@ -45,6 +45,21 @@ int buscaTab(TabSimbolos raiz, char* valor){
 }
 
 void insere(TabSimbolos* raiz, char* valor){
+  
+    // trata erro de tamanho
+    if(strlen(valor) > 33){
+        printf("Tamanho excede o maximo %d>33. valor sera truncado.\n", strlen(valor));
+        char aux_valor[33];
+        int i = 0;
+        for(i = 0; i < 33; i++){
+            aux_valor[i] = valor[i];
+        }
+        valor[33] = '\0';
+        valor = NULL;
+        free(valor);
+        valor = (char*) malloc(sizeof(char*) * 33);
+        strcpy(valor, aux_valor);
+    }
 
     if(buscaTab(*raiz, valor) == 1){
         printf("valor ja existente na tabela de simbolos.\n");
