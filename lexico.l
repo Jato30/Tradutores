@@ -16,7 +16,7 @@ COMENT-LINHA	"//".*
 COMENT-BLOCO	"/*"(.|\n)*"*/"
 LETRA			[a-zA-Z]
 DIGITO			[0-9]
-CHAR			"\'"{LETRA}"\'"
+CHAR			"\'"."\'"
 
 INT				{DIGITO}+
 FLOAT			{INT}"."{DIGITO}+"E"?{DIGITO}*
