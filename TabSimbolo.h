@@ -14,9 +14,9 @@ typedef struct Simbolo{
 typedef Simbolo* TabSimbolos;
 
 void cria(TabSimbolos* raiz);
+int buscaTab(TabSimbolos raiz, char* valor);
 void insere(TabSimbolos* raiz, char* valor);
 void printTab(TabSimbolos raiz);
-int buscaTab(TabSimbolos raiz, char* valor);
 
 void cria(TabSimbolos* raiz){
   *raiz = NULL;
