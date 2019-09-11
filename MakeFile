@@ -1,6 +1,4 @@
 
-#comando para remover pastas
-RMDIR = rm -rf
 #comando para remover arquivos
 RM = rm -f
 CD = cd
@@ -8,14 +6,14 @@ CD = cd
 MAKE = make
 
 
-FLAGS= -Wall -pedantic -Wextra
-DFLAGS = -ggdb -O0
-
+FLAGS= 
+DFLAGS= -Wall -pedantic -Wextra -ggdb -O0
+PATH= ./170052427/
 
 
 #Arquivos que devem ser compilados:
-C_FILES= $(wildcard ./170052427/*.c)
-FLEX_FILES= $(wildcard ./170052427/*.l)
+C_FILES= $(wildcard $(PATH)*.c)
+FLEX_FILES= $(wildcard $(PATH)*.l)
 
 
 #Nome do executável
@@ -25,7 +23,7 @@ EXEC = exec
 all: $(EXEC)
 
 $(EXEC): $(FILES)
-  flex $(FLEX_FILES)
+	flex $(FLEX_FILES)
 	gcc $(C_FILES) $(FLAGS)
 
 debug: FLAGS += $(DFLAGS)
@@ -33,13 +31,13 @@ debug: all
 
 clean:
 	$(RM) $(EXEC)
-  $(RM) lex.yy.c
+	$(RM) lex.yy.c
 
 
 again: clean
 again: all
 
-first: chmod 777 -R ./170052427/
+first: chmod 777 -R $(PATH)
 first: all
 
 
@@ -47,7 +45,7 @@ help:
 	@echo.
 	@echo Available targets:
 	@echo - all:      Builds the release version (default target)
-  @echo - first:    Gives permission at the first time (or when added new files)
+	@echo - first:    Gives permission at the first time (or when added new files)
 	@echo - debug:    Builds the debug version
 	@echo - clean:    Clean compilation files and executable
 	@echo - help:     Shows this help
