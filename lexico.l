@@ -7,7 +7,7 @@
 	//#include "sintatico.tab.h"
 	//#include "hash.h"
 	//Hash tab;
-	int num_char = 0;
+	int num_char = 0, num_lin = 1;
 	int erro = 0;
 	TabSimbolos tabela;
 %}
@@ -47,38 +47,38 @@ MULOP			"*"|"/"
 
 %%
 
-{PALAVRA-CHAVE}		{printf("Palavra-chave: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{ID}				{printf("Identificador: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{INT}				{printf("Inteiro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{FLOAT}				{printf("Float: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{CHAR}				{printf("Char: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{PALAVRA-CHAVE}		{printf("Palavra-chave: %s\n", yytext); num_char += strlen(yytext); checa_erro(yytext, num_lin, num_char); insere(&tabela, yytext, num_lin, num_char);}
+{ID}				{printf("Identificador: %s\n", yytext); num_char += strlen(yytext); checa_erro(yytext, num_lin, num_char); insere(&tabela, yytext, num_lin, num_char);}
+{INT}				{printf("Inteiro: %s\n", yytext); num_char += strlen(yytext); checa_erro(yytext, num_lin, num_char); insere(&tabela, yytext, num_lin, num_char);}
+{FLOAT}				{printf("Float: %s\n", yytext); num_char += strlen(yytext); checa_erro(yytext, num_lin, num_char); insere(&tabela, yytext, num_lin, num_char);}
+{CHAR}				{printf("Char: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
 
-{RELOP}				{printf("Operador Relacional: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{ATROP}				{printf("Operador Atribuicao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{ADDOP}				{printf("Operador Adicao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{MULOP}				{printf("Operador Multiplicacao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{RELOP}				{printf("Operador Relacional: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{ATROP}				{printf("Operador Atribuicao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{ADDOP}				{printf("Operador Adicao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{MULOP}				{printf("Operador Multiplicacao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
 
-{INI-PARAM}			{printf("Inicio de parametro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{FIM-PARAM}			{printf("Fim de parametro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{INI-INSTRUC}		{printf("Inicio de instrucao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{FIM-INSTRUC}		{printf("Fim de instrucao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{SEPARA-ARG}		{printf("Separador de argumento: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{ACESSO-MEMB}		{printf("Operador de acesso a membro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{FIM-EXPRESS}		{printf("Fim de expressao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{INI-PARAM}			{printf("Inicio de parametro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{FIM-PARAM}			{printf("Fim de parametro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{INI-INSTRUC}		{printf("Inicio de instrucao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{FIM-INSTRUC}		{printf("Fim de instrucao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{SEPARA-ARG}		{printf("Separador de argumento: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{ACESSO-MEMB}		{printf("Operador de acesso a membro: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{FIM-EXPRESS}		{printf("Fim de expressao: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
 
-{INI-SUBESCRIT}		{printf("Abre colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
-{FIM-SUBESCRIT}		{printf("Fecha colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{INI-SUBESCRIT}		{printf("Abre colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
+{FIM-SUBESCRIT}		{printf("Fecha colchetes: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
 
-{LITERAL}			{printf("String constante: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext)}
+{LITERAL}			{printf("String constante: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
 
 
 {COMENT-LINHA}		{printf("Comentario!! Ignorando: %s\n", yytext);}
 {COMENT-BLOCO}		{printf("Comentario!! Ignorando: %s\n", yytext);}
 
-\n					{yylineno++; num_char = 0;}
+\n					{num_lin++; num_char = 0;}
 
 [ \t\r]				;
-.					{printf("\t[ERRO] Caractere nao reconhecido: %s linha[%d:%d]\n", yytext, yylineno, num_char); erro++;}
+.					{printf("\t[ERRO] Caractere nao reconhecido: %s linha[%d:%d]\n", yytext, num_lin, num_char); erro++;}
 
 
 %%
@@ -99,14 +99,15 @@ int main(int argc, char** argv){
 
 	//InicializaHash(tab);
 	cria(&tabela);
+
 	yylex();
 
-	printf("\nNumero total de linhas: %d\n", yylineno);
+	printf("\nNumero total de linhas: %d\n", num_lin);
 	if(erro > 0){
 		printf("Total de erros encontrados: %d\n", erro);
 	}
 	else{
-		printTab(tabela);
+		printTab(&tabela);
 	}
 
 	return 0;
