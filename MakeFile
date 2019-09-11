@@ -8,7 +8,7 @@ MAKE = make
 
 FLAGS= 
 DFLAGS= -Wall -pedantic -Wextra -ggdb -O0
-PATH= ./170052427/
+PATH= ../170052427/
 
 
 #Arquivos que devem ser compilados:
