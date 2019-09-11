@@ -22,7 +22,7 @@ DIGITO			[0-9]
 CHAR			"\'"."\'"
 
 INT				{DIGITO}+
-FLOAT			{INT}"."{DIGITO}+"E"?{DIGITO}*
+FLOAT			{INT}"."{DIGITO}+([eE][-+])?{DIGITO}*
 NUM				{INT}|{FLOAT}
 ID				({LETRA})+({LETRA}|{DIGITO}|"_")*
 
@@ -40,7 +40,7 @@ INI-INSTRUC		"{"
 FIM-INSTRUC		"}"
 
 OPERADORES		{RELOP}|{ATROP}|{ADDOP}|{MULOP}
-RELOP			"<"|">"|"<="|">="|"=="|"!="|"!"
+RELOP			"<"|">"|"<="|">="|"=="|"!="|"!"|"&&"|"||"
 ATROP			"="|"+="|"-="|"*="|"/="|"%="
 ADDOP			"+"|"-"
 MULOP			"*"|"/"
