@@ -15,7 +15,7 @@ typedef Simbolo* TabSimbolos;
 
 void cria(TabSimbolos* raiz);
 int buscaTab(TabSimbolos* raiz, char* valor);
-int checa_erro(char* valor, int lin, int col);
+int checa_warn(char* valor, int lin, int col);
 void insere(TabSimbolos* raiz, char* valor, int lin, int col);
 void printTab(TabSimbolos* raiz);
 
@@ -46,14 +46,16 @@ int buscaTab(TabSimbolos* raiz, char* valor){
 }
 
 // RETORNO: 0 nenhnum erro, 1 erro corrigido, 2 erro nao corrigido
-int checa_erro(char* valor, int lin, int col){
+int checa_warn(char* valor, int lin, int col){
 	int erro = 0;
 
 	// ERRO DE TAMANHO
 	{
 		int tam = (int) strlen(valor);
 		if(tam > 33){
-			erro = 1;
+			if(erro < 1){
+				erro = 1;
+			}
 			printf("\t[WARNING]: Tamanho excede o maximo %d>33. valor sera truncado. Linha[%d:%d]\n", tam, lin+1, col);
 			char aux_valor[33];
 			int i = 0;
@@ -71,7 +73,23 @@ int checa_erro(char* valor, int lin, int col){
 	// ERRO DE IF
 	{
 		if(strcmp("fi", valor) == 0){
+			if(erro < 2){
+				erro = 2;
+			}
 			printf("\t[WARNING]: em vez de %s, nao quis dizer if? Linha[%d:%d]\n", valor, lin+1, col);
+		}
+	}
+
+	// ERRO DE FIM DE EXPRESSAO ;;
+	{
+		if(';' == valor[0] && strcmp(";", valor) != 0){
+			printf("\t[WARNING]: Fim de expressao com %s valor sera substituido por ; Linha[%d:%d]\n", valor, lin+1, col);
+			if(erro < 1){
+				erro = 1;
+			}
+
+			valor[1] = '\0';
+			valor[0] = ';';
 		}
 	}
 
@@ -134,7 +152,7 @@ void printTab(TabSimbolos* raiz){
 	else{
 		TabSimbolos atual;
 		atual = *raiz;
-		printf("Chave\t\tQuantidade\t\tValor\n");
+		printf("CHAVE\t\tQUANTIDADE\t\tVALOR\n");
 
 		while(atual != NULL){
 			printf("%d\t\t%d\t\t\t%s\n", atual->chave, atual->qtd, atual->valor);
