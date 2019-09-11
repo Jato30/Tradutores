@@ -3,7 +3,7 @@ Implementação de uma linguagem a partir de C e um compilador para ela (sem mon
 
 
 
-##Compilação
+## Compilação
 
 - Certifique-se que está no diretório raiz e que este se chama ./170052427/
 - Utilize o comando make help para mais comandos
