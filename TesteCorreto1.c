@@ -1,6 +1,5 @@
 
 int main(){
-	print("Hello World!\n");
 	int i;
 	point um;
 	um.x = 1;
@@ -13,16 +12,18 @@ int main(){
 	dois.x = 1;
 	dois.y = 2;
 	if(tres.x <= quatro.y){
-		fi(0 != 1){
-			dois.x = 1;
-		}
+		um.x = 1;
+		um.y = 2;
+	}
+	else{
+		um.x = 1.5;
+		um.y = 1;
 	}
 	tres.x = 2;
-	tres.y = 2;
-	quatro.x = 2;// comentario\n
-	quatro.y = 1;
+	tres.y = 2;// comentario\n
 	//cria shape
-	shape ret = {um, dois, tres, quatro};
+	shape ret;
+	constroi(&ret, um, dois, tres);
 
 	print("O perimetro da forma criada eh: %.3f\n", Perimetro(ret));
 
