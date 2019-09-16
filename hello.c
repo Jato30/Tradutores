@@ -12,6 +12,11 @@ int main(){
 	point dois, tres, quatro;
 	dois.x = 1;
 	dois.y = 2;
+	if(tres.x <= quatro.y){
+		fi(0 != 1){
+			dois.x = 1;
+		}
+	}
 	tres.x = 2;
 	tres.y = 2;
 	quatro.x = 2;// comentario\n

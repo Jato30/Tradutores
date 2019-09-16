@@ -77,7 +77,6 @@ ERRO			{INT}{ID}|{RELOP}{RELOP}+|{ATROP}{ATROP}+|{ADDOP}{ADDOP}+|{MULOP}{MULOP}+
 
 {LITERAL}			{printf("String constante: %s\n", yytext); num_char += strlen(yytext); insere(&tabela, yytext, num_lin, num_char);}
 
-
 {COMENT-LINHA}		{printf("Comentario!! Ignorando: %s\n", yytext);}
 {COMENT-BLOCO}		{printf("Comentario!! Ignorando: %s\n", yytext); num_lin += contLinha(yytext);}
 

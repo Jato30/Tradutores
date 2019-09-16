@@ -6,9 +6,9 @@ CD = cd
 MAKE = make
 
 
-FLAGS= 
-DFLAGS= -Wall -pedantic -Wextra -ggdb -O0
-PATH= ../170052427/
+FLAGS= -Wall -pedantic -Wextra
+DFLAGS= -ggdb -O0
+PATH= ../Tradutores/
 
 
 #Arquivos que devem ser compilados:
@@ -37,7 +37,8 @@ clean:
 again: clean
 again: all
 
-first: chmod 777 -R $(PATH)
+first:
+	chmod 777 -R $(PATH)
 first: all
 
 
