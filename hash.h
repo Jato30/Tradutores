@@ -34,8 +34,8 @@ int DestroiHash(Hash *tabela);
  * @return Ponteiro para a tabela hash ou NULL se falhar
 */
 Hash *InicializaHash(){
-	//printf("Inicializando tabela hash com tamanho: %d\n", tam);
 	int tam = 1;
+	//printf("Inicializando tabela hash com tamanho: %d\n", tam);
 	
 	if(tam <= 0){
 		return NULL;
@@ -47,7 +47,7 @@ Hash *InicializaHash(){
 		return NULL;
 	}
 
-	// alocate lista de entradas na tabela
+	// aloca lista de entradas na tabela
 	tabela->entradas = malloc(sizeof(entrada_hash*) * tam);
 	if(tabela->entradas == NULL){
 		return NULL;
