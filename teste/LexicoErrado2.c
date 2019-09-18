@@ -10,5 +10,5 @@ int main(){
 		forma1.pts[2].x -= 0.5;
 	}
 	
-	return 0;
+	return 0;/* teste
 }
