@@ -25,8 +25,27 @@ FLEX_FILES= $(wildcard $(PATH)*.l)
 EXEC = exec
 
 
-all: lex.yy.c
-	gcc lex.yy.c
+all:
+	$(MAKE) gramatica
+	$(MAKE) lexico
+	gcc sintatico.tab.c lex.yy.c
+
+gramatica:
+	bison -d sintatico.y
+
+lexico:
+	flex lexico.l
+
+
+#all: lexico
+#	gcc sintatico.tab.c lex.yy.c
+
+#gramatica:
+#	bison -d sintatico.y
+
+#lexico: gramatica
+#lexico:
+#	flex lexico.l
 
 
 $(EXEC): lex.yy.c $(FLEX_FILES)

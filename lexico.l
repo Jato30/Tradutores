@@ -4,26 +4,24 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "./lib/TabSimbolo.h"
-	// #include "sintatico.tab.h"
+	#include "sintatico.tab.h"
 	//#include "hash.h"
 	//Hash tab;
 	int num_char = 0, num_lin = 1;
 	int erro = 0;
-	TabSimbolos tabela;
+	TabSimbolos tabela = NULL;
 	int contLinha(char* text);
 %}
 
 LETRA			[a-zA-Z]
 DIGITO			[0-9]
-NUM				{INT}|{FLOAT}
 
-
-COMENT-ETERNO	"/*"(.|{EOL})*
-COMENT-LINHA	"//".*
-COMENT-BLOCO	"/*"(.|\n)*"*/"
-PALAVRA-CHAVE	if|else|for|float|int|char|shape|point|return
+COMENT_LINHA	"//".*
+COMENT_BLOCO	"/*"(.|\n)*"*/"
+/*COMENT_ETERNO	"/*"(.|\n)**/
+PALAVRA_INSTRUC	if|else|for|return
+TIPO_ESPECIF	float|int|shape|point
 LITERAL			"\"".*"\""
-CHAR			"\'"."\'"
 
 INT				{DIGITO}+
 FLOAT			{INT}"."{DIGITO}+([eE][-+])?{DIGITO}*
@@ -34,184 +32,184 @@ ATROP			"="|"+="|"-="|"*="|"/="|"%="
 ADDOP			"+"|"-"
 MULOP			"*"|"/"
 
-INI-SUBESCRIT	"["
-FIM-SUBESCRIT	"]"
-INI-PARAM		"("
-FIM-PARAM		")"
-INI-INSTRUC		"{"
-FIM-INSTRUC		"}"
+INI_SUBESCRIT	"["
+FIM_SUBESCRIT	"]"
+INI_PARAM		"("
+FIM_PARAM		")"
+INI_INSTRUC		"{"
+FIM_INSTRUC		"}"
 
-FIM-EXPRESS		";"+
-SEPARA-ARG		","
-ACESSO-MEMB		"."|"->"
-ACESSO-END		"&"
+FIM_EXPRESS		";"+
+SEPARA_ARG		","
+ACESSO_MEMB		"."|"->"
+ACESSO_END		"&"
 
 EOL				\n|\r\n
-SEPARADORES		{SEPARA-ARG}|{ACESSO-MEMB}
+SEPARADORES		{SEPARA_ARG}|{ACESSO_MEMB}
 ERRO			{INT}{ID}|{RELOP}{RELOP}+|{ATROP}{ATROP}+|{ADDOP}{ADDOP}+|{MULOP}{MULOP}+|{FLOAT}{FLOAT}+|{SEPARADORES}{SEPARADORES}+
 
 
 %%
 
-{ERRO}			{erro++; num_char += strlen(yytext); printf("\t[ERRO] Entrada invalida: %s linha[%d:%d]\n", yytext, num_lin, num_char);}
+{ERRO} 			{erro++; num_char += strlen(yytext); printf("\t[ERRO] Entrada invalida: %s linha[%d:%d]\n", yytext, num_lin, num_char);}
 
-{PALAVRA-CHAVE}	{
-					printf("Palavra-chave: %s\n", yytext);
+{PALAVRA_INSTRUC} {
+					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
 					insere(&tabela, yytext, num_lin, num_char);
-					return PALAVRA-CHAVE;
+					return (PALAVRA_INSTRUC);
 				}
 
-{LITERAL}		{
+{TIPO_ESPECIF} 	{
+					printf("Tipo de dados: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(yytext, num_lin, num_char);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (TIPO_ESPECIF);
+				}
+
+{LITERAL} 		{
 					printf("String constante: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return LITERAL;
+					return (LITERAL);
 				}
 
-{CHAR}			{
-					printf("Char: %s\n", yytext);
-					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
-					return CHAR;
-				}
-
-
-{INT}			{
+{INT} 			{
 					printf("Inteiro: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
 					insere(&tabela, yytext, num_lin, num_char);
-					return INT;
+					return (INT);
 				}
 
-{FLOAT}			{
+{FLOAT} 		{
 					printf("Float: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
 					insere(&tabela, yytext, num_lin, num_char);
-					return FLOAT;
+					return (FLOAT);
 				}
 
-{ID}			{
+{ID} 			{
 					printf("Identificador: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
 					insere(&tabela, yytext, num_lin, num_char);
-					return ID;
+					return (ID);
 				}
 
 
-{RELOP}			{
+{RELOP} 		{
 					printf("Operador Relacional: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char)
-					return RELOP;
+					insere(&tabela, yytext, num_lin, num_char);
+					return (RELOP);
 				}
 
-{ATROP}			{
+{ATROP} 		{
 					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return ATROP;
+					return (ATROP);
 				}
 
-{ADDOP}			{
+{ADDOP} 		{
 					printf("Operador Adicao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return ADDOP;
+					return (ADDOP);
 				}
 
-{MULOP}			{
+{MULOP} 		{
 					printf("Operador Multiplicacao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return MULOP;
+					return (MULOP);
 				}
 
 
-{INI-SUBESCRIT}	{
+{INI_SUBESCRIT} {
 					printf("Abre colchetes: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return INI-SUBESCRIT;
+					return (INI_SUBESCRIT);
 				}
 
-{FIM-SUBESCRIT}	{
+{FIM_SUBESCRIT} {
 					printf("Fecha colchetes: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return FIM-SUBESCRIT;
+					return (FIM_SUBESCRIT);
 				}
 
-{INI-PARAM}		{
+{INI_PARAM} 	{
 					printf("Inicio de parametro: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return INI-PARAM;
+					return (INI_PARAM);
 				}
 
-{FIM-PARAM}		{
+{FIM_PARAM} 	{
 					printf("Fim de parametro: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return FIM-PARAM;
+					return (FIM_PARAM);
 				}
 
-{INI-INSTRUC}	{
+{INI_INSTRUC} 	{
 					printf("Inicio de instrucao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext,
 					num_lin, num_char);
-					return INI-INSTRUC;
+					return (INI_INSTRUC);
 				}
 
-{FIM-INSTRUC}	{
+{FIM_INSTRUC} 	{
 					printf("Fim de instrucao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return FIM-INSTRUC;
+					return (FIM_INSTRUC);
 				}
 
 
-{FIM-EXPRESS}	{
+{FIM_EXPRESS} 	{
 					printf("Fim de expressao: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char); 
 					insere(&tabela, yytext, num_lin, num_char);
-					return FIM-EXPRESS;
+					return (FIM_EXPRESS);
 				}
 
-{SEPARA-ARG}	{
+{SEPARA_ARG} 	{
 					printf("Separador de argumento: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return SEPARA-ARG;
+					return (SEPARA_ARG);
 				}
 
-{ACESSO-MEMB}	{
+{ACESSO_MEMB} 	{
 					printf("Operador de acesso a membro: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return ACESSO-MEMB;
+					return (ACESSO_MEMB);
 				}
 
-{ACESSO-END}	{
+{ACESSO_END} 	{
 					printf("Operador de acesso a endereco: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return ACESSO-END;
+					return (ACESSO_END);
 				}
 
-{COMENT-LINHA}	{printf("Comentario!! Ignorando: %s\n", yytext);}
-{COMENT-BLOCO}	{printf("Comentario!! Ignorando: %s\n", yytext); num_lin += contLinha(yytext);}
+{COMENT_LINHA} 	{printf("Comentario!! Ignorando: %s\n", yytext);}
+{COMENT_BLOCO} 	{printf("Comentario!! Ignorando: %s\n", yytext); num_lin += contLinha(yytext);}
 
-{EOL}			{num_lin++; num_char = 0;}
-[ \t\r]			;
-{COMENT-ETERNO}	{erro++; printf("\t[ERRO] Comentario nunca finalizado: %s linha[%d:%d]\n", yytext, num_lin, num_char);}
-.				{printf("\t[ERRO] Caractere nao reconhecido: %s linha[%d:%d]\n", yytext, num_lin, ++num_char); erro++;}
+{EOL} 			{num_lin++; num_char = 0;}
+[ \t\r] 		;
+
+. 				{printf("\t[ERRO] Caractere nao reconhecido: %s linha[%d:%d]\n", yytext, num_lin, ++num_char); erro++;}
 
 
 %%
@@ -233,28 +231,31 @@ int contLinha(char* text){
 }
 
 // PARA COMPILAR SEM MAIN, UTILIZE A FLAG -ll (pegar entrada padrao)
-int main(int argc, char** argv){
+// int main(int argc, char** argv){
 
-	if(argc > 1){
-		yyin = fopen( argv[1], "r");
-	}
-	else{
-		yyin = stdin;
-	}
+// 	if(argc > 1){
+// 		yyin = fopen( argv[1], "r");
+// 	}
+// 	else{
+// 		yyin = stdin;
+// 	}
 
-	//InicializaHash(tab);
-	cria(&tabela);
+// 	//InicializaHash(tab);
+// 	cria(&tabela);
 
-	yylex();
+// 	yylex();
 
-	printf("\nNumero total de linhas: %d\n", num_lin);
-	if(erro > 0){
-		printf("Total de erros encontrados: %d\n", erro);
-	}
-	else{
-		printTab(&tabela);
-	}
+// 	printf("\nNumero total de linhas: %d\n", num_lin);
+// 	if(erro > 0){
+// 		printf("Total de erros encontrados: %d\n", erro);
+// 	}
+// 	else{
+// 		printTab(&tabela);
+// 	}
 
-	return 0;
-}
+// 	return 0;
+// }
 
+/*
+{COMENT_ETERNO} {erro++; printf("\t[ERRO] Comentario nunca finalizado: %s linha[%d:%d]\n", yytext, num_lin, num_char);}
+*/

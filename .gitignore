@@ -2,3 +2,6 @@ main
 lex.yy.c
 *.out
 *.exe
+exec
+sintatico.tab.c
+sintatico.tab.h

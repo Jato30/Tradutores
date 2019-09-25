@@ -2,127 +2,145 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "./lib/TabSimbolo.h"
 
 	int yylex();
-%}
+	void yyerror(char const *s);
+	char* myvar;
+%} 
 
-%token COMENT-ETERNO
-%token COMENT-LINHA
-%token COMENT-BLOCO
-%token PALAVRA-CHAVE
+%token TIPO_ESPECIF
+%token PALAVRA_INSTRUC
 %token LITERAL
 %token LETRA
 %token DIGITO
-%token CHAR
 
 %token INT
 %token FLOAT
-%token NUM
 %token ID
 
-%token SEPARADORES
-%token SEPARA-ARG
-%token ACESSO-MEMB
-%token ACESSO-END
-%token FIM-EXPRESS
+%token SEPARA_ARG
+%token ACESSO_MEMB
+%token ACESSO_END
+%token FIM_EXPRESS
 
-%token INI-SUBESCRIT
-%token FIM-SUBESCRIT
-%token INI-PARAM
-%token FIM-PARAM
-%token INI-INSTRUC
-%token FIM-INSTRUC
+%token INI_SUBESCRIT
+%token FIM_SUBESCRIT
+%token INI_PARAM
+%token FIM_PARAM
+%token INI_INSTRUC
+%token FIM_INSTRUC
 
 %token RELOP
 %token ATROP
 %token ADDOP
 %token MULOP
 
-%token EOL
-%token ERRO
-
 
 %%
 
 
-PROGRAMA:
-			LISTA-DECL EOL;
+programa:
+			lista_decl;
 
-LISTA-DECL:
-			LISTA-DECL DECLARACAO | DECLARACAO;
+lista_decl:
+			lista_decl declaracao | declaracao;
 
-DECLARACAO:
-			DECL-VAR | DECL-FUNC;
+declaracao:
+			decl_var | decl_func;
 
-DECL-VAR:
-			TIPO-ESPECIF ID FIM-EXPRESS | TIPO-ESPECIF ID INI-SUBESCRIT INT FIM-SUBESCRIT FIM-EXPRESS;
+decl_var:
+			TIPO_ESPECIF ID FIM_EXPRESS | TIPO_ESPECIF ID INI_SUBESCRIT INT FIM_SUBESCRIT FIM_EXPRESS;
 
-DECL-FUNC:
-			TIPO-ESPECIF ID INI-PARAM PARAMS FIM-PARAM INSTRUC-COMPOSTA;
+decl_func:
+			TIPO_ESPECIF ID INI_PARAM params FIM_PARAM instruc_composta;
 
-TIPO-ESPECIF:
-			int|float|char|shape|point;
+params:
+			/* %empty */ | lista_param;
 
-PARAMS:
-			LISTA-PARAM | ;
+lista_param:
+			lista_param SEPARA_ARG param | param;
 
+param:
+			TIPO_ESPECIF ID | TIPO_ESPECIF ID INI_SUBESCRIT FIM_SUBESCRIT;
 
+instruc_composta:
+			INI_INSTRUC decl_local lista_instruc FIM_INSTRUC;
 
+decl_local:
+			/* %empty */ | decl_local decl_var;
 
+lista_instruc:
+			/* %empty */ | lista_instruc instrucao;
 
-<LISTA-PARAM>→<LISTA-PARAM><SEPARA-ARG><PARAMS>|<PARAMS>
-<PARAM>→<TIPO-ESPECIF>ID|<TIPO-ESPECIF>ID<INI-SUBESCRIT><FIM-SUBESCRIT>
-<INSTRUC-COMPOSTA>→<INI-INSTRUC><DECL-LOCAL><LISTA-INSTRUC><FIM-INSTRUC>
-<DECL-LOCAL>→<DECL-LOCAL> <DECL-VAR>|
-<LISTA-INSTRUC>→<LISTA-INSTRUC> <INSTRUCAO>|<INSTRUCAO>→<INSTRUC-EXPRESS>|<INSTRUC-COMPOSTA>|<INSTRUC-COND>|<INSTRUC-ITERAC>|<INSTRUC-RETURN>
-<INSTRUC-EXPR>→<EXPRESSAO> <FIM-EXPRESS>|<FIM-EXPRESS>
-<INSTRUC-COND>→if<INI-PARAM><EXPRESSAO><FIM-PARAM><INI-INSTRUC><INSTRUCAO><FIM-INSTRUC>|if<INI-PARAM><EXPRESSAO><FIM-PARAM> <INI-INSTRUC> <INSTRUCAO> <FIM-INSTRUC>else<INI-INSTRUC> <INSTRUCAO> <FIM-INSTRUC>
-<INSTRUC-ITERAC>→for<INI-PARAM><EXPRESSAO><FIM-EXPRESS><EXPRESS-SIMP><FIM-EXPRESS><EXPRESSAO><FIM-PARAM><INI-INSTRUC><INSTRUCAO> <FIM-INSTRUC>
-<INSTRUC-RETURN>→return<EXPRESSAO> <FIM-EXPRESS>
-<EXPRESSAO>→<VAR> <ATROP> <EXPRESSAO>|<EXPRESS-SIMP>
-<VAR>→ID|ID<INI-SUBESCRIT> <EXPRESSAO> <FIM-SUBESCRIT>
-<EXPRESS-SIMP>→<EXPRESS-SOMA> <RELOP> <EXPRESS-SOMA>|<EXPRESS-SOMA>
-<EXPRESS-SOMA>→<EXPRESS-SOMA><ADDOP><TERMO>|<TERMO><TERMO>→<TERMO> <MULOP> <FACTOR>|<FACTOR><FACTOR>→<INI-PARAM> <EXPRESSAO> <FIM-PARAM>|<ACESS-END>—<VAR>|<CHAMADA>|<NUM>|<CHAR>|<LITERAL>
-<ADDOP>→+|−
-<MULOP>→ ∗|/
-<CHAMADA>→ID<INI-PARAM> <ARG> <FIM-PARAM>
-<ARG>→<LISTA-ARG>|
-<LISTA-ARG>→<LISTA-ARG><SEPARA-ARG><EXPRESSAO>|<EXPRESSAO>
-<ATROP>→=|+=|-=|*=|/=|%=
-<RELOP>→<|>|!|==|!=|<=|>=|&&|||
-<LETRA>→a|b|c|d|...|x|y|z|A|B|C|D|...|X|Y|Z
-<DIGITO>→0|1|2|3|4|5|6|7|8|9
-<NUM>→INT|FLOAT
-<CHAR>→<INI-CHAR>CARACTERE<FIM-CHAR>
-<INI-SUBESCRIT>→[
-<FIM-SUBESCRIT>→]
-<INI-PARAM>→(
-<FIM-PARAMC>→)
-<INI-INSTRUC>→ {
-<FIM-INSTRUC>→ }
-<INI-STRING>→"
-<FIM-STRING>→"
-<INI-CHAR>→'
-<FIM-CHAR>→'
-<ACESS-MEMB>→.|->
-<ACESS-END>→&<VAR>
-<FIM-EXPRESS>→;
-<SEPARA-ARG>→,
+instrucao:
+			instruc_expr | instruc_composta | instruc_cond | instruc_iterac | instruc_return;
 
-CARACTERE=.
-INT=<DIGITO>+
-FLOAT=INT"."<DIGITO>+( (e|E)(-|+) )?<DIGITO>∗
-LITERAL="CARACTERE∗"
-ID=<LETRA>|(<LETRA>|<DIGITO>|)
+instruc_expr:
+			expressao FIM_EXPRESS | FIM_EXPRESS;
 
+instruc_cond:
+			"if" INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC |
+			"if" INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC "else" INI_INSTRUC instrucao FIM_INSTRUC
+			;
+
+instruc_iterac:
+			"for" INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC;
+
+instruc_return:
+			"return" expressao FIM_EXPRESS;
+
+expressao:
+			var ATROP expressao | express_simp;
+
+var:
+			ID ACESSO_MEMB ID
+			| ID INI_SUBESCRIT expressao FIM_SUBESCRIT
+			| ID
+			;
+
+express_simp:
+			express_soma RELOP express_soma | express_soma;
+
+express_soma:
+			express_soma ADDOP termo | termo;
+
+termo:
+			termo MULOP factor | factor;
+
+factor:
+			INI_PARAM expressao FIM_PARAM | endereco | var | chamada | num | LITERAL;
+
+chamada:
+			ID INI_PARAM arg FIM_PARAM;
+
+arg:
+			/* %empty */ | lista_arg;
+
+lista_arg:
+			lista_arg SEPARA_ARG expressao | expressao;
+
+num:
+			INT { printf("\t\t### SINTATICO:\tint = %d\n", $1); }
+			| FLOAT;
+
+endereco:
+			ACESSO_END var;
 
 
 
 %%
 
-
-int main(){
-	yyparse();
-	return 0;
+void yyerror (char const *s) {
+	fprintf (stderr, "%s\n", s);
 }
+
+int main(int argc, char** argv){
+	yyparse();
+
+	return 0;
+} 
+
+// {printf("IDENTIFICADOR: %s", $1);}
+// {printf("FLOAT: %d\n", $1);} 
+// {printf("INT: %d\n", $1);} 
+// {printf("PT-VIRG: %s\n", $1);} 
