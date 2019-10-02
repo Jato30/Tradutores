@@ -5,7 +5,6 @@
 
 	int yylex();
 	void yyerror(char const *s);
-	char* myvar;
 %} 
 
 %token IF
@@ -68,8 +67,12 @@ programa:
 			;
 
 lista_decl:
-			lista_decl declaracao
-			| declaracao
+			declaracao recursao1
+			;
+
+recursao1:
+			/* %empty */
+			| declaracao recursao1
 			;
 
 declaracao:
@@ -78,8 +81,12 @@ declaracao:
 			;
 
 decl_var:
-			tipo_especif ID FIM_EXPRESS
-			| tipo_especif ID INI_SUBESCRIT INT FIM_SUBESCRIT FIM_EXPRESS
+			tipo_especif ID fatora1
+			;
+
+fatora1:
+			FIM_EXPRESS
+			| INI_SUBESCRIT INTEIRO FIM_SUBESCRIT FIM_EXPRESS
 			;
 
 decl_func:
@@ -104,8 +111,12 @@ lista_param:
 			;
 
 param:
-			tipo_especif ID
-			| tipo_especif ID INI_SUBESCRIT FIM_SUBESCRIT
+			tipo_especif ID fatora2
+			;
+
+fatora2:
+			/* %empty */
+			| INI_SUBESCRIT INTEIRO FIM_SUBESCRIT
 			;
 
 instruc_composta:
@@ -113,14 +124,23 @@ instruc_composta:
 			;
 
 decl_local:
+			recursao2
+			;
+
+recursao2:
 			/* %empty */
-			| decl_local decl_var
+			| decl_var recursao2
 			;
 
 lista_instruc:
-			/* %empty */
-			| lista_instruc instrucao
+			recursao3
 			;
+
+recursao3:
+			/* %empty */
+			| instrucao recursao3
+			;
+
 
 instrucao:
 			instruc_expr
@@ -136,8 +156,12 @@ instruc_expr:
 			;
 
 instruc_cond:
-			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-			| IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora3
+			;
+
+fatora3:
+			/* %empty */
+			| ELSE INI_INSTRUC instrucao FIM_INSTRUC
 			;
 
 instruc_iterac:
@@ -160,18 +184,30 @@ var:
 			;
 
 express_simp:
-			express_soma relop express_soma
-			| express_soma
+			express_soma fatora4
+			;
+
+fatora4:
+			/* %empty */
+			| relop express_soma
 			;
 
 express_soma:
-			express_soma addop termo
-			| termo
+			termo recursao4
+			;
+
+recursao4:
+			/* %empty */
+			| addop termo recursao4
 			;
 
 termo:
-			termo mulop factor
-			| factor
+			factor recursao5
+			;
+
+recursao5:
+			/* %empty */
+			| mulop factor recursao5
 			;
 
 factor:
@@ -193,8 +229,12 @@ arg:
 			;
 
 lista_arg:
-			lista_arg SEPARA_ARG expressao
-			| expressao
+			expressao recursao6
+			;
+
+recursao6:
+			/* %empty */
+			| SEPARA_ARG expressao recursao6
 			;
 
 atrop:
@@ -234,8 +274,8 @@ mulop:
 			;
 
 num:
-			INT { printf("\t\t### SINTATICO:\tint = %d\n", $1); }
-			| FLOAT
+			INTEIRO { printf("\t\t### SINTATICO:\tint = %d\n", $1); }
+			| DECIMAL
 			;
 
 endereco:
