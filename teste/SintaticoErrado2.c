@@ -5,6 +5,10 @@ int main(){
 	point p2;
 	point p3;
 	shape forma;
+	shape forma2;
+	int i;
+	int dentro = 0;
+
 	constroi(&forma, &p1, &p2, &p3);
 	
 	forma.pt[0].x = 1;
@@ -14,7 +18,7 @@ int main(){
 	forma.pt[2].x = 1;
 	forma.pt[2].y = 2;
 
-	shape forma2;
+
 	constroi(&forma2, 4);
 
 	forma2.pt[0].x = 2.49;
@@ -26,8 +30,6 @@ int main(){
 	forma2.pt[3].x = 4.2;
 	forma2.pt[3].y = 1;
 
-	int i;
-	int dentro = 0;
 	for(i = 0; i < forma2.qtd; i++){
 		if(IsIn(forma, forma2.pt[i])){
 			print("Ponto esta dentro");

@@ -33,7 +33,6 @@ INTEIRO			{DIGITO}+
 DECIMAL			{INTEIRO}"."{DIGITO}+([eE][-+])?{DIGITO}*
 ID				({LETRA})+({LETRA}|{DIGITO}|"_")*
 
-RELOP			{LT}|{GT}|{LE}|{GE}|{EQ}|{NE}|{NOT}|{AND}|{OR}
 LT				"<"
 GT				">"
 LE				"<="
@@ -43,21 +42,22 @@ NE				"!="
 NOT				"!"
 AND				"&&"
 OR				"||"
+RELOP			{LT}|{GT}|{LE}|{GE}|{EQ}|{NE}|{NOT}|{AND}|{OR}
 
-ATROP			{ATR}|{PLUS_ATR}|{MINUS_ATR}|{TIMES_ATR}|{OVER_ATR}|{MOD_ATR}
 ATR				"="
 PLUS_ATR		"+="
 MINUS_ATR		"-="
 TIMES_ATR		"*="
 OVER_ATR		"/="
 MOD_ATR			"%="
+ATROP			{ATR}|{PLUS_ATR}|{MINUS_ATR}|{TIMES_ATR}|{OVER_ATR}|{MOD_ATR}
 
-OPERATOR		{PLUS_OP}|{MINUS_OP}|{TIMES_OP}|{OVER_OP}
 PLUS_OP			"+"
 MINUS_OP		"-"
 TIMES_OP		"*"
 OVER_OP			"/"
 MOD_OP			"%"
+OPERATOR		{PLUS_OP}|{MINUS_OP}|{TIMES_OP}|{OVER_OP}
 
 INI_SUBESCRIT	"["
 FIM_SUBESCRIT	"]"
@@ -73,7 +73,7 @@ ACESSO_END		"&"
 
 EOL				\n|\r\n
 SEPARADORES		{SEPARA_ARG}|{ACESSO_MEMB}
-ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{ATROP}{ATROP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{SEPARADORES}{SEPARADORES}+
+ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{SEPARADORES}{SEPARADORES}+
 
 
 %%
@@ -259,7 +259,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{ATROP}{ATROP}+|{OPERATOR}{OPERATOR}+|{DECI
 					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return (ATROP);
+					return (MINUS_ATR);
 				}
 
 {TIMES_ATR} 	{

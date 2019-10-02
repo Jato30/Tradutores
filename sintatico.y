@@ -81,12 +81,12 @@ declaracao:
 			;
 
 decl_var:
-			tipo_especif ID fatora1
+			tipo_especif ID fatora1 FIM_EXPRESS
 			;
 
 fatora1:
-			FIM_EXPRESS
-			| INI_SUBESCRIT INTEIRO FIM_SUBESCRIT FIM_EXPRESS
+			/* %empty */
+			| INI_SUBESCRIT expressao FIM_SUBESCRIT
 			;
 
 decl_func:
@@ -105,10 +105,16 @@ params:
 			| lista_param
 			;
 
+
 lista_param:
-			lista_param SEPARA_ARG param
-			| param
+			param recursao2
 			;
+
+recursao2:
+			/* %empty */
+			| SEPARA_ARG param recursao2
+			;
+
 
 param:
 			tipo_especif ID fatora2
@@ -116,29 +122,32 @@ param:
 
 fatora2:
 			/* %empty */
-			| INI_SUBESCRIT INTEIRO FIM_SUBESCRIT
+			| INI_SUBESCRIT expressao FIM_SUBESCRIT
 			;
+
 
 instruc_composta:
 			INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
 			;
 
+
 decl_local:
-			recursao2
-			;
-
-recursao2:
-			/* %empty */
-			| decl_var recursao2
-			;
-
-lista_instruc:
 			recursao3
 			;
 
 recursao3:
 			/* %empty */
-			| instrucao recursao3
+			| decl_var recursao3
+			;
+
+
+lista_instruc:
+			recursao4
+			;
+
+recursao4:
+			/* %empty */
+			| instrucao recursao4
 			;
 
 
@@ -155,6 +164,7 @@ instruc_expr:
 			| FIM_EXPRESS
 			;
 
+
 instruc_cond:
 			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora3
 			;
@@ -163,6 +173,7 @@ fatora3:
 			/* %empty */
 			| ELSE INI_INSTRUC instrucao FIM_INSTRUC
 			;
+
 
 instruc_iterac:
 			FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
@@ -177,38 +188,52 @@ expressao:
 			| express_simp
 			;
 
-var:
-			ID ACESSO_MEMB ID
-			| ID INI_SUBESCRIT expressao FIM_SUBESCRIT
-			| ID
-			;
 
-express_simp:
-			express_soma fatora4
+var:
+			ID fatora4
 			;
 
 fatora4:
 			/* %empty */
+			| INI_SUBESCRIT expressao FIM_SUBESCRIT fatora5
+			| ACESSO_MEMB var
+			;
+
+fatora5:
+			/* %empty */
+			| ACESSO_MEMB var
+			;
+
+
+express_simp:
+			express_soma fatora6
+			;
+
+fatora6:
+			/* %empty */
 			| relop express_soma
 			;
 
+
 express_soma:
-			termo recursao4
-			;
-
-recursao4:
-			/* %empty */
-			| addop termo recursao4
-			;
-
-termo:
-			factor recursao5
+			termo recursao5
 			;
 
 recursao5:
 			/* %empty */
-			| mulop factor recursao5
+			| addop termo recursao5
 			;
+
+
+termo:
+			factor recursao6
+			;
+
+recursao6:
+			/* %empty */
+			| mulop factor recursao6
+			;
+
 
 factor:
 			INI_PARAM expressao FIM_PARAM
@@ -228,14 +253,16 @@ arg:
 			| lista_arg
 			;
 
+
 lista_arg:
-			expressao recursao6
+			expressao recursao7
 			;
 
-recursao6:
+recursao7:
 			/* %empty */
-			| SEPARA_ARG expressao recursao6
+			| SEPARA_ARG expressao recursao7
 			;
+
 
 atrop:
 			ATR
