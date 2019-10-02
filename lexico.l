@@ -19,18 +19,45 @@ DIGITO			[0-9]
 COMENT_LINHA	"//".*
 COMENT_BLOCO	"/*"(.|\n)*"*/"
 /*COMENT_ETERNO	"/*"(.|\n)**/
-PALAVRA_INSTRUC	if|else|for|return
-TIPO_ESPECIF	float|int|shape|point
+IF				if
+ELSE			else
+FOR				for
+RETURN			return
+INT				int
+FLOAT			float
+POINT			point
+SHAPE			shape
 LITERAL			"\"".*"\""
 
-INT				{DIGITO}+
-FLOAT			{INT}"."{DIGITO}+([eE][-+])?{DIGITO}*
+INTEIRO			{DIGITO}+
+DECIMAL			{INTEIRO}"."{DIGITO}+([eE][-+])?{DIGITO}*
 ID				({LETRA})+({LETRA}|{DIGITO}|"_")*
 
-RELOP			"<"|">"|"<="|">="|"=="|"!="|"!"|"&&"|"||"
-ATROP			"="|"+="|"-="|"*="|"/="|"%="
-ADDOP			"+"|"-"
-MULOP			"*"|"/"
+RELOP			{LT}|{GT}|{LE}|{GE}|{EQ}|{NE}|{NOT}|{AND}|{OR}
+LT				"<"
+GT				">"
+LE				"<="
+GE				">="
+EQ				"=="
+NE				"!="
+NOT				"!"
+AND				"&&"
+OR				"||"
+
+ATROP			{ATR}|{PLUS_ATR}|{MINUS_ATR}|{TIMES_ATR}|{OVER_ATR}|{MOD_ATR}
+ATR				"="
+PLUS_ATR		"+="
+MINUS_ATR		"-="
+TIMES_ATR		"*="
+OVER_ATR		"/="
+MOD_ATR			"%="
+
+OPERATOR		{PLUS_OP}|{MINUS_OP}|{TIMES_OP}|{OVER_OP}
+PLUS_OP			"+"
+MINUS_OP		"-"
+TIMES_OP		"*"
+OVER_OP			"/"
+MOD_OP			"%"
 
 INI_SUBESCRIT	"["
 FIM_SUBESCRIT	"]"
@@ -41,32 +68,80 @@ FIM_INSTRUC		"}"
 
 FIM_EXPRESS		";"+
 SEPARA_ARG		","
-ACESSO_MEMB		"."|"->"
+ACESSO_MEMB		"."
 ACESSO_END		"&"
 
 EOL				\n|\r\n
 SEPARADORES		{SEPARA_ARG}|{ACESSO_MEMB}
-ERRO			{INT}{ID}|{RELOP}{RELOP}+|{ATROP}{ATROP}+|{ADDOP}{ADDOP}+|{MULOP}{MULOP}+|{FLOAT}{FLOAT}+|{SEPARADORES}{SEPARADORES}+
+ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{ATROP}{ATROP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{SEPARADORES}{SEPARADORES}+
 
 
 %%
 
 {ERRO} 			{erro++; num_char += strlen(yytext); printf("\t[ERRO] Entrada invalida: %s linha[%d:%d]\n", yytext, num_lin, num_char);}
 
-{PALAVRA_INSTRUC} {
+{IF} 			{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
 					insere(&tabela, yytext, num_lin, num_char);
-					return (PALAVRA_INSTRUC);
+					return (IF);
 				}
 
-{TIPO_ESPECIF} 	{
+{ELSE} 			{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(yytext, num_lin, num_char);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (ELSE);
+				}
+
+{FOR} 			{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(yytext, num_lin, num_char);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (FOR);
+				}
+
+{RETURN} 		{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(yytext, num_lin, num_char);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (RETURN);
+				}
+
+{INT} 			{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(yytext, num_lin, num_char);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (INT);
+				}
+
+{FLOAT} 		{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(yytext, num_lin, num_char);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (FLOAT);
+				}
+
+{POINT} 		{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
 					insere(&tabela, yytext, num_lin, num_char);
-					return (TIPO_ESPECIF);
+					return (POINT);
+				}
+
+{SHAPE} 		{
+					printf("Tipo de dados: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(yytext, num_lin, num_char);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (SHAPE);
 				}
 
 {LITERAL} 		{
@@ -76,20 +151,21 @@ ERRO			{INT}{ID}|{RELOP}{RELOP}+|{ATROP}{ATROP}+|{ADDOP}{ADDOP}+|{MULOP}{MULOP}+
 					return (LITERAL);
 				}
 
-{INT} 			{
+
+{INTEIRO} 		{
 					printf("Inteiro: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
 					insere(&tabela, yytext, num_lin, num_char);
-					return (INT);
+					return (INTEIRO);
 				}
 
-{FLOAT} 		{
+{DECIMAL} 		{
 					printf("Float: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
 					insere(&tabela, yytext, num_lin, num_char);
-					return (FLOAT);
+					return (DECIMAL);
 				}
 
 {ID} 			{
@@ -101,32 +177,146 @@ ERRO			{INT}{ID}|{RELOP}{RELOP}+|{ATROP}{ATROP}+|{ADDOP}{ADDOP}+|{MULOP}{MULOP}+
 				}
 
 
-{RELOP} 		{
+{LT} 			{
 					printf("Operador Relacional: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return (RELOP);
+					return (LT);
 				}
 
-{ATROP} 		{
+{GT} 			{
+					printf("Operador Relacional: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (GT);
+				}
+
+{LE} 			{
+					printf("Operador Relacional: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (LE);
+				}
+
+{GE} 			{
+					printf("Operador Relacional: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (GE);
+				}
+
+{EQ} 			{
+					printf("Operador Relacional: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (EQ);
+				}
+
+{NE} 			{
+					printf("Operador Relacional: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (NE);
+				}
+
+{NOT} 			{
+					printf("Operador Logico: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (NOT);
+				}
+
+{AND} 			{
+					printf("Operador Logico: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (AND);
+				}
+
+{OR} 			{
+					printf("Operador Logico: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (OR);
+				}
+
+
+{ATR} 			{
+					printf("Operador Atribuicao: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (ATR);
+				}
+
+{PLUS_ATR} 		{
+					printf("Operador Atribuicao: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (PLUS_ATR);
+				}
+
+{MINUS_ATR} 	{
 					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (ATROP);
 				}
 
-{ADDOP} 		{
-					printf("Operador Adicao: %s\n", yytext);
+{TIMES_ATR} 	{
+					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return (ADDOP);
+					return (TIMES_ATR);
 				}
 
-{MULOP} 		{
-					printf("Operador Multiplicacao: %s\n", yytext);
+{OVER_ATR} 		{
+					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
-					return (MULOP);
+					return (OVER_ATR);
+				}
+
+{MOD_ATR} 		{
+					printf("Operador Atribuicao: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (MOD_ATR);
+				}
+
+
+{PLUS_OP} 		{
+					printf("Operador Aditivo: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (PLUS_OP);
+				}
+
+{MINUS_OP} 		{
+					printf("Operador Aditivo: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (MINUS_OP);
+				}
+
+{TIMES_OP} 		{
+					printf("Operador Multiplicativo: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (TIMES_OP);
+				}
+
+{OVER_OP} 		{
+					printf("Operador Multiplicativo: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (OVER_OP);
+				}
+
+{MOD_OP} 		{
+					printf("Operador Multiplicativo: %s\n", yytext);
+					num_char += strlen(yytext);
+					insere(&tabela, yytext, num_lin, num_char);
+					return (MOD_OP);
 				}
 
 

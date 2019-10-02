@@ -8,20 +8,42 @@
 	char* myvar;
 %} 
 
-%token TIPO_ESPECIF
-%token PALAVRA_INSTRUC
-%token LITERAL
-%token LETRA
-%token DIGITO
-
+%token IF
+%token ELSE
+%token FOR
+%token RETURN
 %token INT
 %token FLOAT
+%token POINT
+%token SHAPE
+%token LITERAL
+
+%token INTEIRO
+%token DECIMAL
 %token ID
 
-%token SEPARA_ARG
-%token ACESSO_MEMB
-%token ACESSO_END
-%token FIM_EXPRESS
+%token LT
+%token GT
+%token LE
+%token GE
+%token EQ
+%token NE
+%token NOT
+%token AND
+%token OR
+
+%token ATR
+%token PLUS_ATR
+%token MINUS_ATR
+%token TIMES_ATR
+%token OVER_ATR
+%token MOD_ATR
+
+%token PLUS_OP
+%token MINUS_OP
+%token TIMES_OP
+%token OVER_OP
+%token MOD_OP
 
 %token INI_SUBESCRIT
 %token FIM_SUBESCRIT
@@ -30,67 +52,106 @@
 %token INI_INSTRUC
 %token FIM_INSTRUC
 
-%token RELOP
-%token ATROP
-%token ADDOP
-%token MULOP
+%token FIM_EXPRESS
+%token SEPARA_ARG
+%token ACESSO_MEMB
+%token ACESSO_END
+
+
 
 
 %%
 
 
 programa:
-			lista_decl;
+			lista_decl
+			;
 
 lista_decl:
-			lista_decl declaracao | declaracao;
+			lista_decl declaracao
+			| declaracao
+			;
 
 declaracao:
-			decl_var | decl_func;
+			decl_var
+			| decl_func
+			;
 
 decl_var:
-			TIPO_ESPECIF ID FIM_EXPRESS | TIPO_ESPECIF ID INI_SUBESCRIT INT FIM_SUBESCRIT FIM_EXPRESS;
+			tipo_especif ID FIM_EXPRESS
+			| tipo_especif ID INI_SUBESCRIT INT FIM_SUBESCRIT FIM_EXPRESS
+			;
 
 decl_func:
-			TIPO_ESPECIF ID INI_PARAM params FIM_PARAM instruc_composta;
+			tipo_especif ID INI_PARAM params FIM_PARAM instruc_composta
+			;
+
+tipo_especif:
+			INT
+			| FLOAT
+			| POINT
+			| SHAPE
+			;
 
 params:
-			/* %empty */ | lista_param;
+			/* %empty */
+			| lista_param
+			;
 
 lista_param:
-			lista_param SEPARA_ARG param | param;
+			lista_param SEPARA_ARG param
+			| param
+			;
 
 param:
-			TIPO_ESPECIF ID | TIPO_ESPECIF ID INI_SUBESCRIT FIM_SUBESCRIT;
+			tipo_especif ID
+			| tipo_especif ID INI_SUBESCRIT FIM_SUBESCRIT
+			;
 
 instruc_composta:
-			INI_INSTRUC decl_local lista_instruc FIM_INSTRUC;
+			INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
+			;
 
 decl_local:
-			/* %empty */ | decl_local decl_var;
+			/* %empty */
+			| decl_local decl_var
+			;
 
 lista_instruc:
-			/* %empty */ | lista_instruc instrucao;
+			/* %empty */
+			| lista_instruc instrucao
+			;
 
 instrucao:
-			instruc_expr | instruc_composta | instruc_cond | instruc_iterac | instruc_return;
+			instruc_expr
+			| instruc_composta
+			| instruc_cond
+			| instruc_iterac
+			| instruc_return
+			;
 
 instruc_expr:
-			expressao FIM_EXPRESS | FIM_EXPRESS;
+			expressao FIM_EXPRESS
+			| FIM_EXPRESS
+			;
 
 instruc_cond:
-			"if" INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC |
-			"if" INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC "else" INI_INSTRUC instrucao FIM_INSTRUC
+			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+			| IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
 			;
 
 instruc_iterac:
-			"for" INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC;
+			FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+			;
 
 instruc_return:
-			"return" expressao FIM_EXPRESS;
+			RETURN expressao FIM_EXPRESS
+			;
 
 expressao:
-			var ATROP expressao | express_simp;
+			var atrop expressao
+			| express_simp
+			;
 
 var:
 			ID ACESSO_MEMB ID
@@ -99,32 +160,87 @@ var:
 			;
 
 express_simp:
-			express_soma RELOP express_soma | express_soma;
+			express_soma relop express_soma
+			| express_soma
+			;
 
 express_soma:
-			express_soma ADDOP termo | termo;
+			express_soma addop termo
+			| termo
+			;
 
 termo:
-			termo MULOP factor | factor;
+			termo mulop factor
+			| factor
+			;
 
 factor:
-			INI_PARAM expressao FIM_PARAM | endereco | var | chamada | num | LITERAL;
+			INI_PARAM expressao FIM_PARAM
+			| endereco
+			| var
+			| chamada
+			| num
+			| LITERAL
+			;
 
 chamada:
-			ID INI_PARAM arg FIM_PARAM;
+			ID INI_PARAM arg FIM_PARAM
+			;
 
 arg:
-			/* %empty */ | lista_arg;
+			/* %empty */
+			| lista_arg
+			;
 
 lista_arg:
-			lista_arg SEPARA_ARG expressao | expressao;
+			lista_arg SEPARA_ARG expressao
+			| expressao
+			;
+
+atrop:
+			ATR
+			| PLUS_ATR
+			| MINUS_ATR
+			| TIMES_ATR
+			| OVER_ATR
+			| MOD_ATR
+			;
+
+relop:
+			LT
+			| GT
+			| LE
+			| GE
+			| EQ
+			| NE
+			| logop
+			;
+
+logop:
+			NOT
+			| AND
+			| OR
+			;
+
+addop:
+			PLUS_OP
+			| MINUS_OP
+			;
+
+mulop:
+			TIMES_OP
+			| OVER_OP
+			| MOD_OP
+			;
 
 num:
 			INT { printf("\t\t### SINTATICO:\tint = %d\n", $1); }
-			| FLOAT;
+			| FLOAT
+			;
 
 endereco:
-			ACESSO_END var;
+			ACESSO_END var
+			;
 
 
 
