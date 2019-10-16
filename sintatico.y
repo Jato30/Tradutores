@@ -36,16 +36,12 @@
 %token MINUS_ATR
 %token TIMES_ATR
 %token OVER_ATR
-%token MOD_ATR
 
 %token PLUS_OP
 %token MINUS_OP
 %token TIMES_OP
 %token OVER_OP
-%token MOD_OP
 
-%token INI_SUBESCRIT
-%token FIM_SUBESCRIT
 %token INI_PARAM
 %token FIM_PARAM
 %token INI_INSTRUC
@@ -53,7 +49,6 @@
 
 %token FIM_EXPRESS
 %token SEPARA_ARG
-%token ACESSO_MEMB
 %token ACESSO_END
 
 
@@ -81,12 +76,7 @@ declaracao:
 			;
 
 decl_var:
-			tipo_especif ID fatora1 FIM_EXPRESS
-			;
-
-fatora1:
-			/* %empty */
-			| INI_SUBESCRIT expressao FIM_SUBESCRIT
+			tipo_especif ID FIM_EXPRESS
 			;
 
 decl_func:
@@ -117,14 +107,8 @@ recursao2:
 
 
 param:
-			tipo_especif ID fatora2
+			tipo_especif ID 
 			;
-
-fatora2:
-			/* %empty */
-			| INI_SUBESCRIT expressao FIM_SUBESCRIT
-			;
-
 
 instruc_composta:
 			INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
@@ -166,10 +150,10 @@ instruc_expr:
 
 
 instruc_cond:
-			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora3
+			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
 			;
 
-fatora3:
+fatora1:
 			/* %empty */
 			| ELSE INI_INSTRUC instrucao FIM_INSTRUC
 			;
@@ -190,26 +174,14 @@ expressao:
 
 
 var:
-			ID fatora4
+			ID
 			;
-
-fatora4:
-			/* %empty */
-			| INI_SUBESCRIT expressao FIM_SUBESCRIT fatora5
-			| ACESSO_MEMB var
-			;
-
-fatora5:
-			/* %empty */
-			| ACESSO_MEMB var
-			;
-
 
 express_simp:
-			express_soma fatora6
+			express_soma fatora2
 			;
 
-fatora6:
+fatora2:
 			/* %empty */
 			| relop express_soma
 			;
@@ -270,7 +242,6 @@ atrop:
 			| MINUS_ATR
 			| TIMES_ATR
 			| OVER_ATR
-			| MOD_ATR
 			;
 
 relop:
@@ -297,7 +268,6 @@ addop:
 mulop:
 			TIMES_OP
 			| OVER_OP
-			| MOD_OP
 			;
 
 num:

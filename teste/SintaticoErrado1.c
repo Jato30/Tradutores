@@ -2,30 +2,27 @@
 int main(){
 	int i;
 	point um;
-	um.x = 1;
-	um.y = 1;
+	constroiPoint(&um, 1, 1);
 
 	/* Inicia os pontos
 	Cada ponto com coord diferentes
 	:) */
 	point dois, tres, quatro;
-	dois.x = 1;
-	dois.y = 2;
-	if(tres.x <= quatro.y){
-		um.x = 1;
-		um.y = 2;
+	constroiPoint(&dois, 1.0, 2.0);
+	if(42 <= -59.3){
+		constroiPoint(&um, 1.0, 2.0);
 	}
 	else{
-		um.x = 1.5;
-		um.y = 1;
+		constroiPoint(&um, 1.5, 1.0);
 	}
-	tres.x = 2;
-	tres.y = 2;// comentario\n
+	constroiPoint(&tres, 2.0, 2.0);// comentario\n
 	//cria shape
 	shape ret;
-	constroi(&ret, um, dois, tres);
+	constroiShape(&forma, um);
+	constroiShape(&forma, dois);
+	constroiShape(&forma, tres);
 
-	print("O perimetro da forma criada eh: %.3f\n", Perimetro(ret));
+	printFloat("O perimetro da forma criada eh: \n", Perimetro(ret));
 
 	return 0;
 }

@@ -3,38 +3,35 @@ int main(){
 
 	point p1;
 	point p2;
-	point p3;
+	point p3, p4;
 	shape forma;
 	shape forma2;
 	int i;
 	int dentro = 0;
 
-	constroi(&forma, &p1, &p2, &p3);
-	
-	forma.pt[0].x = 1;
-	forma.pt[0].y = 1;
-	forma.pt[1].x = 2.5;
-	forma.pt[1].y = 2;
-	forma.pt[2].x = 1;
-	forma.pt[2].y = 2;
+
+	constroiPoint(&p1, 1.0, 1.0);
+	constroiPoint(&p2, 2.5, 2.0);
+	constroiPoint(&p3, 1.0, 2);
+	constroiShape(&forma, p1);
+	constroiShape(&forma, p2);
+	constroiShape(&forma, p3);
 
 
-	constroi(&forma2, 4);
+	constroiPoint(&p1, 2.49, 1.0);
+	constroiPoint(&p2, 2.49, 3.5);
+	constroiPoint(&p3, 4.2, 3.5);
+	constroiPoint(&p4, 4.2, 1);
+	constroiShape(&forma, p1);
+	constroiShape(&forma, p2);
+	constroiShape(&forma, p3);
+	constroiShape(&forma, p4);
 
-	forma2.pt[0].x = 2.49;
-	forma2.pt[0].y = 1;
-	forma2.pt[1].x = 2.49;
-	forma2.pt[1].y = 3.5;
-	forma2.pt[2].x = 4.2;
-	forma2.pt[2].y = 3.5;
-	forma2.pt[3].x = 4.2;
-	forma2.pt[3].y = 1;
-
-	for(i = 0; i < forma2.qtd; i++){
-		if(IsIn(forma, forma2.pt[i])){
-			print("Ponto esta dentro");
+	for(i = 0; i < forma2; i++){
+		if(IsIn(forma, p1 + i)){
+			printPoint("Ponto esta dentro", p1);
 			dentro = 1;
-			i = forma2.qtd;
+			i = forma2 - Perimetro)qtd(;
 			print("Ponto esta dentro, saindo do loop...");
 		}
 		else{

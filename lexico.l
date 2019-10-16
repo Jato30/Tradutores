@@ -49,18 +49,14 @@ PLUS_ATR		"+="
 MINUS_ATR		"-="
 TIMES_ATR		"*="
 OVER_ATR		"/="
-MOD_ATR			"%="
-ATROP			{ATR}|{PLUS_ATR}|{MINUS_ATR}|{TIMES_ATR}|{OVER_ATR}|{MOD_ATR}
+ATROP			{ATR}|{PLUS_ATR}|{MINUS_ATR}|{TIMES_ATR}|{OVER_ATR}
 
 PLUS_OP			"+"
 MINUS_OP		"-"
 TIMES_OP		"*"
 OVER_OP			"/"
-MOD_OP			"%"
 OPERATOR		{PLUS_OP}|{MINUS_OP}|{TIMES_OP}|{OVER_OP}
 
-INI_SUBESCRIT	"["
-FIM_SUBESCRIT	"]"
 INI_PARAM		"("
 FIM_PARAM		")"
 INI_INSTRUC		"{"
@@ -68,12 +64,10 @@ FIM_INSTRUC		"}"
 
 FIM_EXPRESS		";"+
 SEPARA_ARG		","
-ACESSO_MEMB		"."
 ACESSO_END		"&"
 
 EOL				\n|\r\n
-SEPARADORES		{SEPARA_ARG}|{ACESSO_MEMB}
-ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{SEPARADORES}{SEPARADORES}+
+ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{SEPARA_ARG}{SEPARA_ARG}+
 
 
 %%
@@ -276,13 +270,6 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					return (OVER_ATR);
 				}
 
-{MOD_ATR} 		{
-					printf("Operador Atribuicao: %s\n", yytext);
-					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
-					return (MOD_ATR);
-				}
-
 
 {PLUS_OP} 		{
 					printf("Operador Aditivo: %s\n", yytext);
@@ -312,27 +299,6 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					return (OVER_OP);
 				}
 
-{MOD_OP} 		{
-					printf("Operador Multiplicativo: %s\n", yytext);
-					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
-					return (MOD_OP);
-				}
-
-
-{INI_SUBESCRIT} {
-					printf("Abre colchetes: %s\n", yytext);
-					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
-					return (INI_SUBESCRIT);
-				}
-
-{FIM_SUBESCRIT} {
-					printf("Fecha colchetes: %s\n", yytext);
-					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
-					return (FIM_SUBESCRIT);
-				}
 
 {INI_PARAM} 	{
 					printf("Inicio de parametro: %s\n", yytext);
@@ -377,13 +343,6 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					num_char += strlen(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (SEPARA_ARG);
-				}
-
-{ACESSO_MEMB} 	{
-					printf("Operador de acesso a membro: %s\n", yytext);
-					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
-					return (ACESSO_MEMB);
 				}
 
 {ACESSO_END} 	{

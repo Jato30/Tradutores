@@ -3,19 +3,20 @@ int main(){
 
 	shape forma;
 	int per;
+	point pt1;
+	point pt2;
+	point pt3;
 
-	constroi(&forma, 3);
-	
-	forma.pt[0].x = 1;
-	forma.pt[0].y = 1;
-	forma.pt[1].x = 1.5;
-	forma.pt[1].y = 1.5;
-	forma.pt[2].x = 0.2;
-	forma.pt[2].y = 0.1;
+	constroiPoint(&pt1, 1.0, 1.0);
+	constroiPoint(&pt2, 1.5, 1.5);
+	constroiPoint(&pt3, 0.2, 0.1);
+	constroiShape(&forma, pt1);
+	constroiShape(&forma, pt2);
+	constroiShape(&forma, pt3);
 
 	per = Perimetro(forma);
 	if(per != 3.71293){
-		print("perimetro = %f", per);
+		printFloat("perimetro = ", per);
 	}
 
 	return 0;
