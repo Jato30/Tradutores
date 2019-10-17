@@ -7,7 +7,7 @@ int main(){
 	point pt2;
 	point pt3;
 
-	constroiPoint(&pt1, 1.0, 1.0);
+	constroiPoint(&pt1, 1.0, 1);
 	constroiPoint(&pt2, 1.5, 1.5);
 	constroiPoint(&pt3, 0.2, 0.1);
 	constroiShape(&forma, pt1);

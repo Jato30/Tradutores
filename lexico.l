@@ -9,8 +9,8 @@
 	//Hash tab;
 	int num_char = 0, num_lin = 1;
 	int erro = 0;
-	TabSimbolos tabela = NULL;
 	int contLinha(char* text);
+	TabSimbolos tabela = NULL;
 %}
 
 LETRA			[a-zA-Z]
@@ -18,6 +18,7 @@ DIGITO			[0-9]
 
 COMENT_LINHA	"//".*
 COMENT_BLOCO	"/*"(.|\n)*"*/"
+LITERAL			"\"".*"\""
 /*COMENT_ETERNO	"/*"(.|\n)**/
 IF				if
 ELSE			else
@@ -27,7 +28,6 @@ INT				int
 FLOAT			float
 POINT			point
 SHAPE			shape
-LITERAL			"\"".*"\""
 
 INTEIRO			{DIGITO}+
 DECIMAL			{INTEIRO}"."{DIGITO}+([eE][-+])?{DIGITO}*
@@ -141,6 +141,8 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {LITERAL} 		{
 					printf("String constante: %s\n", yytext);
 					num_char += strlen(yytext);
+					yylval.LITERAL = (char*) malloc(sizeof(char) * strlen(yytext));
+					strcpy(yylval.LITERAL, yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (LITERAL);
 				}
@@ -150,6 +152,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Inteiro: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
+					yylval.INTEIRO = atoi(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (INTEIRO);
 				}
@@ -158,6 +161,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Float: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
+					yylval.DECIMAL = atof(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (DECIMAL);
 				}
@@ -166,6 +170,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Identificador: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
+					strcpy(yylval.ID, yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (ID);
 				}

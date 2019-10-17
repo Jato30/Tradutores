@@ -26,9 +26,10 @@ EXEC = exec
 
 
 all:
-	$(MAKE) gramatica
-	$(MAKE) lexico
-	gcc sintatico.tab.c lex.yy.c
+	clear
+	bison -dv sintatico.y --report=all
+	flex -l lexico.l
+	gcc sintatico.tab.c lex.yy.c -o exec -lfl
 
 gramatica:
 	bison -d sintatico.y

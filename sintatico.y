@@ -4,7 +4,25 @@
 	#include <stdlib.h>
 
 	int yylex();
+
+	typedef struct Expressao Expressao;
+	Expressao* novaExpr(Expressao* esq, Expressao* dir, char op, int val);
+	void printArvore(Expressao *raiz, int tabs);
+	void destroiArvore(Expressao *raiz);
+	void novaFolhaFloat(double val);
+	void novaFolhaInt(int val);
+	void novaFolhaText(char* val);
+	
 	void yyerror(char const *s);
+
+	struct Expressao{
+		Expressao *esquerda;
+		Expressao *direita;
+		char op;
+		int valor;
+	};
+
+	Expressao* raiz;
 %} 
 
 %token IF
@@ -52,6 +70,19 @@
 %token ACESSO_END
 
 
+%union{
+	int INTEIRO;
+	double DECIMAL;
+	char ID[33];
+	char* LITERAL;
+}
+
+
+%type <num> DECIMAL
+
+
+%start programa
+
 
 
 %%
@@ -69,6 +100,7 @@ recursao1:
 			/* %empty */
 			| declaracao recursao1
 			;
+
 
 declaracao:
 			decl_var
@@ -213,7 +245,9 @@ factor:
 			| var
 			| chamada
 			| num
-			| LITERAL
+			| LITERAL {
+				novaFolhaText(yylval.LITERAL);
+			}
 			;
 
 chamada:
@@ -237,42 +271,84 @@ recursao7:
 
 
 atrop:
-			ATR
-			| PLUS_ATR
-			| MINUS_ATR
-			| TIMES_ATR
-			| OVER_ATR
+			ATR {
+				novaFolhaText("=");
+			}
+			| PLUS_ATR {
+				novaFolhaText("+=");
+			}
+			| MINUS_ATR {
+				novaFolhaText("-=");
+			}
+			| TIMES_ATR {
+				novaFolhaText("*=");
+			}
+			| OVER_ATR {
+				novaFolhaText("/=");
+			}
 			;
 
 relop:
-			LT
-			| GT
-			| LE
-			| GE
-			| EQ
-			| NE
+			LT {
+				novaFolhaText("<");
+			}
+			| GT {
+				novaFolhaText(">");
+			}
+			| LE {
+				novaFolhaText("<=");
+			}
+			| GE {
+				novaFolhaText(">=");
+			}
+			| EQ {
+				novaFolhaText("==");
+			}
+			| NE {
+				novaFolhaText("!=");
+			}
 			| logop
 			;
 
 logop:
-			NOT
-			| AND
-			| OR
+			NOT {
+				novaFolhaText("!");
+			}
+			| AND {
+				novaFolhaText("&&");
+			}
+			| OR {
+				novaFolhaText("||");
+			}
 			;
 
 addop:
-			PLUS_OP
-			| MINUS_OP
+			PLUS_OP {
+				novaFolhaText("+");
+			}
+			| MINUS_OP {
+				novaFolhaText("-");
+			}
 			;
 
 mulop:
-			TIMES_OP
-			| OVER_OP
+			TIMES_OP {
+				novaFolhaText("*");
+			}
+			| OVER_OP {
+				novaFolhaText("/");
+			}
 			;
 
 num:
-			INTEIRO { printf("\t\t### SINTATICO:\tint = %d\n", $1); }
-			| DECIMAL
+			INTEIRO {
+				
+				novaFolhaInt(yylval.INTEIRO);
+			}
+			| DECIMAL {
+				
+				novaFolhaFloat(yylval.DECIMAL);
+			}
 			;
 
 endereco:
@@ -283,17 +359,64 @@ endereco:
 
 %%
 
-void yyerror (char const *s) {
-	fprintf (stderr, "%s\n", s);
+
+Expressao* novaExpr(Expressao* esq, Expressao* dir, char op, int val){
+	Expressao *exp = (Expressao*) malloc(sizeof(Expressao));
+	exp->esquerda = esq;
+	exp->direita = dir;
+	exp->op = op;
+	exp->valor = val;
+	return exp;
 }
 
-int main(int argc, char** argv){
+void printArvore(Expressao *raiz, int tabs){
+	int i;
+	for(i = 0; i < tabs; ++i){
+		printf("  ");
+	}
+	if(raiz->op) {
+		printf("%c{\n", raiz->op);
+		printArvore(raiz->esquerda, tabs + 1);
+		printArvore(raiz->direita, tabs + 1);
+		for(i = 0; i < tabs; ++i){
+			printf("  ");
+		}
+		printf("}\n");
+	}
+	else{
+		printf("%d\n", raiz->valor);
+	}
+}
+
+void destroiArvore(Expressao *raiz){
+	if(raiz->esquerda){
+		destroiArvore(raiz->esquerda);
+	}
+	if(raiz->direita){
+		destroiArvore(raiz->direita);
+	}
+	free(raiz);
+}
+
+void novaFolhaFloat(double val){
+
+}
+
+void novaFolhaInt(int val){
+
+}
+
+void novaFolhaText(char* val){
+
+}
+
+void yyerror(char const *s){
+	fprintf(stderr, "%s\n", s);
+}
+
+int main(void){
 	yyparse();
 
 	return 0;
-} 
+}
 
-// {printf("IDENTIFICADOR: %s", $1);}
-// {printf("FLOAT: %d\n", $1);} 
-// {printf("INT: %d\n", $1);} 
-// {printf("PT-VIRG: %s\n", $1);} 
