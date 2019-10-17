@@ -4,10 +4,10 @@ Grammar
 
     1 programa: lista_decl
 
-    2 lista_decl: declaracao recursao1
+    2 lista_decl: declaracao rec_decls
 
-    3 recursao1: %empty
-    4          | declaracao recursao1
+    3 rec_decls: %empty
+    4          | declaracao rec_decls
 
     5 declaracao: decl_var
     6           | decl_func
@@ -24,24 +24,24 @@ Grammar
    13 params: %empty
    14       | lista_param
 
-   15 lista_param: param recursao2
+   15 lista_param: param rec_paramlist
 
-   16 recursao2: %empty
-   17          | SEPARA_ARG param recursao2
+   16 rec_paramlist: %empty
+   17              | SEPARA_ARG param rec_paramlist
 
    18 param: tipo_especif ID
 
    19 instruc_composta: INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
 
-   20 decl_local: recursao3
+   20 decl_local: rec_declocs
 
-   21 recursao3: %empty
-   22          | decl_var recursao3
+   21 rec_declocs: %empty
+   22            | decl_var rec_declocs
 
-   23 lista_instruc: recursao4
+   23 lista_instruc: rec_instrucs
 
-   24 recursao4: %empty
-   25          | instrucao recursao4
+   24 rec_instrucs: %empty
+   25             | instrucao rec_instrucs
 
    26 instrucao: instruc_expr
    27          | instruc_composta
@@ -52,10 +52,10 @@ Grammar
    31 instruc_expr: expressao FIM_EXPRESS
    32             | FIM_EXPRESS
 
-   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
 
-   34 fatora1: %empty
-   35        | ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   34 fat_if: %empty
+   35       | ELSE INI_INSTRUC instrucao FIM_INSTRUC
 
    36 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
 
@@ -66,20 +66,20 @@ Grammar
 
    40 var: ID
 
-   41 express_simp: express_soma fatora2
+   41 express_simp: express_soma fat_express
 
-   42 fatora2: %empty
-   43        | relop express_soma
+   42 fat_express: %empty
+   43            | relop express_soma
 
-   44 express_soma: termo recursao5
+   44 express_soma: termo rec_plusexpress
 
-   45 recursao5: %empty
-   46          | addop termo recursao5
+   45 rec_plusexpress: %empty
+   46                | addop termo rec_plusexpress
 
-   47 termo: factor recursao6
+   47 termo: factor rec_timesexpress
 
-   48 recursao6: %empty
-   49          | mulop factor recursao6
+   48 rec_timesexpress: %empty
+   49                 | mulop factor rec_timesexpress
 
    50 factor: INI_PARAM expressao FIM_PARAM
    51       | endereco
@@ -88,44 +88,44 @@ Grammar
    54       | num
    55       | LITERAL
 
-   56 chamada: ID INI_PARAM arg FIM_PARAM
+   56 endereco: ACESSO_END var
 
-   57 arg: %empty
-   58    | lista_arg
+   57 chamada: ID INI_PARAM arg FIM_PARAM
 
-   59 lista_arg: expressao recursao7
+   58 arg: %empty
+   59    | lista_arg
 
-   60 recursao7: %empty
-   61          | SEPARA_ARG expressao recursao7
+   60 lista_arg: expressao rec_args
 
-   62 atrop: ATR
-   63      | PLUS_ATR
-   64      | MINUS_ATR
-   65      | TIMES_ATR
-   66      | OVER_ATR
+   61 rec_args: %empty
+   62         | SEPARA_ARG expressao rec_args
 
-   67 relop: LT
-   68      | GT
-   69      | LE
-   70      | GE
-   71      | EQ
-   72      | NE
-   73      | logop
+   63 atrop: ATR
+   64      | PLUS_ATR
+   65      | MINUS_ATR
+   66      | TIMES_ATR
+   67      | OVER_ATR
 
-   74 logop: NOT
-   75      | AND
-   76      | OR
+   68 relop: LT
+   69      | GT
+   70      | LE
+   71      | GE
+   72      | EQ
+   73      | NE
+   74      | logop
 
-   77 addop: PLUS_OP
-   78      | MINUS_OP
+   75 logop: NOT
+   76      | AND
+   77      | OR
 
-   79 mulop: TIMES_OP
-   80      | OVER_OP
+   78 addop: PLUS_OP
+   79      | MINUS_OP
 
-   81 num: INTEIRO
-   82    | DECIMAL
+   80 mulop: TIMES_OP
+   81      | OVER_OP
 
-   83 endereco: ACESSO_END var
+   82 num: INTEIRO
+   83    | DECIMAL
 
 
 Terminals, with rules where they appear
@@ -141,34 +141,34 @@ FLOAT (263) 10
 POINT (264) 11
 SHAPE (265) 12
 LITERAL (266) 55
-INTEIRO (267) 81
-DECIMAL (268) 82
-ID (269) 7 8 18 40 56
-LT (270) 67
-GT (271) 68
-LE (272) 69
-GE (273) 70
-EQ (274) 71
-NE (275) 72
-NOT (276) 74
-AND (277) 75
-OR (278) 76
-ATR (279) 62
-PLUS_ATR (280) 63
-MINUS_ATR (281) 64
-TIMES_ATR (282) 65
-OVER_ATR (283) 66
-PLUS_OP (284) 77
-MINUS_OP (285) 78
-TIMES_OP (286) 79
-OVER_OP (287) 80
-INI_PARAM (288) 8 33 36 50 56
-FIM_PARAM (289) 8 33 36 50 56
+INTEIRO (267) 82
+DECIMAL (268) 83
+ID (269) 7 8 18 40 57
+LT (270) 68
+GT (271) 69
+LE (272) 70
+GE (273) 71
+EQ (274) 72
+NE (275) 73
+NOT (276) 75
+AND (277) 76
+OR (278) 77
+ATR (279) 63
+PLUS_ATR (280) 64
+MINUS_ATR (281) 65
+TIMES_ATR (282) 66
+OVER_ATR (283) 67
+PLUS_OP (284) 78
+MINUS_OP (285) 79
+TIMES_OP (286) 80
+OVER_OP (287) 81
+INI_PARAM (288) 8 33 36 50 57
+FIM_PARAM (289) 8 33 36 50 57
 INI_INSTRUC (290) 19 33 35 36
 FIM_INSTRUC (291) 19 33 35 36
 FIM_EXPRESS (292) 7 31 32 36 37
-SEPARA_ARG (293) 17 61
-ACESSO_END (294) 83
+SEPARA_ARG (293) 17 62
+ACESSO_END (294) 56
 
 
 Nonterminals, with rules where they appear
@@ -179,7 +179,7 @@ programa (41)
     on left: 1, on right: 0
 lista_decl (42)
     on left: 2, on right: 1
-recursao1 (43)
+rec_decls (43)
     on left: 3 4, on right: 2 4
 declaracao (44)
     on left: 5 6, on right: 2 4
@@ -193,7 +193,7 @@ params (48)
     on left: 13 14, on right: 8
 lista_param (49)
     on left: 15, on right: 14
-recursao2 (50)
+rec_paramlist (50)
     on left: 16 17, on right: 15 17
 param (51)
     on left: 18, on right: 15 17
@@ -201,11 +201,11 @@ instruc_composta (52)
     on left: 19, on right: 8 27
 decl_local (53)
     on left: 20, on right: 19
-recursao3 (54)
+rec_declocs (54)
     on left: 21 22, on right: 20 22
 lista_instruc (55)
     on left: 23, on right: 19
-recursao4 (56)
+rec_instrucs (56)
     on left: 24 25, on right: 23 25
 instrucao (57)
     on left: 26 27 28 29 30, on right: 25 33 35 36
@@ -213,59 +213,59 @@ instruc_expr (58)
     on left: 31 32, on right: 26
 instruc_cond (59)
     on left: 33, on right: 28
-fatora1 (60)
+fat_if (60)
     on left: 34 35, on right: 33
 instruc_iterac (61)
     on left: 36, on right: 29
 instruc_return (62)
     on left: 37, on right: 30
 expressao (63)
-    on left: 38 39, on right: 31 33 36 37 38 50 59 61
+    on left: 38 39, on right: 31 33 36 37 38 50 60 62
 var (64)
-    on left: 40, on right: 38 52 83
+    on left: 40, on right: 38 52 56
 express_simp (65)
     on left: 41, on right: 36 39
-fatora2 (66)
+fat_express (66)
     on left: 42 43, on right: 41
 express_soma (67)
     on left: 44, on right: 41 43
-recursao5 (68)
+rec_plusexpress (68)
     on left: 45 46, on right: 44 46
 termo (69)
     on left: 47, on right: 44 46
-recursao6 (70)
+rec_timesexpress (70)
     on left: 48 49, on right: 47 49
 factor (71)
     on left: 50 51 52 53 54 55, on right: 47 49
-chamada (72)
-    on left: 56, on right: 53
-arg (73)
-    on left: 57 58, on right: 56
-lista_arg (74)
-    on left: 59, on right: 58
-recursao7 (75)
-    on left: 60 61, on right: 59 61
-atrop (76)
-    on left: 62 63 64 65 66, on right: 38
-relop (77)
-    on left: 67 68 69 70 71 72 73, on right: 43
-logop (78)
-    on left: 74 75 76, on right: 73
-addop (79)
-    on left: 77 78, on right: 46
-mulop (80)
-    on left: 79 80, on right: 49
-num (81)
-    on left: 81 82, on right: 54
-endereco (82)
-    on left: 83, on right: 51
+endereco (72)
+    on left: 56, on right: 51
+chamada (73)
+    on left: 57, on right: 53
+arg (74)
+    on left: 58 59, on right: 57
+lista_arg (75)
+    on left: 60, on right: 59
+rec_args (76)
+    on left: 61 62, on right: 60 62
+atrop (77)
+    on left: 63 64 65 66 67, on right: 38
+relop (78)
+    on left: 68 69 70 71 72 73 74, on right: 43
+logop (79)
+    on left: 75 76 77, on right: 74
+addop (80)
+    on left: 78 79, on right: 46
+mulop (81)
+    on left: 80 81, on right: 49
+num (82)
+    on left: 82 83, on right: 54
 
 
 State 0
 
     0 $accept: . programa $end
     1 programa: . lista_decl
-    2 lista_decl: . declaracao recursao1
+    2 lista_decl: . declaracao rec_decls
     5 declaracao: . decl_var
     6           | . decl_func
     7 decl_var: . tipo_especif ID FIM_EXPRESS
@@ -332,9 +332,9 @@ State 6
 
 State 7
 
-    2 lista_decl: declaracao . recursao1
-    3 recursao1: . %empty  [$end]
-    4          | . declaracao recursao1
+    2 lista_decl: declaracao . rec_decls
+    3 rec_decls: . %empty  [$end]
+    4          | . declaracao rec_decls
     5 declaracao: . decl_var
     6           | . decl_func
     7 decl_var: . tipo_especif ID FIM_EXPRESS
@@ -349,9 +349,9 @@ State 7
     POINT  shift, and go to state 3
     SHAPE  shift, and go to state 4
 
-    $default  reduce using rule 3 (recursao1)
+    $default  reduce using rule 3 (rec_decls)
 
-    recursao1     go to state 12
+    rec_decls     go to state 12
     declaracao    go to state 13
     decl_var      go to state 8
     decl_func     go to state 9
@@ -389,16 +389,16 @@ State 11
 
 State 12
 
-    2 lista_decl: declaracao recursao1 .
+    2 lista_decl: declaracao rec_decls .
 
     $default  reduce using rule 2 (lista_decl)
 
 
 State 13
 
-    3 recursao1: . %empty  [$end]
-    4          | . declaracao recursao1
-    4          | declaracao . recursao1
+    3 rec_decls: . %empty  [$end]
+    4          | . declaracao rec_decls
+    4          | declaracao . rec_decls
     5 declaracao: . decl_var
     6           | . decl_func
     7 decl_var: . tipo_especif ID FIM_EXPRESS
@@ -413,9 +413,9 @@ State 13
     POINT  shift, and go to state 3
     SHAPE  shift, and go to state 4
 
-    $default  reduce using rule 3 (recursao1)
+    $default  reduce using rule 3 (rec_decls)
 
-    recursao1     go to state 15
+    rec_decls     go to state 15
     declaracao    go to state 13
     decl_var      go to state 8
     decl_func     go to state 9
@@ -433,9 +433,9 @@ State 14
 
 State 15
 
-    4 recursao1: declaracao recursao1 .
+    4 rec_decls: declaracao rec_decls .
 
-    $default  reduce using rule 4 (recursao1)
+    $default  reduce using rule 4 (rec_decls)
 
 
 State 16
@@ -447,7 +447,7 @@ State 16
    12             | . SHAPE
    13 params: . %empty  [FIM_PARAM]
    14       | . lista_param
-   15 lista_param: . param recursao2
+   15 lista_param: . param rec_paramlist
    18 param: . tipo_especif ID
 
     INT    shift, and go to state 1
@@ -493,15 +493,15 @@ State 20
 
 State 21
 
-   15 lista_param: param . recursao2
-   16 recursao2: . %empty  [FIM_PARAM]
-   17          | . SEPARA_ARG param recursao2
+   15 lista_param: param . rec_paramlist
+   16 rec_paramlist: . %empty  [FIM_PARAM]
+   17              | . SEPARA_ARG param rec_paramlist
 
     SEPARA_ARG  shift, and go to state 24
 
-    $default  reduce using rule 16 (recursao2)
+    $default  reduce using rule 16 (rec_paramlist)
 
-    recursao2  go to state 25
+    rec_paramlist  go to state 25
 
 
 State 22
@@ -527,7 +527,7 @@ State 24
    10             | . FLOAT
    11             | . POINT
    12             | . SHAPE
-   17 recursao2: SEPARA_ARG . param recursao2
+   17 rec_paramlist: SEPARA_ARG . param rec_paramlist
    18 param: . tipo_especif ID
 
     INT    shift, and go to state 1
@@ -541,7 +541,7 @@ State 24
 
 State 25
 
-   15 lista_param: param recursao2 .
+   15 lista_param: param rec_paramlist .
 
     $default  reduce using rule 15 (lista_param)
 
@@ -554,21 +554,21 @@ State 26
    11             | . POINT
    12             | . SHAPE
    19 instruc_composta: INI_INSTRUC . decl_local lista_instruc FIM_INSTRUC
-   20 decl_local: . recursao3
-   21 recursao3: . %empty  [IF, FOR, RETURN, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
-   22          | . decl_var recursao3
+   20 decl_local: . rec_declocs
+   21 rec_declocs: . %empty  [IF, FOR, RETURN, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
+   22            | . decl_var rec_declocs
 
     INT    shift, and go to state 1
     FLOAT  shift, and go to state 2
     POINT  shift, and go to state 3
     SHAPE  shift, and go to state 4
 
-    $default  reduce using rule 21 (recursao3)
+    $default  reduce using rule 21 (rec_declocs)
 
     decl_var      go to state 29
     tipo_especif  go to state 30
     decl_local    go to state 31
-    recursao3     go to state 32
+    rec_declocs   go to state 32
 
 
 State 27
@@ -580,15 +580,15 @@ State 27
 
 State 28
 
-   16 recursao2: . %empty  [FIM_PARAM]
-   17          | . SEPARA_ARG param recursao2
-   17          | SEPARA_ARG param . recursao2
+   16 rec_paramlist: . %empty  [FIM_PARAM]
+   17              | . SEPARA_ARG param rec_paramlist
+   17              | SEPARA_ARG param . rec_paramlist
 
     SEPARA_ARG  shift, and go to state 24
 
-    $default  reduce using rule 16 (recursao2)
+    $default  reduce using rule 16 (rec_paramlist)
 
-    recursao2  go to state 33
+    rec_paramlist  go to state 33
 
 
 State 29
@@ -598,20 +598,20 @@ State 29
    10             | . FLOAT
    11             | . POINT
    12             | . SHAPE
-   21 recursao3: . %empty  [IF, FOR, RETURN, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
-   22          | . decl_var recursao3
-   22          | decl_var . recursao3
+   21 rec_declocs: . %empty  [IF, FOR, RETURN, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
+   22            | . decl_var rec_declocs
+   22            | decl_var . rec_declocs
 
     INT    shift, and go to state 1
     FLOAT  shift, and go to state 2
     POINT  shift, and go to state 3
     SHAPE  shift, and go to state 4
 
-    $default  reduce using rule 21 (recursao3)
+    $default  reduce using rule 21 (rec_declocs)
 
     decl_var      go to state 29
     tipo_especif  go to state 30
-    recursao3     go to state 34
+    rec_declocs   go to state 34
 
 
 State 30
@@ -625,9 +625,9 @@ State 31
 
    19 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
    19                 | INI_INSTRUC decl_local . lista_instruc FIM_INSTRUC
-   23 lista_instruc: . recursao4
-   24 recursao4: . %empty  [FIM_INSTRUC]
-   25          | . instrucao recursao4
+   23 lista_instruc: . rec_instrucs
+   24 rec_instrucs: . %empty  [FIM_INSTRUC]
+   25             | . instrucao rec_instrucs
    26 instrucao: . instruc_expr
    27          | . instruc_composta
    28          | . instruc_cond
@@ -635,25 +635,25 @@ State 31
    30          | . instruc_return
    31 instruc_expr: . expressao FIM_EXPRESS
    32             | . FIM_EXPRESS
-   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
    36 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
    37 instruc_return: . RETURN expressao FIM_EXPRESS
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     IF           shift, and go to state 36
     FOR          shift, and go to state 37
@@ -667,11 +667,11 @@ State 31
     FIM_EXPRESS  shift, and go to state 44
     ACESSO_END   shift, and go to state 45
 
-    $default  reduce using rule 24 (recursao4)
+    $default  reduce using rule 24 (rec_instrucs)
 
     instruc_composta  go to state 46
     lista_instruc     go to state 47
-    recursao4         go to state 48
+    rec_instrucs      go to state 48
     instrucao         go to state 49
     instruc_expr      go to state 50
     instruc_cond      go to state 51
@@ -683,30 +683,30 @@ State 31
     express_soma      go to state 57
     termo             go to state 58
     factor            go to state 59
-    chamada           go to state 60
-    num               go to state 61
-    endereco          go to state 62
+    endereco          go to state 60
+    chamada           go to state 61
+    num               go to state 62
 
 
 State 32
 
-   20 decl_local: recursao3 .
+   20 decl_local: rec_declocs .
 
     $default  reduce using rule 20 (decl_local)
 
 
 State 33
 
-   17 recursao2: SEPARA_ARG param recursao2 .
+   17 rec_paramlist: SEPARA_ARG param rec_paramlist .
 
-    $default  reduce using rule 17 (recursao2)
+    $default  reduce using rule 17 (rec_paramlist)
 
 
 State 34
 
-   22 recursao3: decl_var recursao3 .
+   22 rec_declocs: decl_var rec_declocs .
 
-    $default  reduce using rule 22 (recursao3)
+    $default  reduce using rule 22 (rec_declocs)
 
 
 State 35
@@ -718,7 +718,7 @@ State 35
 
 State 36
 
-   33 instruc_cond: IF . INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: IF . INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
 
     INI_PARAM  shift, and go to state 63
 
@@ -736,19 +736,19 @@ State 38
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -763,9 +763,9 @@ State 38
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 39
@@ -777,22 +777,22 @@ State 39
 
 State 40
 
-   81 num: INTEIRO .
+   82 num: INTEIRO .
 
-    $default  reduce using rule 81 (num)
+    $default  reduce using rule 82 (num)
 
 
 State 41
 
-   82 num: DECIMAL .
+   83 num: DECIMAL .
 
-    $default  reduce using rule 82 (num)
+    $default  reduce using rule 83 (num)
 
 
 State 42
 
    40 var: ID .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, ATR, PLUS_ATR, MINUS_ATR, TIMES_ATR, OVER_ATR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   56 chamada: ID . INI_PARAM arg FIM_PARAM
+   57 chamada: ID . INI_PARAM arg FIM_PARAM
 
     INI_PARAM  shift, and go to state 66
 
@@ -804,9 +804,9 @@ State 43
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    50       | INI_PARAM . expressao FIM_PARAM
    51       | . endereco
@@ -814,10 +814,10 @@ State 43
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -832,9 +832,9 @@ State 43
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 44
@@ -847,7 +847,7 @@ State 44
 State 45
 
    40 var: . ID
-   83 endereco: ACESSO_END . var
+   56 endereco: ACESSO_END . var
 
     ID  shift, and go to state 68
 
@@ -870,7 +870,7 @@ State 47
 
 State 48
 
-   23 lista_instruc: recursao4 .
+   23 lista_instruc: rec_instrucs .
 
     $default  reduce using rule 23 (lista_instruc)
 
@@ -878,9 +878,9 @@ State 48
 State 49
 
    19 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
-   24 recursao4: . %empty  [FIM_INSTRUC]
-   25          | . instrucao recursao4
-   25          | instrucao . recursao4
+   24 rec_instrucs: . %empty  [FIM_INSTRUC]
+   25             | . instrucao rec_instrucs
+   25             | instrucao . rec_instrucs
    26 instrucao: . instruc_expr
    27          | . instruc_composta
    28          | . instruc_cond
@@ -888,25 +888,25 @@ State 49
    30          | . instruc_return
    31 instruc_expr: . expressao FIM_EXPRESS
    32             | . FIM_EXPRESS
-   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
    36 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
    37 instruc_return: . RETURN expressao FIM_EXPRESS
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     IF           shift, and go to state 36
     FOR          shift, and go to state 37
@@ -920,10 +920,10 @@ State 49
     FIM_EXPRESS  shift, and go to state 44
     ACESSO_END   shift, and go to state 45
 
-    $default  reduce using rule 24 (recursao4)
+    $default  reduce using rule 24 (rec_instrucs)
 
     instruc_composta  go to state 46
-    recursao4         go to state 71
+    rec_instrucs      go to state 71
     instrucao         go to state 49
     instruc_expr      go to state 50
     instruc_cond      go to state 51
@@ -935,9 +935,9 @@ State 49
     express_soma      go to state 57
     termo             go to state 58
     factor            go to state 59
-    chamada           go to state 60
-    num               go to state 61
-    endereco          go to state 62
+    endereco          go to state 60
+    chamada           go to state 61
+    num               go to state 62
 
 
 State 50
@@ -979,11 +979,11 @@ State 55
 
    38 expressao: var . atrop expressao
    52 factor: var .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   62 atrop: . ATR
-   63      | . PLUS_ATR
-   64      | . MINUS_ATR
-   65      | . TIMES_ATR
-   66      | . OVER_ATR
+   63 atrop: . ATR
+   64      | . PLUS_ATR
+   65      | . MINUS_ATR
+   66      | . TIMES_ATR
+   67      | . OVER_ATR
 
     ATR        shift, and go to state 73
     PLUS_ATR   shift, and go to state 74
@@ -1005,19 +1005,19 @@ State 56
 
 State 57
 
-   41 express_simp: express_soma . fatora2
-   42 fatora2: . %empty  [FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   43        | . relop express_soma
-   67 relop: . LT
-   68      | . GT
-   69      | . LE
-   70      | . GE
-   71      | . EQ
-   72      | . NE
-   73      | . logop
-   74 logop: . NOT
-   75      | . AND
-   76      | . OR
+   41 express_simp: express_soma . fat_express
+   42 fat_express: . %empty  [FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   43            | . relop express_soma
+   68 relop: . LT
+   69      | . GT
+   70      | . LE
+   71      | . GE
+   72      | . EQ
+   73      | . NE
+   74      | . logop
+   75 logop: . NOT
+   76      | . AND
+   77      | . OR
 
     LT   shift, and go to state 79
     GT   shift, and go to state 80
@@ -1029,87 +1029,87 @@ State 57
     AND  shift, and go to state 86
     OR   shift, and go to state 87
 
-    $default  reduce using rule 42 (fatora2)
+    $default  reduce using rule 42 (fat_express)
 
-    fatora2  go to state 88
-    relop    go to state 89
-    logop    go to state 90
+    fat_express  go to state 88
+    relop        go to state 89
+    logop        go to state 90
 
 
 State 58
 
-   44 express_soma: termo . recursao5
-   45 recursao5: . %empty  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   46          | . addop termo recursao5
-   77 addop: . PLUS_OP
-   78      | . MINUS_OP
+   44 express_soma: termo . rec_plusexpress
+   45 rec_plusexpress: . %empty  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   46                | . addop termo rec_plusexpress
+   78 addop: . PLUS_OP
+   79      | . MINUS_OP
 
     PLUS_OP   shift, and go to state 91
     MINUS_OP  shift, and go to state 92
 
-    $default  reduce using rule 45 (recursao5)
+    $default  reduce using rule 45 (rec_plusexpress)
 
-    recursao5  go to state 93
-    addop      go to state 94
+    rec_plusexpress  go to state 93
+    addop            go to state 94
 
 
 State 59
 
-   47 termo: factor . recursao6
-   48 recursao6: . %empty  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   49          | . mulop factor recursao6
-   79 mulop: . TIMES_OP
-   80      | . OVER_OP
+   47 termo: factor . rec_timesexpress
+   48 rec_timesexpress: . %empty  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   49                 | . mulop factor rec_timesexpress
+   80 mulop: . TIMES_OP
+   81      | . OVER_OP
 
     TIMES_OP  shift, and go to state 95
     OVER_OP   shift, and go to state 96
 
-    $default  reduce using rule 48 (recursao6)
+    $default  reduce using rule 48 (rec_timesexpress)
 
-    recursao6  go to state 97
-    mulop      go to state 98
+    rec_timesexpress  go to state 97
+    mulop             go to state 98
 
 
 State 60
-
-   53 factor: chamada .
-
-    $default  reduce using rule 53 (factor)
-
-
-State 61
-
-   54 factor: num .
-
-    $default  reduce using rule 54 (factor)
-
-
-State 62
 
    51 factor: endereco .
 
     $default  reduce using rule 51 (factor)
 
 
+State 61
+
+   53 factor: chamada .
+
+    $default  reduce using rule 53 (factor)
+
+
+State 62
+
+   54 factor: num .
+
+    $default  reduce using rule 54 (factor)
+
+
 State 63
 
-   33 instruc_cond: IF INI_PARAM . expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: IF INI_PARAM . expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1124,9 +1124,9 @@ State 63
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 64
@@ -1135,19 +1135,19 @@ State 64
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1162,9 +1162,9 @@ State 64
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 65
@@ -1179,23 +1179,23 @@ State 66
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   56        | ID INI_PARAM . arg FIM_PARAM
-   57 arg: . %empty  [FIM_PARAM]
-   58    | . lista_arg
-   59 lista_arg: . expressao recursao7
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   57        | ID INI_PARAM . arg FIM_PARAM
+   58 arg: . %empty  [FIM_PARAM]
+   59    | . lista_arg
+   60 lista_arg: . expressao rec_args
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1204,7 +1204,7 @@ State 66
     INI_PARAM   shift, and go to state 43
     ACESSO_END  shift, and go to state 45
 
-    $default  reduce using rule 57 (arg)
+    $default  reduce using rule 58 (arg)
 
     expressao     go to state 102
     var           go to state 55
@@ -1212,11 +1212,11 @@ State 66
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
+    endereco      go to state 60
+    chamada       go to state 61
     arg           go to state 103
     lista_arg     go to state 104
-    num           go to state 61
-    endereco      go to state 62
+    num           go to state 62
 
 
 State 67
@@ -1235,9 +1235,9 @@ State 68
 
 State 69
 
-   83 endereco: ACESSO_END var .
+   56 endereco: ACESSO_END var .
 
-    $default  reduce using rule 83 (endereco)
+    $default  reduce using rule 56 (endereco)
 
 
 State 70
@@ -1249,9 +1249,9 @@ State 70
 
 State 71
 
-   25 recursao4: instrucao recursao4 .
+   25 rec_instrucs: instrucao rec_instrucs .
 
-    $default  reduce using rule 25 (recursao4)
+    $default  reduce using rule 25 (rec_instrucs)
 
 
 State 72
@@ -1263,37 +1263,37 @@ State 72
 
 State 73
 
-   62 atrop: ATR .
-
-    $default  reduce using rule 62 (atrop)
-
-
-State 74
-
-   63 atrop: PLUS_ATR .
+   63 atrop: ATR .
 
     $default  reduce using rule 63 (atrop)
 
 
-State 75
+State 74
 
-   64 atrop: MINUS_ATR .
+   64 atrop: PLUS_ATR .
 
     $default  reduce using rule 64 (atrop)
 
 
-State 76
+State 75
 
-   65 atrop: TIMES_ATR .
+   65 atrop: MINUS_ATR .
 
     $default  reduce using rule 65 (atrop)
 
 
-State 77
+State 76
 
-   66 atrop: OVER_ATR .
+   66 atrop: TIMES_ATR .
 
     $default  reduce using rule 66 (atrop)
+
+
+State 77
+
+   67 atrop: OVER_ATR .
+
+    $default  reduce using rule 67 (atrop)
 
 
 State 78
@@ -1302,19 +1302,19 @@ State 78
    38          | var atrop . expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1329,77 +1329,77 @@ State 78
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 79
 
-   67 relop: LT .
-
-    $default  reduce using rule 67 (relop)
-
-
-State 80
-
-   68 relop: GT .
+   68 relop: LT .
 
     $default  reduce using rule 68 (relop)
 
 
-State 81
+State 80
 
-   69 relop: LE .
+   69 relop: GT .
 
     $default  reduce using rule 69 (relop)
 
 
-State 82
+State 81
 
-   70 relop: GE .
+   70 relop: LE .
 
     $default  reduce using rule 70 (relop)
 
 
-State 83
+State 82
 
-   71 relop: EQ .
+   71 relop: GE .
 
     $default  reduce using rule 71 (relop)
 
 
-State 84
+State 83
 
-   72 relop: NE .
+   72 relop: EQ .
 
     $default  reduce using rule 72 (relop)
 
 
+State 84
+
+   73 relop: NE .
+
+    $default  reduce using rule 73 (relop)
+
+
 State 85
 
-   74 logop: NOT .
-
-    $default  reduce using rule 74 (logop)
-
-
-State 86
-
-   75 logop: AND .
+   75 logop: NOT .
 
     $default  reduce using rule 75 (logop)
 
 
-State 87
+State 86
 
-   76 logop: OR .
+   76 logop: AND .
 
     $default  reduce using rule 76 (logop)
 
 
+State 87
+
+   77 logop: OR .
+
+    $default  reduce using rule 77 (logop)
+
+
 State 88
 
-   41 express_simp: express_soma fatora2 .
+   41 express_simp: express_soma fat_express .
 
     $default  reduce using rule 41 (express_simp)
 
@@ -1407,19 +1407,19 @@ State 88
 State 89
 
    40 var: . ID
-   43 fatora2: relop . express_soma
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   43 fat_express: relop . express_soma
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1432,35 +1432,35 @@ State 89
     express_soma  go to state 108
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 90
 
-   73 relop: logop .
+   74 relop: logop .
 
-    $default  reduce using rule 73 (relop)
+    $default  reduce using rule 74 (relop)
 
 
 State 91
 
-   77 addop: PLUS_OP .
-
-    $default  reduce using rule 77 (addop)
-
-
-State 92
-
-   78 addop: MINUS_OP .
+   78 addop: PLUS_OP .
 
     $default  reduce using rule 78 (addop)
 
 
+State 92
+
+   79 addop: MINUS_OP .
+
+    $default  reduce using rule 79 (addop)
+
+
 State 93
 
-   44 express_soma: termo recursao5 .
+   44 express_soma: termo rec_plusexpress .
 
     $default  reduce using rule 44 (express_soma)
 
@@ -1468,18 +1468,18 @@ State 93
 State 94
 
    40 var: . ID
-   46 recursao5: addop . termo recursao5
-   47 termo: . factor recursao6
+   46 rec_plusexpress: addop . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1491,28 +1491,28 @@ State 94
     var       go to state 107
     termo     go to state 109
     factor    go to state 59
-    chamada   go to state 60
-    num       go to state 61
-    endereco  go to state 62
+    endereco  go to state 60
+    chamada   go to state 61
+    num       go to state 62
 
 
 State 95
 
-   79 mulop: TIMES_OP .
-
-    $default  reduce using rule 79 (mulop)
-
-
-State 96
-
-   80 mulop: OVER_OP .
+   80 mulop: TIMES_OP .
 
     $default  reduce using rule 80 (mulop)
 
 
+State 96
+
+   81 mulop: OVER_OP .
+
+    $default  reduce using rule 81 (mulop)
+
+
 State 97
 
-   47 termo: factor recursao6 .
+   47 termo: factor rec_timesexpress .
 
     $default  reduce using rule 47 (termo)
 
@@ -1520,17 +1520,17 @@ State 97
 State 98
 
    40 var: . ID
-   49 recursao6: mulop . factor recursao6
+   49 rec_timesexpress: mulop . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1541,14 +1541,14 @@ State 98
 
     var       go to state 107
     factor    go to state 110
-    chamada   go to state 60
-    num       go to state 61
-    endereco  go to state 62
+    endereco  go to state 60
+    chamada   go to state 61
+    num       go to state 62
 
 
 State 99
 
-   33 instruc_cond: IF INI_PARAM expressao . FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: IF INI_PARAM expressao . FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
 
     FIM_PARAM  shift, and go to state 111
 
@@ -1569,29 +1569,29 @@ State 101
 
 State 102
 
-   59 lista_arg: expressao . recursao7
-   60 recursao7: . %empty  [FIM_PARAM]
-   61          | . SEPARA_ARG expressao recursao7
+   60 lista_arg: expressao . rec_args
+   61 rec_args: . %empty  [FIM_PARAM]
+   62         | . SEPARA_ARG expressao rec_args
 
     SEPARA_ARG  shift, and go to state 113
 
-    $default  reduce using rule 60 (recursao7)
+    $default  reduce using rule 61 (rec_args)
 
-    recursao7  go to state 114
+    rec_args  go to state 114
 
 
 State 103
 
-   56 chamada: ID INI_PARAM arg . FIM_PARAM
+   57 chamada: ID INI_PARAM arg . FIM_PARAM
 
     FIM_PARAM  shift, and go to state 115
 
 
 State 104
 
-   58 arg: lista_arg .
+   59 arg: lista_arg .
 
-    $default  reduce using rule 58 (arg)
+    $default  reduce using rule 59 (arg)
 
 
 State 105
@@ -1617,48 +1617,48 @@ State 107
 
 State 108
 
-   43 fatora2: relop express_soma .
+   43 fat_express: relop express_soma .
 
-    $default  reduce using rule 43 (fatora2)
+    $default  reduce using rule 43 (fat_express)
 
 
 State 109
 
-   45 recursao5: . %empty  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   46          | . addop termo recursao5
-   46          | addop termo . recursao5
-   77 addop: . PLUS_OP
-   78      | . MINUS_OP
+   45 rec_plusexpress: . %empty  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   46                | . addop termo rec_plusexpress
+   46                | addop termo . rec_plusexpress
+   78 addop: . PLUS_OP
+   79      | . MINUS_OP
 
     PLUS_OP   shift, and go to state 91
     MINUS_OP  shift, and go to state 92
 
-    $default  reduce using rule 45 (recursao5)
+    $default  reduce using rule 45 (rec_plusexpress)
 
-    recursao5  go to state 116
-    addop      go to state 94
+    rec_plusexpress  go to state 116
+    addop            go to state 94
 
 
 State 110
 
-   48 recursao6: . %empty  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   49          | . mulop factor recursao6
-   49          | mulop factor . recursao6
-   79 mulop: . TIMES_OP
-   80      | . OVER_OP
+   48 rec_timesexpress: . %empty  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   49                 | . mulop factor rec_timesexpress
+   49                 | mulop factor . rec_timesexpress
+   80 mulop: . TIMES_OP
+   81      | . OVER_OP
 
     TIMES_OP  shift, and go to state 95
     OVER_OP   shift, and go to state 96
 
-    $default  reduce using rule 48 (recursao6)
+    $default  reduce using rule 48 (rec_timesexpress)
 
-    recursao6  go to state 117
-    mulop      go to state 98
+    rec_timesexpress  go to state 117
+    mulop             go to state 98
 
 
 State 111
 
-   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM . INI_INSTRUC instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM . INI_INSTRUC instrucao FIM_INSTRUC fat_if
 
     INI_INSTRUC  shift, and go to state 118
 
@@ -1667,19 +1667,19 @@ State 112
 
    36 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS . express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1693,9 +1693,9 @@ State 112
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 113
@@ -1703,20 +1703,20 @@ State 113
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   61 recursao7: SEPARA_ARG . expressao recursao7
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   62 rec_args: SEPARA_ARG . expressao rec_args
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1731,37 +1731,37 @@ State 113
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 114
 
-   59 lista_arg: expressao recursao7 .
+   60 lista_arg: expressao rec_args .
 
-    $default  reduce using rule 59 (lista_arg)
+    $default  reduce using rule 60 (lista_arg)
 
 
 State 115
 
-   56 chamada: ID INI_PARAM arg FIM_PARAM .
+   57 chamada: ID INI_PARAM arg FIM_PARAM .
 
-    $default  reduce using rule 56 (chamada)
+    $default  reduce using rule 57 (chamada)
 
 
 State 116
 
-   46 recursao5: addop termo recursao5 .
+   46 rec_plusexpress: addop termo rec_plusexpress .
 
-    $default  reduce using rule 46 (recursao5)
+    $default  reduce using rule 46 (rec_plusexpress)
 
 
 State 117
 
-   49 recursao6: mulop factor recursao6 .
+   49 rec_timesexpress: mulop factor rec_timesexpress .
 
-    $default  reduce using rule 49 (recursao6)
+    $default  reduce using rule 49 (rec_timesexpress)
 
 
 State 118
@@ -1774,26 +1774,26 @@ State 118
    30          | . instruc_return
    31 instruc_expr: . expressao FIM_EXPRESS
    32             | . FIM_EXPRESS
-   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
-   33             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
+   33             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC fat_if
    36 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
    37 instruc_return: . RETURN expressao FIM_EXPRESS
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     IF           shift, and go to state 36
     FOR          shift, and go to state 37
@@ -1819,9 +1819,9 @@ State 118
     express_soma      go to state 57
     termo             go to state 58
     factor            go to state 59
-    chamada           go to state 60
-    num               go to state 61
-    endereco          go to state 62
+    endereco          go to state 60
+    chamada           go to state 61
+    num               go to state 62
 
 
 State 119
@@ -1833,20 +1833,20 @@ State 119
 
 State 120
 
-   60 recursao7: . %empty  [FIM_PARAM]
-   61          | . SEPARA_ARG expressao recursao7
-   61          | SEPARA_ARG expressao . recursao7
+   61 rec_args: . %empty  [FIM_PARAM]
+   62         | . SEPARA_ARG expressao rec_args
+   62         | SEPARA_ARG expressao . rec_args
 
     SEPARA_ARG  shift, and go to state 113
 
-    $default  reduce using rule 60 (recursao7)
+    $default  reduce using rule 61 (rec_args)
 
-    recursao7  go to state 123
+    rec_args  go to state 123
 
 
 State 121
 
-   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao . FIM_INSTRUC fatora1
+   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao . FIM_INSTRUC fat_if
 
     FIM_INSTRUC  shift, and go to state 124
 
@@ -1857,19 +1857,19 @@ State 122
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     LITERAL     shift, and go to state 39
     INTEIRO     shift, and go to state 40
@@ -1884,29 +1884,29 @@ State 122
     express_soma  go to state 57
     termo         go to state 58
     factor        go to state 59
-    chamada       go to state 60
-    num           go to state 61
-    endereco      go to state 62
+    endereco      go to state 60
+    chamada       go to state 61
+    num           go to state 62
 
 
 State 123
 
-   61 recursao7: SEPARA_ARG expressao recursao7 .
+   62 rec_args: SEPARA_ARG expressao rec_args .
 
-    $default  reduce using rule 61 (recursao7)
+    $default  reduce using rule 62 (rec_args)
 
 
 State 124
 
-   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC . fatora1
-   34 fatora1: . %empty  [IF, FOR, RETURN, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
-   35        | . ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC . fat_if
+   34 fat_if: . %empty  [IF, FOR, RETURN, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
+   35       | . ELSE INI_INSTRUC instrucao FIM_INSTRUC
 
     ELSE  shift, and go to state 126
 
-    $default  reduce using rule 34 (fatora1)
+    $default  reduce using rule 34 (fat_if)
 
-    fatora1  go to state 127
+    fat_if  go to state 127
 
 
 State 125
@@ -1918,14 +1918,14 @@ State 125
 
 State 126
 
-   35 fatora1: ELSE . INI_INSTRUC instrucao FIM_INSTRUC
+   35 fat_if: ELSE . INI_INSTRUC instrucao FIM_INSTRUC
 
     INI_INSTRUC  shift, and go to state 129
 
 
 State 127
 
-   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1 .
+   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if .
 
     $default  reduce using rule 33 (instruc_cond)
 
@@ -1947,26 +1947,26 @@ State 129
    30          | . instruc_return
    31 instruc_expr: . expressao FIM_EXPRESS
    32             | . FIM_EXPRESS
-   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
-   35 fatora1: ELSE INI_INSTRUC . instrucao FIM_INSTRUC
+   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
+   35 fat_if: ELSE INI_INSTRUC . instrucao FIM_INSTRUC
    36 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
    37 instruc_return: . RETURN expressao FIM_EXPRESS
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     IF           shift, and go to state 36
     FOR          shift, and go to state 37
@@ -1992,9 +1992,9 @@ State 129
     express_soma      go to state 57
     termo             go to state 58
     factor            go to state 59
-    chamada           go to state 60
-    num               go to state 61
-    endereco          go to state 62
+    endereco          go to state 60
+    chamada           go to state 61
+    num               go to state 62
 
 
 State 130
@@ -2007,26 +2007,26 @@ State 130
    30          | . instruc_return
    31 instruc_expr: . expressao FIM_EXPRESS
    32             | . FIM_EXPRESS
-   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
+   33 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
    36 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
    36               | FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC
    37 instruc_return: . RETURN expressao FIM_EXPRESS
    38 expressao: . var atrop expressao
    39          | . express_simp
    40 var: . ID
-   41 express_simp: . express_soma fatora2
-   44 express_soma: . termo recursao5
-   47 termo: . factor recursao6
+   41 express_simp: . express_soma fat_express
+   44 express_soma: . termo rec_plusexpress
+   47 termo: . factor rec_timesexpress
    50 factor: . INI_PARAM expressao FIM_PARAM
    51       | . endereco
    52       | . var
    53       | . chamada
    54       | . num
    55       | . LITERAL
-   56 chamada: . ID INI_PARAM arg FIM_PARAM
-   81 num: . INTEIRO
-   82    | . DECIMAL
-   83 endereco: . ACESSO_END var
+   56 endereco: . ACESSO_END var
+   57 chamada: . ID INI_PARAM arg FIM_PARAM
+   82 num: . INTEIRO
+   83    | . DECIMAL
 
     IF           shift, and go to state 36
     FOR          shift, and go to state 37
@@ -2052,14 +2052,14 @@ State 130
     express_soma      go to state 57
     termo             go to state 58
     factor            go to state 59
-    chamada           go to state 60
-    num               go to state 61
-    endereco          go to state 62
+    endereco          go to state 60
+    chamada           go to state 61
+    num               go to state 62
 
 
 State 131
 
-   35 fatora1: ELSE INI_INSTRUC instrucao . FIM_INSTRUC
+   35 fat_if: ELSE INI_INSTRUC instrucao . FIM_INSTRUC
 
     FIM_INSTRUC  shift, and go to state 133
 
@@ -2073,9 +2073,9 @@ State 132
 
 State 133
 
-   35 fatora1: ELSE INI_INSTRUC instrucao FIM_INSTRUC .
+   35 fat_if: ELSE INI_INSTRUC instrucao FIM_INSTRUC .
 
-    $default  reduce using rule 35 (fatora1)
+    $default  reduce using rule 35 (fat_if)
 
 
 State 134

@@ -1,7 +1,9 @@
-
+%defines
+%pure-parser
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	// #include "./lib/TabSimbolo.h"
 
 	int yylex();
 
@@ -22,6 +24,7 @@
 		int valor;
 	};
 
+	// TabSimbolos tabela = NULL;
 	Expressao* raiz;
 %} 
 
@@ -75,10 +78,10 @@
 	double DECIMAL;
 	char ID[33];
 	char* LITERAL;
+	
 }
 
 
-%type <num> DECIMAL
 
 
 %start programa
@@ -93,12 +96,12 @@ programa:
 			;
 
 lista_decl:
-			declaracao recursao1
+			declaracao rec_decls
 			;
 
-recursao1:
+rec_decls:
 			/* %empty */
-			| declaracao recursao1
+			| declaracao rec_decls
 			;
 
 
@@ -129,12 +132,12 @@ params:
 
 
 lista_param:
-			param recursao2
+			param rec_paramlist
 			;
 
-recursao2:
+rec_paramlist:
 			/* %empty */
-			| SEPARA_ARG param recursao2
+			| SEPARA_ARG param rec_paramlist
 			;
 
 
@@ -148,22 +151,22 @@ instruc_composta:
 
 
 decl_local:
-			recursao3
+			rec_declocs
 			;
 
-recursao3:
+rec_declocs:
 			/* %empty */
-			| decl_var recursao3
+			| decl_var rec_declocs
 			;
 
 
 lista_instruc:
-			recursao4
+			rec_instrucs
 			;
 
-recursao4:
+rec_instrucs:
 			/* %empty */
-			| instrucao recursao4
+			| instrucao rec_instrucs
 			;
 
 
@@ -182,10 +185,10 @@ instruc_expr:
 
 
 instruc_cond:
-			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fatora1
+			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if
 			;
 
-fatora1:
+fat_if:
 			/* %empty */
 			| ELSE INI_INSTRUC instrucao FIM_INSTRUC
 			;
@@ -210,32 +213,32 @@ var:
 			;
 
 express_simp:
-			express_soma fatora2
+			express_soma fat_express
 			;
 
-fatora2:
+fat_express:
 			/* %empty */
 			| relop express_soma
 			;
 
 
 express_soma:
-			termo recursao5
+			termo rec_plusexpress
 			;
 
-recursao5:
+rec_plusexpress:
 			/* %empty */
-			| addop termo recursao5
+			| addop termo rec_plusexpress
 			;
 
 
 termo:
-			factor recursao6
+			factor rec_timesexpress
 			;
 
-recursao6:
+rec_timesexpress:
 			/* %empty */
-			| mulop factor recursao6
+			| mulop factor rec_timesexpress
 			;
 
 
@@ -250,6 +253,10 @@ factor:
 			}
 			;
 
+endereco:
+			ACESSO_END var
+			;
+
 chamada:
 			ID INI_PARAM arg FIM_PARAM
 			;
@@ -261,12 +268,12 @@ arg:
 
 
 lista_arg:
-			expressao recursao7
+			expressao rec_args
 			;
 
-recursao7:
+rec_args:
 			/* %empty */
-			| SEPARA_ARG expressao recursao7
+			| SEPARA_ARG expressao rec_args
 			;
 
 
@@ -351,9 +358,6 @@ num:
 			}
 			;
 
-endereco:
-			ACESSO_END var
-			;
 
 
 
@@ -417,6 +421,7 @@ void yyerror(char const *s){
 int main(void){
 	yyparse();
 
+	//destroiTab(&tabela);
 	return 0;
 }
 

@@ -1,3 +1,5 @@
+%option noyywrap
+%option bison-bridge
 
 %{
 	#include <stdio.h>
@@ -10,8 +12,10 @@
 	int num_char = 0, num_lin = 1;
 	int erro = 0;
 	int contLinha(char* text);
-	TabSimbolos tabela = NULL;
+	TabSimbolos tabela;
 %}
+
+
 
 LETRA			[a-zA-Z]
 DIGITO			[0-9]
@@ -141,8 +145,23 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {LITERAL} 		{
 					printf("String constante: %s\n", yytext);
 					num_char += strlen(yytext);
-					yylval.LITERAL = (char*) malloc(sizeof(char) * strlen(yytext));
-					strcpy(yylval.LITERAL, yytext);
+
+					int i, j = 0;
+					char* aux = (char*) malloc(sizeof(char) * (strlen(yytext) - 2));
+					for(i = 0; i < strlen(yytext); i++){
+						if(yytext[i] = '"'){
+							i++;
+							if(i == strlen(yytext)){
+								break;
+							}
+						}
+						aux[j] = yytext[i];
+						j++;
+					}
+					yylval->LITERAL = (char*) malloc(sizeof(char) * strlen(aux));
+					strcpy(yylval->LITERAL, aux);
+					free(aux);
+					aux = NULL;
 					insere(&tabela, yytext, num_lin, num_char);
 					return (LITERAL);
 				}
@@ -152,7 +171,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Inteiro: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
-					yylval.INTEIRO = atoi(yytext);
+					yylval->INTEIRO = atoi(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (INTEIRO);
 				}
@@ -161,7 +180,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Float: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
-					yylval.DECIMAL = atof(yytext);
+					yylval->DECIMAL = atof(yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (DECIMAL);
 				}
@@ -170,7 +189,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Identificador: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char);
-					strcpy(yylval.ID, yytext);
+					strcpy(yylval->ID, yytext);
 					insere(&tabela, yytext, num_lin, num_char);
 					return (ID);
 				}
@@ -367,10 +386,6 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 
 
 %%
-
-int yywrap(){
-	return 1;
-}
 
 int contLinha(char* text){
 	int i = 0, count = 0;

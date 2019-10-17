@@ -18,6 +18,7 @@ int buscaTab(TabSimbolos* raiz, char* valor);
 int checa_warn(char* valor, int lin, int col);
 void insere(TabSimbolos* raiz, char* valor, int lin, int col);
 void printTab(TabSimbolos* raiz);
+void destroiTab(TabSimbolos* raiz);
 
 void cria(TabSimbolos* raiz){
 	*raiz = NULL;
@@ -160,6 +161,17 @@ void printTab(TabSimbolos* raiz){
 		}
 	}
 
+}
+
+void destroiTab(TabSimbolos* raiz){
+	if((*raiz)->prox != NULL){
+		destroiTab(&((*raiz)->prox));
+	}
+
+	free((*raiz)->valor);
+	(*raiz)->valor = NULL;
+	free(*raiz);
+	(*raiz) = NULL;
 }
 
 

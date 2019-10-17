@@ -5,3 +5,5 @@ lex.yy.c
 exec
 sintatico.tab.c
 sintatico.tab.h
+*.output
+sintatico.output
