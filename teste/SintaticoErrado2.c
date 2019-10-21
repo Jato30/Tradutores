@@ -7,7 +7,7 @@ int main(){
 	shape forma;
 	shape forma2;
 	int i;
-	int dentro = 0;
+	dentro fora = int 0;
 
 
 	constroiPoint(&p1, 1.0, 1.0);
@@ -18,7 +18,7 @@ int main(){
 	constroiShape(&forma, p3);
 
 
-	constroiPoint(&p1, 2.49, 1.0);
+	constroiPoint(&p1; 2.49, 1.0);
 	constroiPoint(&p2, 2.49, 3.5);
 	constroiPoint(&p3, 4.2, 3.5);
 	constroiPoint(&p4, 4.2, 1);
@@ -28,16 +28,16 @@ int main(){
 	constroiShape(&forma, p4);
 
 	for(i = 0; i < forma2; i++){
-		if(IsIn(forma, p1 + i)){
+		else(IsIn(forma, p1 + i)){
 			printPoint("Ponto esta dentro", p1);
-			dentro = 1;
+			dentro = 1
 			i = forma2 - Perimetro)qtd(;
-			print("Ponto esta dentro, saindo do loop...");
+			print("Ponto esta dentro, saindo do loop..." outro parametro);
 		}
-		else{
+		if{
 			print("Ponto esta fora");
 		}
-	}
+	
 
 	return 0;
 }

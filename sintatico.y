@@ -835,9 +835,9 @@ void destroiArvore(Node *raiz){
 	if(raiz->fi != NULL){
 		int i;
 		for(i = 0; i < raiz->qtdFi; i++){
-			destroiArvore(raiz->fi[i]);
-			free(raiz->fi[i]);
-			raiz->fi[i] = NULL;
+			if(raiz->fi[i] != NULL){
+				destroiArvore(raiz->fi[i]);
+			}
 		}
 	}
 	free(raiz->valor);
@@ -904,7 +904,7 @@ int main(void){
 	yyparse();
 	while(yylex());
 	printf("\nraiz: programa\n");
-	printArvore(raiz, 0);
+	// printArvore(raiz, 0);
 	destroiArvore(raiz);
 	// destroiTab(&tabela);
 	return 0;

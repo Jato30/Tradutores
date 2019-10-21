@@ -22,7 +22,7 @@ int main(){
 	constroiShape(&forma, dois);
 	constroiShape(&forma, tres);
 
-	printFloat("O perimetro da forma criada eh: \n", Perimetro(ret));
+	printFloat("O perimetro da forma criada eh: ", Perimetro(ret));
 
 	return 0;
 }
