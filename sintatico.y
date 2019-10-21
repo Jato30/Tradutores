@@ -179,16 +179,28 @@ decl_func:
 
 tipo_especif:
 			INT {
-				$$ = novaFolhaText("int");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("int");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| FLOAT {
-				$$ = novaFolhaText("float");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("float");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| POINT {
-				$$ = novaFolhaText("point");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("point");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| SHAPE {
-				$$ = novaFolhaText("shape");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("shape");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
@@ -343,7 +355,10 @@ instruc_expr:
 				$$ = novoNo(1, lista, "expressao ; ");
 			}
 			| FIM_EXPRESS {
-				$$ = novaFolhaText(";");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText(";");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
@@ -432,7 +447,10 @@ expressao:
 
 var:
 			ID {
-				$$ = novaFolhaText($1);
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText($1);
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
@@ -617,40 +635,73 @@ rec_args:
 
 atrop:
 			ATR {
-				$$ = novaFolhaText("=");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("=");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| PLUS_ATR {
-				$$ = novaFolhaText("+=");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("+=");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| MINUS_ATR {
-				$$ = novaFolhaText("-=");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("-=");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| TIMES_ATR {
-				$$ = novaFolhaText("*=");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("*=");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| OVER_ATR {
-				$$ = novaFolhaText("/=");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("/=");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
 relop:
 			LT {
-				$$ = novaFolhaText("<");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("<");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| GT {
-				$$ = novaFolhaText(">");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText(">");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| LE {
-				$$ = novaFolhaText("<=");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("<=");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| GE {
-				$$ = novaFolhaText(">=");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("=>");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| EQ {
-				$$ = novaFolhaText("==");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("==");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| NE {
-				$$ = novaFolhaText("!=");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("!=");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| logop {
 				Node** lista = (Node**) malloc(sizeof(Node*));
@@ -662,40 +713,67 @@ relop:
 
 logop:
 			NOT {
-				$$ = novaFolhaText("!");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("!");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| AND {
-				$$ = novaFolhaText("&&");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("&&");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| OR {
-				$$ = novaFolhaText("||");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("||");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
 addop:
 			PLUS_OP {
-				$$ = novaFolhaText("+");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("+");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| MINUS_OP {
-				$$ = novaFolhaText("-");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("-");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
 mulop:
 			TIMES_OP {
-				$$ = novaFolhaText("*");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("*");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| OVER_OP {
-				$$ = novaFolhaText("/");
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("/");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
 num:
 			INTEIRO {
-				$$ = novaFolhaInt($1);
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaInt($1);
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			| DECIMAL {
-				$$ = novaFolhaFloat($1);
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaFloat($1);
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
