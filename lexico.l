@@ -12,6 +12,7 @@
 	int num_char = 0, num_lin = 1;
 	int erro = 0;
 	int contLinha(char* text);
+	int checa_warn(char* valor, int lin, int col);
 	TabSimbolos tabela;
 %}
 
@@ -81,80 +82,73 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {IF} 			{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
-					insere(&tabela, yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (IF);
 				}
 
 {ELSE} 			{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
-					insere(&tabela, yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (ELSE);
 				}
 
 {FOR} 			{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
-					insere(&tabela, yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (FOR);
 				}
 
 {RETURN} 		{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
-					insere(&tabela, yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (RETURN);
 				}
 
 {INT} 			{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
-					insere(&tabela, yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (INT);
 				}
 
 {FLOAT} 		{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
-					insere(&tabela, yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (FLOAT);
 				}
 
 {POINT} 		{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
-					insere(&tabela, yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (POINT);
 				}
 
 {SHAPE} 		{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
-					insere(&tabela, yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (SHAPE);
 				}
 
 {LITERAL} 		{
-					printf("String constante: %s\n", yytext);
 					num_char += strlen(yytext);
 
 					int i, j = 0;
 					char* aux = (char*) malloc(sizeof(char) * (strlen(yytext) - 2));
-					for(i = 0; i < strlen(yytext); i++){
-						if(yytext[i] = '"'){
-							i++;
-							if(i == strlen(yytext)){
-								break;
-							}
-						}
+					for(i = 1; i < (strlen(yytext) - 1); i++){
 						aux[j] = yytext[i];
 						j++;
 					}
@@ -162,7 +156,10 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					strcpy(yylval->LITERAL, aux);
 					free(aux);
 					aux = NULL;
-					insere(&tabela, yytext, num_lin, num_char);
+
+					printf("String constante: \"%s\"\n", yylval->LITERAL);
+					insere(&tabela, yylval->LITERAL, num_lin, num_char);
+
 					return (LITERAL);
 				}
 
@@ -170,27 +167,27 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {INTEIRO} 		{
 					printf("Inteiro: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
 					yylval->INTEIRO = atoi(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (INTEIRO);
 				}
 
 {DECIMAL} 		{
 					printf("Float: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
 					yylval->DECIMAL = atof(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (DECIMAL);
 				}
 
 {ID} 			{
 					printf("Identificador: %s\n", yytext);
 					num_char += strlen(yytext);
-					checa_warn(yytext, num_lin, num_char);
+					checa_warn(strdup(yytext), num_lin, num_char);
 					strcpy(yylval->ID, yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+					insere(&tabela, yylval->ID, num_lin, num_char);
 					return (ID);
 				}
 
@@ -198,63 +195,61 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {LT} 			{
 					printf("Operador Relacional: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
 					return (LT);
 				}
 
 {GT} 			{
 					printf("Operador Relacional: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
 					return (GT);
 				}
 
 {LE} 			{
 					printf("Operador Relacional: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (LE);
 				}
 
 {GE} 			{
 					printf("Operador Relacional: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (GE);
 				}
 
 {EQ} 			{
 					printf("Operador Relacional: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (EQ);
 				}
 
 {NE} 			{
 					printf("Operador Relacional: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (NE);
 				}
 
 {NOT} 			{
 					printf("Operador Logico: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (NOT);
 				}
 
 {AND} 			{
 					printf("Operador Logico: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (AND);
 				}
 
 {OR} 			{
 					printf("Operador Logico: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (OR);
 				}
 
@@ -262,35 +257,35 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {ATR} 			{
 					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (ATR);
 				}
 
 {PLUS_ATR} 		{
 					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (PLUS_ATR);
 				}
 
 {MINUS_ATR} 	{
 					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (MINUS_ATR);
 				}
 
 {TIMES_ATR} 	{
 					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (TIMES_ATR);
 				}
 
 {OVER_ATR} 		{
 					printf("Operador Atribuicao: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (OVER_ATR);
 				}
 
@@ -298,28 +293,28 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {PLUS_OP} 		{
 					printf("Operador Aditivo: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (PLUS_OP);
 				}
 
 {MINUS_OP} 		{
 					printf("Operador Aditivo: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (MINUS_OP);
 				}
 
 {TIMES_OP} 		{
 					printf("Operador Multiplicativo: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (TIMES_OP);
 				}
 
 {OVER_OP} 		{
 					printf("Operador Multiplicativo: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (OVER_OP);
 				}
 
@@ -327,14 +322,14 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {INI_PARAM} 	{
 					printf("Inicio de parametro: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (INI_PARAM);
 				}
 
 {FIM_PARAM} 	{
 					printf("Fim de parametro: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (FIM_PARAM);
 				}
 
@@ -349,7 +344,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {FIM_INSTRUC} 	{
 					printf("Fim de instrucao: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (FIM_INSTRUC);
 				}
 
@@ -358,21 +353,21 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Fim de expressao: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(yytext, num_lin, num_char); 
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (FIM_EXPRESS);
 				}
 
 {SEPARA_ARG} 	{
 					printf("Separador de argumento: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (SEPARA_ARG);
 				}
 
 {ACESSO_END} 	{
 					printf("Operador de acesso a endereco: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+
 					return (ACESSO_END);
 				}
 
@@ -397,6 +392,55 @@ int contLinha(char* text){
 	}
 
 	return count;
+}
+
+// RETORNO: 0 nenhnum erro, 1 erro corrigido, 2 erro nao corrigido
+int checa_warn(char* valor, int lin, int col){
+	int erro = 0;
+
+	// ERRO DE TAMANHO
+	{
+		int tam = (int) strlen(valor);
+		if(tam > 33){
+			if(erro < 1){
+				erro = 1;
+			}
+			printf("\t[WARNING]: Tamanho excede o maximo %d>33. valor sera truncado. Linha[%d:%d]\n", tam, lin, col);
+			char aux_valor[33];
+			int i = 0;
+			for(i = 0; i < 33; i++){
+				aux_valor[i] = valor[i];
+			}
+			valor[33] = '\0';
+			strcpy(valor, aux_valor);
+			printf("\t\tNovo valor truncado: %s\n", valor);
+		}
+	}
+
+	// ERRO DE IF
+	{
+		if(strcmp("fi", valor) == 0){
+			if(erro < 2){
+				erro = 2;
+			}
+			printf("\t[WARNING]: em vez de %s, nao quis dizer if? Linha[%d:%d]\n", valor, lin+1, col);
+		}
+	}
+
+	// ERRO DE FIM DE EXPRESSAO ;;
+	{
+		if(';' == valor[0] && strcmp(";", valor) != 0){
+			printf("\t[WARNING]: Fim de expressao com %s valor sera substituido por ; Linha[%d:%d]\n", valor, lin+1, col);
+			if(erro < 1){
+				erro = 1;
+			}
+
+			valor[1] = '\0';
+			valor[0] = ';';
+		}
+	}
+
+	return 0;
 }
 
 // PARA COMPILAR SEM MAIN, UTILIZE A FLAG -ll (pegar entrada padrao)
