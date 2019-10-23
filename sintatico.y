@@ -33,7 +33,7 @@
 	// extern tabela;
 %} 
 
-%token <ID> IF ELSE FOR RETURN INT FLOAT POINT SHAPE
+%token <ID> IF ELSE FOR RETURN INT FLOAT POINT SHAPE PRINTINT PRINTFLOAT PRINTPOINT PRINTSHAPE SCANINT SCANFLOAT CONSTROIPOINT CONSTROISHAPE PERIMETRO ISIN ISCOLLIDED
 
 %token <LITERAL> LITERAL
 
@@ -74,7 +74,7 @@
 
 
 %type <node> num addop mulop logop relop atrop
-%type <node> rec_args lista_arg arg chamada endereco factor
+%type <node> rec_args lista_arg arg nome_func chamada endereco factor
 %type <node> rec_timesexpress termo
 %type <node> rec_plusexpress express_soma fat_express express_simp var expressao instruc_return
 %type <node> instruc_iterac fat_if instruc_cond instruc_expr instrucao rec_instrucs lista_instruc
@@ -132,7 +132,14 @@ rec_decls:
 			/* %empty */ {
 
 			}
-			| declaracao rec_decls
+			| declaracao rec_decls {
+				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[1] = (Node*) malloc(sizeof(Node));
+				lista[0] = $1;
+				lista[1] = $2;
+				$$ = novoNo(2, lista, "declaracao rec_decls ");
+			}
 			;
 
 
@@ -584,13 +591,82 @@ endereco:
 			;
 
 chamada:
-			var INI_PARAM arg FIM_PARAM{
+			nome_func INI_PARAM arg FIM_PARAM{
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $3;
 				$$ = novoNo(2, lista, "var ( arg ) ");
+			}
+			;
+
+nome_func:
+			PRINTINT {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("printInt");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| PRINTFLOAT {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("printFloat");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| PRINTPOINT {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("printPoint");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| PRINTSHAPE {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("printShape");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| SCANINT {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("scanInt");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| SCANFLOAT {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("scanFloat");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| CONSTROIPOINT {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("constroiPoint");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| CONSTROISHAPE {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("constroiShape");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| PERIMETRO {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("Perimetro");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| ISIN {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("IsIn");
+				$$ = novoNo(1, lista, lista[0]->valor);
+			}
+			| ISCOLLIDED {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = (Node*) malloc(sizeof(Node));
+				lista[0] = novaFolhaText("IsCollided");
+				$$ = novoNo(1, lista, lista[0]->valor);
 			}
 			;
 
@@ -868,20 +944,20 @@ Node* novoNo(int quantidade, Filhos* filhos, char* valor){
 
 Node* novaFolhaFloat(double val){
 	Node* novo = (Node*) malloc(sizeof(Node));
-	novo->valor = (char*) malloc(sizeof(char) * contDigf(val));
+	novo->valor = (char*) malloc(sizeof(char) * (contDigf(val) + 1));
 	novo->qtdFi = 0;
-	gcvt(val, contDigf(val), novo->valor);
-	printf("\t\t\t\t ################ %s\n", novo->valor);
+	gcvt(val, contDigf(val) + 1, novo->valor);
+	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	novo->fi = NULL;
 	return novo;
 }
 
 Node* novaFolhaInt(int val){
 	Node* novo = (Node*) malloc(sizeof(Node));
-	novo->valor = (char*) malloc(sizeof(char) * contDigf((double)val));
+	novo->valor = (char*) malloc(sizeof(char) * (contDigf((double)val) + 1));
 	novo->qtdFi = 0;
 	sprintf(novo->valor, "%i", val);
-	printf("\t\t\t\t ################ %s\n", novo->valor);
+	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	novo->fi = NULL;
 	return novo;
 }
@@ -891,7 +967,7 @@ Node* novaFolhaText(char* val){
 	novo->valor = (char*) malloc(sizeof(char) * strlen(val));
 	novo->qtdFi = 0;
 	novo->valor = strdup(val);
-	printf("\t\t\t\t ################ %s\n", novo->valor);
+	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	novo->fi = NULL;
 	return novo;
 }

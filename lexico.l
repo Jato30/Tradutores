@@ -33,6 +33,17 @@ INT				int
 FLOAT			float
 POINT			point
 SHAPE			shape
+PRINTINT		printInt
+PRINTFLOAT		printFloat
+PRINTPOINT		printPoint
+PRINTSHAPE		printShape
+SCANINT			scanInt
+SCANFLOAT		scanFloat
+CONSTROIPOINT	constroiPoint
+CONSTROISHAPE	constroiShape
+PERIMETRO		Perimetro
+ISIN			IsIn
+ISCOLLIDED		IsCollided
 
 INTEIRO			{DIGITO}+
 DECIMAL			{INTEIRO}"."{DIGITO}+([eE][-+])?{DIGITO}*
@@ -78,6 +89,27 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 %%
 
 {ERRO} 			{erro++; num_char += strlen(yytext); printf("\t[ERRO] Entrada invalida: %s linha[%d:%d]\n", yytext, num_lin, num_char);}
+
+{LITERAL} 		{
+					num_char += strlen(yytext);
+
+					int i, j = 0;
+					char* aux = (char*) malloc(sizeof(char) * (strlen(yytext) - 1));
+					for(i = 1; i < (strlen(yytext) - 1); i++){
+						aux[j] = yytext[i];
+						j++;
+					}
+					aux[j] = '\0';
+					yylval->LITERAL = (char*) malloc(sizeof(char) * strlen(aux));
+					strcpy(yylval->LITERAL, aux);
+					free(aux);
+					aux = NULL;
+
+					printf("String constante: \"%s\"\n", yylval->LITERAL);
+					insere(&tabela, yylval->LITERAL, num_lin, num_char);
+
+					return (LITERAL);
+				}
 
 {IF} 			{
 					printf("Palavra reservada: %s\n", yytext);
@@ -143,24 +175,92 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					return (SHAPE);
 				}
 
-{LITERAL} 		{
+{PRINTINT} 		{
+					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (PRINTINT);
+				}
 
-					int i, j = 0;
-					char* aux = (char*) malloc(sizeof(char) * (strlen(yytext) - 2));
-					for(i = 1; i < (strlen(yytext) - 1); i++){
-						aux[j] = yytext[i];
-						j++;
-					}
-					yylval->LITERAL = (char*) malloc(sizeof(char) * strlen(aux));
-					strcpy(yylval->LITERAL, aux);
-					free(aux);
-					aux = NULL;
+{PRINTFLOAT} 	{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (PRINTFLOAT);
+				}
 
-					printf("String constante: \"%s\"\n", yylval->LITERAL);
-					insere(&tabela, yylval->LITERAL, num_lin, num_char);
+{PRINTPOINT} 		{
+					printf("Tipo de dados: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (PRINTPOINT);
+				}
 
-					return (LITERAL);
+{PRINTSHAPE} 	{
+					printf("Tipo de dados: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (PRINTSHAPE);
+				}
+
+{SCANINT} 		{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (SCANINT);
+				}
+
+{SCANFLOAT} 	{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (SCANFLOAT);
+				}
+
+{CONSTROIPOINT} {
+					printf("Tipo de dados: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (CONSTROIPOINT);
+				}
+
+{CONSTROISHAPE} {
+					printf("Tipo de dados: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (CONSTROISHAPE);
+				}
+
+{PERIMETRO} 	{
+					printf("Palavra reservada: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (PERIMETRO);
+				}
+
+{ISIN} 			{
+					printf("Tipo de dados: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (ISIN);
+				}
+
+{ISCOLLIDED} 	{
+					printf("Tipo de dados: %s\n", yytext);
+					num_char += strlen(yytext);
+					checa_warn(strdup(yytext), num_lin, num_char);
+					insere(&tabela, strdup(yytext), num_lin, num_char);
+					return (ISCOLLIDED);
 				}
 
 

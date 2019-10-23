@@ -32,10 +32,10 @@ int main(){
 			printPoint("Ponto esta dentro", p1);
 			dentro = 1
 			i = forma2 - Perimetro)qtd(;
-			print("Ponto esta dentro, saindo do loop..." outro parametro);
+			printFloat("Ponto esta dentro, saindo do loop..." outro parametro);
 		}
 		if{
-			print("Ponto esta fora");
+			printInt("Ponto esta fora");
 		}
 	
 
