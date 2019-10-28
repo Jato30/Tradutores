@@ -1,11 +1,12 @@
-%defines
-%pure-parser
+
+// %code requires {
+// 	#include "./lib/TabSimbolo.h"
+// }
 
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
-	//#include "./lib/TabSimbolo.h"
 
 	int yylex();
 
@@ -28,10 +29,13 @@
 		char* valor;
 	};
 
-	// TabSimbolos tabela = NULL;
+	// TabSimbolos tabela;
 	Node* raiz = NULL;
 	// extern tabela;
-%} 
+%}
+
+%defines
+%pure-parser
 
 %token <ID> IF ELSE FOR RETURN INT FLOAT POINT SHAPE PRINTINT PRINTFLOAT PRINTPOINT PRINTSHAPE SCANINT SCANFLOAT CONSTROIPOINT CONSTROISHAPE PERIMETRO ISIN ISCOLLIDED
 
@@ -908,18 +912,23 @@ void printArvore(Node *raiz, int tabs){
 }
 
 void destroiArvore(Node *raiz){
-	if(raiz->fi != NULL){
-		int i;
-		for(i = 0; i < raiz->qtdFi; i++){
-			if(raiz->fi[i] != NULL){
-				destroiArvore(raiz->fi[i]);
+	if(raiz != NULL){
+		if(raiz->fi != NULL){
+			int i;
+			for(i = 0; i < raiz->qtdFi; i++){
+				if(raiz->fi[i] != NULL){
+					destroiArvore(raiz->fi[i]);
+				}
 			}
 		}
+		if(raiz->valor != NULL){
+			free(raiz->valor);
+			raiz->valor = NULL;
+		}
+
+		free(raiz);
+		raiz = NULL;
 	}
-	free(raiz->valor);
-	raiz->valor = NULL;
-	free(raiz);
-	raiz = NULL;
 }
 
 
@@ -935,7 +944,7 @@ Node* novoNo(int quantidade, Filhos* filhos, char* valor){
 		novo->fi[i] = filhos[i];
 	}
 
-	novo->valor = (char*) malloc(sizeof(char) * strlen(valor));
+	novo->valor = (char*) malloc(sizeof(char) * strlen(valor) +1);
 	novo->valor = strdup(valor);
 
 	printf("\t\t\t\t ################ %s\n", novo->valor);
@@ -977,8 +986,9 @@ void yyerror(char const *s){
 }
 
 int main(void){
+	// criaTab(&tabela);
 	yyparse();
-	while(yylex());
+	// while(yylex());
 	printf("\nraiz: programa\n");
 	// printArvore(raiz, 0);
 	destroiArvore(raiz);

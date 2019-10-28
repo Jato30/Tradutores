@@ -9,10 +9,10 @@ int main(){
 	*/
 	for(i = 1; i >< 4; i += 1){
 		point a, z;
-		a.x = i;
+		a 1x = i;
 		a.,y = i*i - a.x;;
-		z.y = 2 - i;
-		z.x = 2 - (z.y - i*i);
+		_zy = 2 - i;
+		zx = 2 - (z.y - i*i);
 		pol~vertice[i-1] = a;
 		pol.vertice[5-(i-1)] = z;
 	}

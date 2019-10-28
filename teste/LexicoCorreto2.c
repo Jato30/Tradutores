@@ -7,14 +7,14 @@ int main(){
 	* Define posicoes para cada ponto
 	* e atribui a um_poligono_com_seis_lados_diferentes
 	*/
-	for(i = 1; i < 4; i = i+1){
+	for i = 1; i < 4; i = i+1
 		point a, z;
-		a.x = i;
-		a.y = i*i - a.x;
-		z.y = 2 - i;
-		z.x = 2 - (z.y - i*i);
-		um_poligono_com_seis_lados_diferentes.vertice[i-1] = a;
-		um_poligono_com_seis_lados_diferentes.vertice[5-(i-1)] = z;
+		a 1.1 x = i;
+		a= i*i - ax;
+		y = 2 - i;
+		x = 2 - (zy - i*i);
+		um_poligono_com_seis_lados_diferentes>vertice[i-1] = a;
+		um_poligono_com_seis_lados_diferentes>vertice[5-(i-1)] = z;
 	}
 
 	return 0;

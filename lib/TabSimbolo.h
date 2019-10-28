@@ -1,6 +1,7 @@
 #ifndef __TABSIMBOLO_H__
 #define __TABSIMBOLO_H__
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,14 +14,14 @@ typedef struct Simbolo{
 
 typedef Simbolo* TabSimbolos;
 
-void cria(TabSimbolos* raiz);
+void criaTab(TabSimbolos* raiz);
 int buscaTab(TabSimbolos* raiz, char* valor);
 int checa_warn(char* valor, int lin, int col);
 void insere(TabSimbolos* raiz, char* valor, int lin, int col);
 void printTab(TabSimbolos* raiz);
 void destroiTab(TabSimbolos* raiz);
 
-void cria(TabSimbolos* raiz){
+void criaTab(TabSimbolos* raiz){
 	(*raiz) = NULL;
 }
 
@@ -54,7 +55,7 @@ void insere(TabSimbolos* raiz, char* valor, int lin, int col){
 	if(busca == -1){
 		if(*raiz == NULL){  //Lista vazia
 			*raiz = (TabSimbolos) malloc(sizeof(Simbolo));
-			(*raiz)->valor = (char*) malloc(sizeof(char) * strlen(valor));
+			(*raiz)->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
 			strcpy((*raiz)->valor, valor);
 			(*raiz)->chave = 1;
 			(*raiz)->qtd = 1;
@@ -72,7 +73,7 @@ void insere(TabSimbolos* raiz, char* valor, int lin, int col){
 			aux_chave++;
 
 			ultimoLista->prox = (TabSimbolos) malloc(sizeof(Simbolo));
-			ultimoLista->prox->valor = (char*) malloc(sizeof(char) * strlen(valor));
+			ultimoLista->prox->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
 			strcpy(ultimoLista->prox->valor, valor);
 			ultimoLista->prox->chave = aux_chave;
 			ultimoLista->prox->qtd = 1;

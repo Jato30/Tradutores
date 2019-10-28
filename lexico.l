@@ -1,6 +1,7 @@
 %option noyywrap
 %option bison-bridge
 
+
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -13,7 +14,7 @@
 	int erro = 0;
 	int contLinha(char* text);
 	int checa_warn(char* valor, int lin, int col);
-	TabSimbolos tabela;
+	TabSimbolos tabela = NULL;
 %}
 
 
@@ -46,7 +47,7 @@ ISIN			IsIn
 ISCOLLIDED		IsCollided
 
 INTEIRO			{DIGITO}+
-DECIMAL			{INTEIRO}"."{DIGITO}+([eE][-+])?{DIGITO}*
+DECIMAL			{INTEIRO}"."{DIGITO}+
 ID				({LETRA})+({LETRA}|{DIGITO}|"_")*
 
 LT				"<"
@@ -436,8 +437,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {INI_INSTRUC} 	{
 					printf("Inicio de instrucao: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext,
-					num_lin, num_char);
+					insere(&tabela, yytext, num_lin, num_char);
 					return (INI_INSTRUC);
 				}
 
