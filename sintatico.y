@@ -889,26 +889,36 @@ int contDigf(double val){
 
 void printArvore(Node *raiz, int tabs){
 	int i;
+	if(tabs == 0){
+		printf("-----------------------------------------------\nArvore\n\n");
+	}
+	printf("line:%2d", raiz->qtdFi );
+
 	for(i = 0; i < tabs; ++i){
-		printf("- ");
+		printf("  ");
 	}
-	printf("%s\n", raiz->valor);
-	// if(raiz->op) {
-	// 	printf("%c{\n", raiz->op);
-	for(i = 0; i < raiz->qtdFi; i++){
-		if(raiz->fi[i] != NULL){
+	printf("%s%s", raiz->valor , raiz->fi ? "{\n" : "\n");
+
+
+	if(raiz->fi != NULL){
+		i = 0;
+		while(raiz->fi[i] != NULL){
 			printArvore(raiz->fi[i], tabs + 1);
+			i++;
 		}
+		i = 0;
 	}
-	// 	printArvore(raiz->direita, tabs + 1);
-	// 	for(i = 0; i < tabs; ++i){
-			printf("  ");
-	// 	}
-	// 	printf("}\n");
-	// }
-	// else{
-	// 	printf("%s\n", raiz->valor);
-	// }
+	printf("line:%2d", raiz->qtdFi );
+	for(i = 0; i < tabs; ++i){
+		printf("  ");
+	}
+	if(raiz->fi != NULL){
+		printf("}");
+	}
+	printf("\n");
+	if(tabs == 0){
+		printf("-----------------------------------------------\n");
+	}
 }
 
 void destroiArvore(Node *raiz){
@@ -947,7 +957,7 @@ Node* novoNo(int quantidade, Filhos* filhos, char* valor){
 	novo->valor = (char*) malloc(sizeof(char) * strlen(valor) +1);
 	novo->valor = strdup(valor);
 
-	printf("\t\t\t\t ################ %s\n", novo->valor);
+	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	return novo;
 }
 
@@ -988,8 +998,6 @@ void yyerror(char const *s){
 int main(void){
 	// criaTab(&tabela);
 	yyparse();
-	// while(yylex());
-	printf("\nraiz: programa\n");
 	// printArvore(raiz, 0);
 	destroiArvore(raiz);
 	// destroiTab(&tabela);
