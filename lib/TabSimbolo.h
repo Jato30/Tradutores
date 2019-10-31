@@ -1,6 +1,7 @@
 #ifndef __TABSIMBOLO_H__
 #define __TABSIMBOLO_H__
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,25 +14,26 @@ typedef struct Simbolo{
 
 typedef Simbolo* TabSimbolos;
 
-void cria(TabSimbolos* raiz);
+void criaTab(TabSimbolos* raiz);
 int buscaTab(TabSimbolos* raiz, char* valor);
 int checa_warn(char* valor, int lin, int col);
 void insere(TabSimbolos* raiz, char* valor, int lin, int col);
 void printTab(TabSimbolos* raiz);
+void destroiTab(TabSimbolos* raiz);
 
-void cria(TabSimbolos* raiz){
-	*raiz = NULL;
+void criaTab(TabSimbolos* raiz){
+	(*raiz) = NULL;
 }
 
 // RETORNO: retorna a chave do elemento repetido, -1 se nao houver repeticao
 int buscaTab(TabSimbolos* raiz, char* valor){
-	if(*raiz == NULL){
+	if((*raiz) == NULL){
 		// printf("\nTabela vazia\n");
 		return -1;
 	}
 	else{
 		TabSimbolos atual;
-		atual = *raiz;
+		atual = (*raiz);
 		while(atual != NULL){
 			if(strcmp(atual->valor, valor) == 0){
 				// printf("\tJa existe %s na tabela de simbolos\n", valor);
@@ -41,59 +43,10 @@ int buscaTab(TabSimbolos* raiz, char* valor){
 		}
 
 		// printf("Nenhuma ocorrencia repetida.\n");
+		free(atual);
+		atual = NULL;
 		return -1;
 	}
-}
-
-// RETORNO: 0 nenhnum erro, 1 erro corrigido, 2 erro nao corrigido
-int checa_warn(char* valor, int lin, int col){
-	int erro = 0;
-
-	// ERRO DE TAMANHO
-	{
-		int tam = (int) strlen(valor);
-		if(tam > 33){
-			if(erro < 1){
-				erro = 1;
-			}
-			printf("\t[WARNING]: Tamanho excede o maximo %d>33. valor sera truncado. Linha[%d:%d]\n", tam, lin+1, col);
-			char aux_valor[33];
-			int i = 0;
-			for(i = 0; i < 33; i++){
-				aux_valor[i] = valor[i];
-			}
-			valor[33] = '\0';
-			valor = NULL;
-			free(valor);
-			valor = (char*) malloc(sizeof(char*) * 33);
-			strcpy(valor, aux_valor);
-		}
-	}
-
-	// ERRO DE IF
-	{
-		if(strcmp("fi", valor) == 0){
-			if(erro < 2){
-				erro = 2;
-			}
-			printf("\t[WARNING]: em vez de %s, nao quis dizer if? Linha[%d:%d]\n", valor, lin+1, col);
-		}
-	}
-
-	// ERRO DE FIM DE EXPRESSAO ;;
-	{
-		if(';' == valor[0] && strcmp(";", valor) != 0){
-			printf("\t[WARNING]: Fim de expressao com %s valor sera substituido por ; Linha[%d:%d]\n", valor, lin+1, col);
-			if(erro < 1){
-				erro = 1;
-			}
-
-			valor[1] = '\0';
-			valor[0] = ';';
-		}
-	}
-
-	return 0;
 }
 
 void insere(TabSimbolos* raiz, char* valor, int lin, int col){
@@ -102,7 +55,7 @@ void insere(TabSimbolos* raiz, char* valor, int lin, int col){
 	if(busca == -1){
 		if(*raiz == NULL){  //Lista vazia
 			*raiz = (TabSimbolos) malloc(sizeof(Simbolo));
-			(*raiz)->valor = (char*) malloc(sizeof(char) * strlen(valor));
+			(*raiz)->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
 			strcpy((*raiz)->valor, valor);
 			(*raiz)->chave = 1;
 			(*raiz)->qtd = 1;
@@ -120,7 +73,7 @@ void insere(TabSimbolos* raiz, char* valor, int lin, int col){
 			aux_chave++;
 
 			ultimoLista->prox = (TabSimbolos) malloc(sizeof(Simbolo));
-			ultimoLista->prox->valor = (char*) malloc(sizeof(char) * strlen(valor));
+			ultimoLista->prox->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
 			strcpy(ultimoLista->prox->valor, valor);
 			ultimoLista->prox->chave = aux_chave;
 			ultimoLista->prox->qtd = 1;
@@ -160,6 +113,17 @@ void printTab(TabSimbolos* raiz){
 		}
 	}
 
+}
+
+void destroiTab(TabSimbolos* raiz){
+	if((*raiz)->prox != NULL){
+		destroiTab(&((*raiz)->prox));
+	}
+
+	free((*raiz)->valor);
+	(*raiz)->valor = NULL;
+	free(*raiz);
+	(*raiz) = NULL;
 }
 
 
