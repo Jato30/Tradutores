@@ -1,12 +1,9 @@
 
-// %code requires {
-// 	#include "./lib/TabSimbolo.h"
-// }
-
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include "./lib/TabSimbolo.h"
 
 	int yylex();
 
@@ -29,9 +26,8 @@
 		char* valor;
 	};
 
-	// TabSimbolos tabela;
+	TabSimbolos tabela;
 	Node* raiz = NULL;
-	// extern tabela;
 %}
 
 %defines
@@ -133,7 +129,7 @@ lista_decl:
 			;
 
 rec_decls:
-			/* %empty */ {
+			/* %empty */ { $$ = NULL;
 
 			}
 			| declaracao rec_decls {
@@ -216,7 +212,7 @@ tipo_especif:
 			;
 
 params:
-			/* %empty */ {
+			/* %empty */ { $$ = NULL;
 				
 			}
 			| lista_param {
@@ -240,7 +236,7 @@ lista_param:
 			;
 
 rec_paramlist:
-			/* %empty */ {
+			/* %empty */ { $$ = NULL;
 
 			}
 			| SEPARA_ARG param rec_paramlist {
@@ -287,7 +283,7 @@ decl_local:
 			;
 
 rec_declocs:
-			/* %empty */ {
+			/* %empty */ { $$ = NULL;
 
 			}
 			| decl_var rec_declocs {
@@ -392,7 +388,7 @@ instruc_cond:
 			;
 
 fat_if:
-			/* %empty */ {
+			/* %empty */ {$$ = NULL;
 
 			}
 			| ELSE INI_INSTRUC instrucao FIM_INSTRUC {
@@ -477,7 +473,7 @@ express_simp:
 			;
 
 fat_express:
-			/* %empty */ {
+			/* %empty */ { $$ = NULL;
 
 			}
 			| relop express_soma {
@@ -503,7 +499,7 @@ express_soma:
 			;
 
 rec_plusexpress:
-			/* %empty */ {
+			/* %empty */ { $$ = NULL;
 
 			}
 			| addop termo rec_plusexpress {
@@ -531,7 +527,7 @@ termo:
 			;
 
 rec_timesexpress:
-			/* %empty */ {
+			/* %empty */ { $$ = NULL;
 
 			}
 			| mulop factor rec_timesexpress {
@@ -675,7 +671,7 @@ nome_func:
 			;
 
 arg:
-			/* %empty */ {
+/* %empty */ { $$ = NULL;
 
 			}
 			| lista_arg {
@@ -699,7 +695,7 @@ lista_arg:
 			;
 
 rec_args:
-			/* %empty */ {
+			/* %empty */ { $$ = NULL;
 
 			}
 			| SEPARA_ARG expressao rec_args {
@@ -714,7 +710,7 @@ rec_args:
 
 
 atrop:
-			ATR {
+			ATR { 
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("=");
@@ -888,6 +884,7 @@ int contDigf(double val){
 }
 
 void printArvore(Node *raiz, int tabs){
+  if (raiz != NULL) {
 	int i;
 	if(tabs == 0){
 		printf("-----------------------------------------------\nArvore\n\n");
@@ -919,6 +916,7 @@ void printArvore(Node *raiz, int tabs){
 	if(tabs == 0){
 		printf("-----------------------------------------------\n");
 	}
+  }
 }
 
 void destroiArvore(Node *raiz){
@@ -944,16 +942,9 @@ void destroiArvore(Node *raiz){
 
 
 Node* novoNo(int quantidade, Filhos* filhos, char* valor){
-	Node* novo = (Node*) malloc(sizeof(Node));
-	novo->fi = (Filhos*) malloc(sizeof(Node*) * quantidade);
-	
+  	Node* novo = (Node*) malloc(sizeof(Node));
+	novo->fi = filhos;
 	novo->qtdFi = quantidade;
-	int i;
-	for(i = 0; i < quantidade; i++){
-		novo->fi[i] = (Node*) malloc(sizeof(Node));
-		novo->fi[i] = filhos[i];
-	}
-
 	novo->valor = (char*) malloc(sizeof(char) * strlen(valor) +1);
 	novo->valor = strdup(valor);
 
@@ -996,9 +987,10 @@ void yyerror(char const *s){
 }
 
 int main(void){
-	// criaTab(&tabela);
+	criaTab(&tabela);
 	yyparse();
-	// printArvore(raiz, 0);
+	printArvore(raiz, 0);
+	//printTab(&tabela);
 	destroiArvore(raiz);
 	// destroiTab(&tabela);
 	return 0;
