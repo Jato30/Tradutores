@@ -1,27 +1,33 @@
 #ifndef __TABSIMBOLO_H__
 #define __TABSIMBOLO_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#define VAR 100000
+#define FUNC 100001
 
-typedef enum{
-	INTEGER,
-	DOUBLE,
-	PONTO,
-	FORMA,
-	LIT,
-	KEYWORD,
-	VAR,
-	FUNC
+typedef enum {
+	Inteiro,
+	Decimal,
+	Ponto,
+	Forma,
+	Literal
 } TYPE;
 
+typedef struct Parametro{
+	TYPE tipo;
+	char* nome;
+	int isEnd; // Se eh &endereco
+	struct Parametro *prox;
+	
+} Parametro;
 
 typedef struct Simbolo{
 	char* valor;
-	int qtd;
-	int chave;
-	TYPE tipo;
+	int qtd; // Quantidade de vezes que aparece
+	int chave; // Numero do no, valor unico.
+	int isVar; // flag que determina se variavel ou funcao
+	TYPE tipo; // para definir os tipos basicos (se funcao, tipo do retorno)
+	int qtdParams;
+	Parametro *params; // para ser usado somente se for funcao
 	struct Simbolo *prox;
 } Simbolo;
 
@@ -30,115 +36,9 @@ typedef Simbolo* TabSimbolos;
 void criaTab(TabSimbolos* raiz);
 int buscaTab(TabSimbolos* raiz, char* valor);
 int checa_warn(char* valor, int lin, int col);
-void insere(TabSimbolos* raiz, TYPE tipo, char* valor, int lin, int col);
+void insere(TabSimbolos* raiz, char* valor, int lin, int col, int isVar, TYPE tipo, int qtdParams, Parametro* params);
 void printTab(TabSimbolos* raiz);
 void destroiTab(TabSimbolos* raiz);
-
-void criaTab(TabSimbolos* raiz){
-	(*raiz) = NULL;
-}
-
-// RETORNO: retorna a chave do elemento repetido, -1 se nao houver repeticao
-int buscaTab(TabSimbolos* raiz, char* valor){
-	if((*raiz) == NULL){
-		// printf("\nTabela vazia\n");
-		return -1;
-	}
-	else{
-		TabSimbolos atual;
-		atual = (*raiz);
-		while(atual != NULL){
-			if(strcmp(atual->valor, valor) == 0){
-				// printf("\tJa existe %s na tabela de simbolos\n", valor);
-				return atual->chave;
-			}
-			atual = atual->prox;
-		}
-
-		// printf("Nenhuma ocorrencia repetida.\n");
-		free(atual);
-		atual = NULL;
-		return -1;
-	}
-}
-
-void insere(TabSimbolos* raiz, TYPE tipo, char* valor, int lin, int col){
-
-	int busca = buscaTab(raiz, valor);
-	if(busca == -1){
-		if(*raiz == NULL){  //Lista vazia
-			*raiz = (TabSimbolos) malloc(sizeof(Simbolo));
-			(*raiz)->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
-			strcpy((*raiz)->valor, valor);
-			(*raiz)->chave = 1;
-			(*raiz)->qtd = 1;
-			(*raiz)->prox = NULL;
-		}
-		else{
-			TabSimbolos ultimoLista;
-			int aux_chave = 1;
-
-			ultimoLista = *raiz;
-			while(ultimoLista->prox != NULL){
-				aux_chave++;
-				ultimoLista = ultimoLista->prox;
-			}
-			aux_chave++;
-
-			ultimoLista->prox = (TabSimbolos) malloc(sizeof(Simbolo));
-			ultimoLista->prox->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
-			strcpy(ultimoLista->prox->valor, valor);
-			ultimoLista->prox->tipo = tipo;
-			ultimoLista->prox->chave = aux_chave;
-			ultimoLista->prox->qtd = 1;
-			ultimoLista->prox->prox = NULL;
-		}
-
-	}
-	else{
-		TabSimbolos atual;
-		atual = *raiz;   /*@ Primeiro elemento*/
-
-		while(atual->prox != NULL){
-			if(atual->chave == busca){
-				atual->qtd++;
-				break;
-			}
-			atual = atual->prox;
-		}
-	}
-
-}
-
-void printTab(TabSimbolos* raiz){
-	printf("\n\nTABELA DE SIMBOLOS ########\n\n");
-
-	if(*raiz == NULL){
-		printf("\nTabela de Simbolos vazia\n");
-	}
-	else{
-		TabSimbolos atual;
-		atual = *raiz;
-		printf("CHAVE\t\tQUANTIDADE\t\tVALOR\n");
-
-		while(atual != NULL){
-			printf("%d\t\t%d\t\t\t%s\n", atual->chave, atual->qtd, atual->valor);
-			atual = atual->prox;
-		}
-	}
-
-}
-
-void destroiTab(TabSimbolos* raiz){
-	if((*raiz)->prox != NULL){
-		destroiTab(&((*raiz)->prox));
-	}
-
-	free((*raiz)->valor);
-	(*raiz)->valor = NULL;
-	free(*raiz);
-	(*raiz) = NULL;
-}
 
 
 #endif // __TABSIMBOLO_H__
