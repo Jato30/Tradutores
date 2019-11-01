@@ -14,8 +14,7 @@
 	int erro = 0;
 	int contLinha(char* text);
 	int checa_warn(char* valor, int lin, int col);
-	TabSimbolos tabela = NULL;
-
+	extern TabSimbolos tabela;
 %}
 
 
@@ -108,7 +107,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					aux = NULL;
 
 					printf("String constante: \"%s\"\n", yylval->LITERAL);
-					insere(&tabela, TYPE.LIT, yylval->LITERAL, num_lin, num_char);
+					// insere(&tabela, yylval->LITERAL, num_lin, num_char);
 
 					return (LITERAL);
 				}
@@ -117,7 +116,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.KEYWORD, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (IF);
 				}
 
@@ -125,7 +124,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.KEYWORD, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (ELSE);
 				}
 
@@ -133,7 +132,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.KEYWORD, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (FOR);
 				}
 
@@ -141,7 +140,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.KEYWORD, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (RETURN);
 				}
 
@@ -149,7 +148,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (INT);
 				}
 
@@ -157,7 +156,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.DOUBLE, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (FLOAT);
 				}
 
@@ -165,7 +164,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.PONTO, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (POINT);
 				}
 
@@ -173,7 +172,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.FORMA, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (SHAPE);
 				}
 
@@ -181,7 +180,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (PRINTINT);
 				}
 
@@ -189,7 +188,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (PRINTFLOAT);
 				}
 
@@ -197,7 +196,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (PRINTPOINT);
 				}
 
@@ -205,7 +204,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (PRINTSHAPE);
 				}
 
@@ -213,7 +212,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (SCANINT);
 				}
 
@@ -221,7 +220,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (SCANFLOAT);
 				}
 
@@ -229,7 +228,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (CONSTROIPOINT);
 				}
 
@@ -237,7 +236,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (CONSTROISHAPE);
 				}
 
@@ -245,7 +244,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Palavra reservada: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (PERIMETRO);
 				}
 
@@ -253,7 +252,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (ISIN);
 				}
 
@@ -261,7 +260,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					printf("Tipo de dados: %s\n", yytext);
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (ISCOLLIDED);
 				}
 
@@ -271,7 +270,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
 					yylval->INTEIRO = atoi(yytext);
-					insere(&tabela, TYPE.INTEGER, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (INTEIRO);
 				}
 
@@ -280,7 +279,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
 					yylval->DECIMAL = atof(yytext);
-					insere(&tabela, TYPE.DOUBLE, strdup(yytext), num_lin, num_char);
+					// insere(&tabela, strdup(yytext), num_lin, num_char);
 					return (DECIMAL);
 				}
 
@@ -289,7 +288,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					num_char += strlen(yytext);
 					checa_warn(strdup(yytext), num_lin, num_char);
 					strcpy(yylval->ID, yytext);
-					insere(&tabela, TYPE.VAR, yylval->ID, num_lin, num_char);
+					// insere(&tabela, yylval->ID, num_lin, num_char);
 					return (ID);
 				}
 
@@ -438,7 +437,7 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {INI_INSTRUC} 	{
 					printf("Inicio de instrucao: %s\n", yytext);
 					num_char += strlen(yytext);
-					insere(&tabela, yytext, num_lin, num_char);
+					// insere(&tabela, yytext, num_lin, num_char);
 					return (INI_INSTRUC);
 				}
 
