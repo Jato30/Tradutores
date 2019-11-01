@@ -5,10 +5,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef enum{
+	INTEGER,
+	DOUBLE,
+	PONTO,
+	FORMA,
+	LIT,
+	KEYWORD,
+	VAR,
+	FUNC
+} TYPE;
+
+
 typedef struct Simbolo{
 	char* valor;
 	int qtd;
 	int chave;
+	TYPE tipo;
 	struct Simbolo *prox;
 } Simbolo;
 
@@ -17,7 +30,7 @@ typedef Simbolo* TabSimbolos;
 void criaTab(TabSimbolos* raiz);
 int buscaTab(TabSimbolos* raiz, char* valor);
 int checa_warn(char* valor, int lin, int col);
-void insere(TabSimbolos* raiz, char* valor, int lin, int col);
+void insere(TabSimbolos* raiz, TYPE tipo, char* valor, int lin, int col);
 void printTab(TabSimbolos* raiz);
 void destroiTab(TabSimbolos* raiz);
 
@@ -49,7 +62,7 @@ int buscaTab(TabSimbolos* raiz, char* valor){
 	}
 }
 
-void insere(TabSimbolos* raiz, char* valor, int lin, int col){
+void insere(TabSimbolos* raiz, TYPE tipo, char* valor, int lin, int col){
 
 	int busca = buscaTab(raiz, valor);
 	if(busca == -1){
@@ -75,6 +88,7 @@ void insere(TabSimbolos* raiz, char* valor, int lin, int col){
 			ultimoLista->prox = (TabSimbolos) malloc(sizeof(Simbolo));
 			ultimoLista->prox->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
 			strcpy(ultimoLista->prox->valor, valor);
+			ultimoLista->prox->tipo = tipo;
 			ultimoLista->prox->chave = aux_chave;
 			ultimoLista->prox->qtd = 1;
 			ultimoLista->prox->prox = NULL;
