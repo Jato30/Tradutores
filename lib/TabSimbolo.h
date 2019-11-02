@@ -3,19 +3,23 @@
 
 #define VAR 100000
 #define FUNC 100001
+#define KEYWORD 100007
+#define OTHER -100000
 
-typedef enum {
+typedef enum TYPE{
 	Inteiro,
 	Decimal,
 	Ponto,
 	Forma,
-	Literal
+	Literal,
+	other
 } TYPE;
 
 typedef struct Parametro{
 	TYPE tipo;
 	char* nome;
-	int isEnd; // Se eh &endereco
+	int qtd; // quantidade de params
+	int isEnd; // Se nao eh &endereco, 0
 	struct Parametro *prox;
 	
 } Parametro;
@@ -36,7 +40,7 @@ typedef Simbolo* TabSimbolos;
 void criaTab(TabSimbolos* raiz);
 int buscaTab(TabSimbolos* raiz, char* valor);
 int checa_warn(char* valor, int lin, int col);
-void insere(TabSimbolos* raiz, char* valor, int lin, int col, int isVar, TYPE tipo, int qtdParams, Parametro* params);
+void insere(TabSimbolos* raiz, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params);
 void printTab(TabSimbolos* raiz);
 void destroiTab(TabSimbolos* raiz);
 
