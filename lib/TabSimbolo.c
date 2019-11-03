@@ -18,191 +18,191 @@ void criaTab(TabSimbolos* raiz){
 	insere(raiz, "else", OTHER, other, 0, NULL);
 	insere(raiz, "for", OTHER, other, 0, NULL);
 
-	Parametro printInt;
-	printInt.nome = (char*) malloc(sizeof(char) * 6);
-	printInt.nome = "texto";
-	printInt.qtd = 2;
-	printInt.tipo = Literal;
-	printInt.isEnd = 0;
+	Parametro* printInt = (Parametro*) malloc(sizeof(Parametro));
+	printInt->nome = (char*) malloc(sizeof(char) * 6);
+	printInt->nome = "texto";
+	printInt->qtd = 2;
+	printInt->tipo = Literal;
+	printInt->isEnd = 0;
 	
-	printInt.prox = (Parametro*) malloc(sizeof(Parametro));
-	printInt.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	printInt.prox[0].nome = "valor";
-	printInt.prox[0].qtd = 2;
-	printInt.prox[0].tipo = Inteiro;
-	printInt.prox[0].isEnd = 0;
+	printInt->prox = (Parametro*) malloc(sizeof(Parametro));
+	printInt->prox->nome = (char*) malloc(sizeof(char) * 6);
+	printInt->prox->nome = "valor";
+	printInt->prox->qtd = 2;
+	printInt->prox->tipo = Inteiro;
+	printInt->prox->isEnd = 0;
 
-	insere(raiz, "printInt", FUNC, Inteiro, 2, &printInt);
+	insere(raiz, "printInt", FUNC, Inteiro, 2, printInt);
 
 
-	Parametro printFloat;
-	printFloat.nome = (char*) malloc(sizeof(char) * 6);
-	printFloat.nome = "texto";
-	printFloat.qtd = 2;
-	printFloat.tipo = Literal;
-	printFloat.isEnd = 0;
+	Parametro* printFloat = (Parametro*) malloc(sizeof(Parametro));
+	printFloat->nome = (char*) malloc(sizeof(char) * 6);
+	printFloat->nome = "texto";
+	printFloat->qtd = 2;
+	printFloat->tipo = Literal;
+	printFloat->isEnd = 0;
 	
-	printFloat.prox = (Parametro*) malloc(sizeof(Parametro));
-	printFloat.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	printFloat.prox[0].nome = "valor";
-	printFloat.prox[0].qtd = 2;
-	printFloat.prox[0].tipo = Decimal;
-	printFloat.prox[0].isEnd = 0;
+	printFloat->prox = (Parametro*) malloc(sizeof(Parametro));
+	printFloat->prox->nome = (char*) malloc(sizeof(char) * 6);
+	printFloat->prox->nome = "valor";
+	printFloat->prox->qtd = 2;
+	printFloat->prox->tipo = Decimal;
+	printFloat->prox->isEnd = 0;
 
-	insere(raiz, "printFloat", FUNC, Inteiro, 2, &printFloat);
+	insere(raiz, "printFloat", FUNC, Inteiro, 2, printFloat);
 
 
-	Parametro printPoint;
-	printPoint.nome = (char*) malloc(sizeof(char) * 6);
-	printPoint.nome = "texto";
-	printPoint.qtd = 2;
-	printPoint.tipo = Literal;
-	printPoint.isEnd = 0;
+	Parametro* printPoint = (Parametro*) malloc(sizeof(Parametro));
+	printPoint->nome = (char*) malloc(sizeof(char) * 6);
+	printPoint->nome = "texto";
+	printPoint->qtd = 2;
+	printPoint->tipo = Literal;
+	printPoint->isEnd = 0;
 	
-	printPoint.prox = (Parametro*) malloc(sizeof(Parametro));
-	printPoint.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	printPoint.prox[0].nome = "valor";
-	printPoint.prox[0].qtd = 2;
-	printPoint.prox[0].tipo = Ponto;
-	printPoint.prox[0].isEnd = 0;
+	printPoint->prox = (Parametro*) malloc(sizeof(Parametro));
+	printPoint->prox->nome = (char*) malloc(sizeof(char) * 6);
+	printPoint->prox->nome = "valor";
+	printPoint->prox->qtd = 2;
+	printPoint->prox->tipo = Ponto;
+	printPoint->prox->isEnd = 0;
 
-	insere(raiz, "printPoint", FUNC, Inteiro, 2, &printPoint);
+	insere(raiz, "printPoint", FUNC, Inteiro, 2, printPoint);
 
 
-	Parametro printShape;
-	printShape.nome = (char*) malloc(sizeof(char) * 6);
-	printShape.nome = "texto";
-	printShape.qtd = 2;
-	printShape.tipo = Literal;
-	printShape.isEnd = 0;
+	Parametro* printShape = (Parametro*) malloc(sizeof(Parametro));
+	printShape->nome = (char*) malloc(sizeof(char) * 6);
+	printShape->nome = "texto";
+	printShape->qtd = 2;
+	printShape->tipo = Literal;
+	printShape->isEnd = 0;
 	
-	printShape.prox = (Parametro*) malloc(sizeof(Parametro));
-	printShape.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	printShape.prox[0].nome = "valor";
-	printShape.prox[0].qtd = 2;
-	printShape.prox[0].tipo = Forma;
-	printShape.prox[0].isEnd = 0;
+	printShape->prox = (Parametro*) malloc(sizeof(Parametro));
+	printShape->prox->nome = (char*) malloc(sizeof(char) * 6);
+	printShape->prox->nome = "valor";
+	printShape->prox->qtd = 2;
+	printShape->prox->tipo = Forma;
+	printShape->prox->isEnd = 0;
 
-	insere(raiz, "printShape", FUNC, Inteiro, 2, &printShape);
+	insere(raiz, "printShape", FUNC, Inteiro, 2, printShape);
 
 
-	Parametro scanInt;
-	scanInt.nome = (char*) malloc(sizeof(char) * 4);
-	scanInt.nome = "var";
-	scanInt.qtd = 2;
-	scanInt.tipo = Inteiro;
-	scanInt.isEnd = 1;
+	Parametro* scanInt = (Parametro*) malloc(sizeof(Parametro));
+	scanInt->nome = (char*) malloc(sizeof(char) * 4);
+	scanInt->nome = "var";
+	scanInt->qtd = 2;
+	scanInt->tipo = Inteiro;
+	scanInt->isEnd = 1;
 	
-	scanInt.prox = (Parametro*) malloc(sizeof(Parametro));
-	scanInt.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	scanInt.prox[0].nome = "valor";
-	scanInt.prox[0].qtd = 2;
-	scanInt.prox[0].tipo = Inteiro;
-	scanInt.prox[0].isEnd = 0;
+	scanInt->prox = (Parametro*) malloc(sizeof(Parametro));
+	scanInt->prox->nome = (char*) malloc(sizeof(char) * 6);
+	scanInt->prox->nome = "valor";
+	scanInt->prox->qtd = 2;
+	scanInt->prox->tipo = Inteiro;
+	scanInt->prox->isEnd = 0;
 
-	insere(raiz, "scanInt", FUNC, Inteiro, 2, &scanInt);
+	insere(raiz, "scanInt", FUNC, Inteiro, 2, scanInt);
 
 
-	Parametro scanFloat;
-	scanFloat.nome = (char*) malloc(sizeof(char) * 4);
-	scanFloat.nome = "var";
-	scanFloat.qtd = 2;
-	scanFloat.tipo = Decimal;
-	scanFloat.isEnd = 1;
+	Parametro* scanFloat = (Parametro*) malloc(sizeof(Parametro));
+	scanFloat->nome = (char*) malloc(sizeof(char) * 4);
+	scanFloat->nome = "var";
+	scanFloat->qtd = 2;
+	scanFloat->tipo = Decimal;
+	scanFloat->isEnd = 1;
 	
-	scanFloat.prox = (Parametro*) malloc(sizeof(Parametro));
-	scanFloat.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	scanFloat.prox[0].nome = "valor";
-	scanFloat.prox[0].qtd = 2;
-	scanFloat.prox[0].tipo = Decimal;
-	scanFloat.prox[0].isEnd = 0;
+	scanFloat->prox = (Parametro*) malloc(sizeof(Parametro));
+	scanFloat->prox->nome = (char*) malloc(sizeof(char) * 6);
+	scanFloat->prox->nome = "valor";
+	scanFloat->prox->qtd = 2;
+	scanFloat->prox->tipo = Decimal;
+	scanFloat->prox->isEnd = 0;
 
-	insere(raiz, "scanFloat", FUNC, Inteiro, 2, &scanFloat);
+	insere(raiz, "scanFloat", FUNC, Inteiro, 2, scanFloat);
 
 
-	Parametro constroiPoint;
-	constroiPoint.nome = (char*) malloc(sizeof(char) * 4);
-	constroiPoint.nome = "var";
-	constroiPoint.qtd = 3;
-	constroiPoint.tipo = Ponto;
-	constroiPoint.isEnd = 1;
+	Parametro* constroiPoint = (Parametro*) malloc(sizeof(Parametro));
+	constroiPoint->nome = (char*) malloc(sizeof(char) * 4);
+	constroiPoint->nome = "var";
+	constroiPoint->qtd = 3;
+	constroiPoint->tipo = Ponto;
+	constroiPoint->isEnd = 1;
 	
-	constroiPoint.prox = (Parametro*) malloc(sizeof(Parametro));
-	constroiPoint.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	constroiPoint.prox[0].nome = "val_x";
-	constroiPoint.prox[0].qtd = 3;
-	constroiPoint.prox[0].tipo = Decimal;
-	constroiPoint.prox[0].isEnd = 0;
+	constroiPoint->prox = (Parametro*) malloc(sizeof(Parametro));
+	constroiPoint->prox->nome = (char*) malloc(sizeof(char) * 6);
+	constroiPoint->prox->nome = "val_x";
+	constroiPoint->prox->qtd = 3;
+	constroiPoint->prox->tipo = Decimal;
+	constroiPoint->prox->isEnd = 0;
 
-	constroiPoint.prox[0].prox = (Parametro*) malloc(sizeof(Parametro));
-	constroiPoint.prox[1].nome = (char*) malloc(sizeof(char) * 6);
-	constroiPoint.prox[1].nome = "val_y";
-	constroiPoint.prox[1].qtd = 3;
-	constroiPoint.prox[1].tipo = Decimal;
-	constroiPoint.prox[1].isEnd = 0;
+	constroiPoint->prox->prox = (Parametro*) malloc(sizeof(Parametro));
+	constroiPoint->prox->prox->nome = (char*) malloc(sizeof(char) * 6);
+	constroiPoint->prox->prox->nome = "val_y";
+	constroiPoint->prox->prox->qtd = 3;
+	constroiPoint->prox->prox->tipo = Decimal;
+	constroiPoint->prox->prox->isEnd = 0;
 
-	insere(raiz, "constroiPoint", FUNC, Inteiro, 3, &constroiPoint);
+	insere(raiz, "constroiPoint", FUNC, Inteiro, 3, constroiPoint);
 
 
-	Parametro constroiShape;
-	constroiShape.nome = (char*) malloc(sizeof(char) * 4);
-	constroiShape.nome = "var";
-	constroiShape.qtd = 2;
-	constroiShape.tipo = Forma;
-	constroiShape.isEnd = 1;
+	Parametro* constroiShape = (Parametro*) malloc(sizeof(Parametro));
+	constroiShape->nome = (char*) malloc(sizeof(char) * 4);
+	constroiShape->nome = "var";
+	constroiShape->qtd = 2;
+	constroiShape->tipo = Forma;
+	constroiShape->isEnd = 1;
 	
-	constroiShape.prox = (Parametro*) malloc(sizeof(Parametro));
-	constroiShape.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	constroiShape.prox[0].nome = "valor";
-	constroiShape.prox[0].qtd = 2;
-	constroiShape.prox[0].tipo = Ponto;
-	constroiShape.prox[0].isEnd = 0;
+	constroiShape->prox = (Parametro*) malloc(sizeof(Parametro));
+	constroiShape->prox->nome = (char*) malloc(sizeof(char) * 6);
+	constroiShape->prox->nome = "valor";
+	constroiShape->prox->qtd = 2;
+	constroiShape->prox->tipo = Ponto;
+	constroiShape->prox->isEnd = 0;
 
-	insere(raiz, "constroiShape", FUNC, Inteiro, 2, &constroiShape);
-
-
-	Parametro Perimetro;
-	Perimetro.nome = (char*) malloc(sizeof(char) * 4);
-	Perimetro.nome = "var";
-	Perimetro.qtd = 1;
-	Perimetro.tipo = Forma;
-	Perimetro.isEnd = 0;
-
-	insere(raiz, "Perimetro", FUNC, Decimal, 0, &Perimetro);
+	insere(raiz, "constroiShape", FUNC, Inteiro, 2, constroiShape);
 
 
-	Parametro IsIn;
-	IsIn.nome = (char*) malloc(sizeof(char) * 6);
-	IsIn.nome = "forma";
-	IsIn.qtd = 2;
-	IsIn.tipo = Forma;
-	IsIn.isEnd = 0;
+	Parametro* Perimetro = (Parametro*) malloc(sizeof(Parametro));
+	Perimetro->nome = (char*) malloc(sizeof(char) * 4);
+	Perimetro->nome = "var";
+	Perimetro->qtd = 1;
+	Perimetro->tipo = Forma;
+	Perimetro->isEnd = 0;
+
+	insere(raiz, "Perimetro", FUNC, Decimal, 0, Perimetro);
+
+
+	Parametro* IsIn = (Parametro*) malloc(sizeof(Parametro));
+	IsIn->nome = (char*) malloc(sizeof(char) * 6);
+	IsIn->nome = "forma";
+	IsIn->qtd = 2;
+	IsIn->tipo = Forma;
+	IsIn->isEnd = 0;
 	
-	IsIn.prox = (Parametro*) malloc(sizeof(Parametro));
-	IsIn.prox[0].nome = (char*) malloc(sizeof(char) * 6);
-	IsIn.prox[0].nome = "ponto";
-	IsIn.prox[0].qtd = 2;
-	IsIn.prox[0].tipo = Ponto;
-	IsIn.prox[0].isEnd = 0;
+	IsIn->prox = (Parametro*) malloc(sizeof(Parametro));
+	IsIn->prox->nome = (char*) malloc(sizeof(char) * 6);
+	IsIn->prox->nome = "ponto";
+	IsIn->prox->qtd = 2;
+	IsIn->prox->tipo = Ponto;
+	IsIn->prox->isEnd = 0;
 
-	insere(raiz, "IsIn", FUNC, Inteiro, 2, &IsIn);
+	insere(raiz, "IsIn", FUNC, Inteiro, 2, IsIn);
 
 
-	Parametro IsCollided;
-	IsCollided.nome = (char*) malloc(sizeof(char) * 7);
-	IsCollided.nome = "forma1";
-	IsCollided.qtd = 2;
-	IsCollided.tipo = Forma;
-	IsCollided.isEnd = 0;
+	Parametro* IsCollided = (Parametro*) malloc(sizeof(Parametro));
+	IsCollided->nome = (char*) malloc(sizeof(char) * 7);
+	IsCollided->nome = "forma1";
+	IsCollided->qtd = 2;
+	IsCollided->tipo = Forma;
+	IsCollided->isEnd = 0;
 	
-	IsCollided.prox = (Parametro*) malloc(sizeof(Parametro));
-	IsCollided.prox[0].nome = (char*) malloc(sizeof(char) * 7);
-	IsCollided.prox[0].nome = "forma2";
-	IsCollided.prox[0].qtd = 2;
-	IsCollided.prox[0].tipo = Forma;
-	IsCollided.prox[0].isEnd = 0;
+	IsCollided->prox = (Parametro*) malloc(sizeof(Parametro));
+	IsCollided->prox->nome = (char*) malloc(sizeof(char) * 7);
+	IsCollided->prox->nome = "forma2";
+	IsCollided->prox->qtd = 2;
+	IsCollided->prox->tipo = Forma;
+	IsCollided->prox->isEnd = 0;
 
-	insere(raiz, "IsCollided", FUNC, Inteiro, 2, &IsCollided);
+	insere(raiz, "IsCollided", FUNC, Inteiro, 2, IsCollided);
 }
 
 // RETORNO: retorna a chave do elemento encontrado, -1 se nao existir
@@ -297,36 +297,45 @@ void printTab(TabSimbolos* raiz){
 	else{
 		TabSimbolos atual;
 		atual = *raiz;
-		printf("CHAVE\tQUANTIDADE\tVALOR\t\t\tVAR/FUNC\tTIPO\t\tPARAMS\n");
+		printf("CHAVE\tQUANTIDADE\tVALOR\t\tVAR/FUNC\tTIPO\tPARAMS\n");
 
 		while(atual != NULL){
-			printf("%d\t%d\t\t%s\t\t\t%s\t\t", atual->chave, atual->qtd, atual->valor, atual->isVar == VAR ? "VAR" : (atual->isVar == FUNC ? "FUNC" : "LITERAL"));
+			printf("%d\t%5d%18s\t%14s\t\t", atual->chave, atual->qtd, atual->valor, atual->isVar == VAR ? "VAR" : (atual->isVar == FUNC ? "FUNC" : (atual->isVar == KEYWORD ? "Keyword" : "Outro")));
 			switch(atual->tipo){
 				case Inteiro:
-					printf("int\t\t");
+					printf("int\t");
 				break;
 
 				case Decimal:
-					printf("float\t\t");
+					printf("float\t");
 				break;
 
 				case Ponto:
-					printf("Point\t\t");
+					printf("Point\t");
 				break;
 
 				case Forma:
-					printf("Shape\t\t");
+					printf("Shape\t");
+				break;
+
+				case Literal:
+					printf("Literal\t");
 				break;
 			
 				default:
-					printf("Literal\t\t");
+					printf("Outro\t");
 					break;
 			}
 
 			if(atual->isVar == FUNC){
 				int i;
-				for(i = 0; i < atual->qtdParams; i++){
-					switch(atual->params[i].tipo){
+				Parametro* atual2;
+				atual2 = atual->params;
+				if(atual2 != NULL){
+					printf("(");
+				}
+				for(i = 0; atual2 != NULL; atual2 = atual2->prox){
+					switch(atual2->tipo){
 						case Inteiro:
 							printf("int ");
 						break;
@@ -336,11 +345,11 @@ void printTab(TabSimbolos* raiz){
 						break;
 
 						case Ponto:
-							printf("Point ");
+							printf("point ");
 						break;
 
 						case Forma:
-							printf("Shape ");
+							printf("shape ");
 						break;
 					
 						default:
@@ -348,7 +357,7 @@ void printTab(TabSimbolos* raiz){
 							break;
 					}
 
-					printf("%s%s%s ", atual->params[i].isEnd == 0 ? "" : "&", atual->params[i].nome, (i+1) < atual->qtdParams ? "," : "");
+					printf("%s%s%s ", atual2->isEnd == 0 ? "" : "&", atual2->nome, atual2->prox != NULL ? "," : ")");
 				}
 			}
 			printf("\n");
