@@ -191,7 +191,7 @@ decl_var:
 						break;
 				}
 
-				//insere(&tabela, $2->valor, VAR, type, 0, NULL);
+				insere(&tabela, strdup($2->valor), VAR, type, 0, NULL);
 			}
 			;
 
@@ -231,7 +231,14 @@ decl_func:
 						break;
 				}
 
-				//insere(&tabela, $2->valor, FUNC, type, $4->params[0].qtd, $4->params);
+
+				int aux_qtd = 0;
+				if($4 != NULL){
+					if($4->params != NULL){
+						aux_qtd = $4->params->qtd;
+					}
+				}
+				insere(&tabela, strdup($2->valor), FUNC, type, aux_qtd, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
 			}
 			;
 
@@ -684,7 +691,9 @@ factor:
 				$$ = novoNo(1, lista, "num ", NULL);
 			}
 			| LITERAL {
-				$$ = novaFolhaText("literal");
+				$$ = novaFolhaText(strdup($1));
+
+				insere(&tabela, strdup($$->valor), OTHER, Literal, 0, NULL);
 			}
 			;
 
@@ -953,12 +962,16 @@ num:
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaInt($1);
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+
+				insere(&tabela, strdup($$->valor), VAR, Inteiro, 0, NULL);
 			}
 			| DECIMAL {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaFloat($1);
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+
+				insere(&tabela, strdup($$->valor), VAR, Decimal, 0, NULL);
 			}
 			;
 

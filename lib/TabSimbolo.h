@@ -7,7 +7,7 @@
 #define OTHER -100000
 
 typedef enum TYPE{
-	Inteiro,
+	Inteiro = 10000,
 	Decimal,
 	Ponto,
 	Forma,

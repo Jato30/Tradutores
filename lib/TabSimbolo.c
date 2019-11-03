@@ -297,10 +297,10 @@ void printTab(TabSimbolos* raiz){
 	else{
 		TabSimbolos atual;
 		atual = *raiz;
-		printf("CHAVE\tQUANTIDADE\tVALOR\t\tVAR/FUNC\tTIPO\tPARAMS\n");
+		printf("CHAVE\tQUANTIDADE\tVAR/FUNC\tTIPO\t\tVALOR\tPARAMS\n");
 
 		while(atual != NULL){
-			printf("%d\t%5d%18s\t%14s\t\t", atual->chave, atual->qtd, atual->valor, atual->isVar == VAR ? "VAR" : (atual->isVar == FUNC ? "FUNC" : (atual->isVar == KEYWORD ? "Keyword" : "Outro")));
+			printf("%d\t%6d\t%14s\t\t", atual->chave, atual->qtd, atual->isVar == VAR ? "VAR" : (atual->isVar == FUNC ? "FUNC" : (atual->isVar == KEYWORD ? "Keyword" : "Outro")));
 			switch(atual->tipo){
 				case Inteiro:
 					printf("int\t");
@@ -311,11 +311,11 @@ void printTab(TabSimbolos* raiz){
 				break;
 
 				case Ponto:
-					printf("Point\t");
+					printf("point\t");
 				break;
 
 				case Forma:
-					printf("Shape\t");
+					printf("shape\t");
 				break;
 
 				case Literal:
@@ -326,14 +326,13 @@ void printTab(TabSimbolos* raiz){
 					printf("Outro\t");
 					break;
 			}
+			printf("%14s\t", atual->valor);
 
 			if(atual->isVar == FUNC){
+				printf("(");
 				int i;
 				Parametro* atual2;
 				atual2 = atual->params;
-				if(atual2 != NULL){
-					printf("(");
-				}
 				for(i = 0; atual2 != NULL; atual2 = atual2->prox){
 					switch(atual2->tipo){
 						case Inteiro:
@@ -357,9 +356,11 @@ void printTab(TabSimbolos* raiz){
 							break;
 					}
 
-					printf("%s%s%s ", atual2->isEnd == 0 ? "" : "&", atual2->nome, atual2->prox != NULL ? "," : ")");
+					printf("%s%s%s", atual2->isEnd == 0 ? "" : "&", atual2->nome, atual2->prox != NULL ? ", " : "");
 				}
+				printf(")");
 			}
+
 			printf("\n");
 			atual = atual->prox;
 		}
