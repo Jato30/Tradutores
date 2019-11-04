@@ -24,11 +24,15 @@
 		Filhos* fi;
 		int qtdFi;
 		char* valor;
+		int linha;
+		int coluna;
 		Parametro* params;
 	};
 
 	TabSimbolos tabela;
 	Node* raiz = NULL;
+	extern int num_lin;
+	extern int num_char;
 %}
 
 %defines
@@ -1006,45 +1010,53 @@ int contDigf(double val){
 }
 
 void printArvore(Node *raiz, int tabs){
-  if (raiz != NULL) {
-	int i;
-	if(tabs == 0){
-		printf("-----------------------------------------------\nArvore\n\n");
-	}
-	printf("line:%2d", raiz->qtdFi );
-
-	for(i = 0; i < tabs; ++i){
-		printf("  ");
-	}
-	printf("%s%s", raiz->valor , raiz->fi ? "{\n" : "\n");
-
-
-	if(raiz->fi != NULL){
-		i = 0;
-		while(raiz->fi[i] != NULL){
-			printArvore(raiz->fi[i], tabs + 1);
-			i++;
+	if(raiz != NULL){
+		int i;
+		if(tabs == 0){
+			printf("-----------------------------------------------\nArvore\n\n");
 		}
-		i = 0;
+		printf("line:%4d", raiz->linha );
+
+		for(i = 0; i < tabs; ++i){
+			printf("   ");
+		}
+		printf("%s%s", raiz->valor , raiz->fi != NULL ? "{\n" : "\n"); // imprime o valor do no e abre chave para caso nao seja uma folha
+
+		int j = 0;
+		Node* filho = NULL;
+		if(raiz->fi != NULL){ // se nao eh uma folha
+			filho = (raiz->fi[j] != NULL ? raiz->fi[j] : NULL); /* filho aponta pro filho da raiz se nao for nulo */
+		}
+		while(filho != NULL){ // percorre todos os filhos da raiz
+			for(i = 0; filho != NULL; i++){ // percorre todos os filhos dos filhos recursivamente
+				printArvore(filho, tabs + 1);
+				filho = filho->fi != NULL ? (filho->fi[i] != NULL ? filho->fi[i] : NULL /* ultimo filho da lista*/ ) : NULL /* eh uma folha*/;
+			}
+			j++;
+			filho = NULL;
+			if(raiz->fi != NULL){
+				filho = raiz->fi[j] != NULL ? raiz->fi[j] : NULL;
+			}
+		}
+		printf("line:%4d", raiz->linha );
+		for(i = 0; i < tabs; ++i){
+			printf("   ");
+		}
+		if(raiz->fi != NULL){ // se eh uma folha
+			printf("}");
+		}
+		printf("\n");
+		if(tabs == 0){
+			printf("-----------------------------------------------\n");
+		}
 	}
-	printf("line:%2d", raiz->qtdFi );
-	for(i = 0; i < tabs; ++i){
-		printf("  ");
-	}
-	if(raiz->fi != NULL){
-		printf("}");
-	}
-	printf("\n");
-	if(tabs == 0){
-		printf("-----------------------------------------------\n");
-	}
-  }
+
 }
 
 void destroiArvore(Node *raiz){
 	if(raiz != NULL){
+		int i;
 		if(raiz->fi != NULL){
-			int i;
 			for(i = 0; i < raiz->qtdFi; i++){
 				if(raiz->fi[i] != NULL){
 					destroiArvore(raiz->fi[i]);
@@ -1054,6 +1066,22 @@ void destroiArvore(Node *raiz){
 		if(raiz->valor != NULL){
 			free(raiz->valor);
 			raiz->valor = NULL;
+		}
+		if(raiz->params != NULL){
+			Parametro* atual = raiz->params;
+			Parametro* proximo = raiz->params->prox;
+			do{
+				atual = atual->prox;
+				free(raiz->params->prox);
+				raiz->params->prox = NULL;
+				free(raiz->params->nome);
+				raiz->params->nome = NULL;
+			} while(atual != NULL);
+
+			free(raiz->params->nome);
+			raiz->params->nome = NULL;
+			free(raiz->params);
+			raiz->params = NULL;
 		}
 
 		free(raiz);
@@ -1069,6 +1097,10 @@ Node* novoNo(int quantidade, Filhos* filhos, char* valor, Parametro* params){
 	novo->qtdFi = quantidade;
 	novo->valor = (char*) malloc(sizeof(char) * strlen(valor) +1);
 	novo->valor = strdup(valor);
+	novo->linha = -1;
+	novo->coluna = -1;
+
+	novo->params = params != NULL ? params : NULL;
 
 	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	return novo;
@@ -1078,9 +1110,12 @@ Node* novaFolhaFloat(double val){
 	Node* novo = (Node*) malloc(sizeof(Node));
 	novo->valor = (char*) malloc(sizeof(char) * (contDigf(val) + 1));
 	novo->qtdFi = 0;
+	novo->linha = num_lin;
+	novo->coluna = num_char;
 	gcvt(val, contDigf(val) + 1, novo->valor);
 	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	novo->fi = NULL;
+	novo->params = NULL;
 	return novo;
 }
 
@@ -1088,9 +1123,12 @@ Node* novaFolhaInt(int val){
 	Node* novo = (Node*) malloc(sizeof(Node));
 	novo->valor = (char*) malloc(sizeof(char) * (contDigf((double)val) + 1));
 	novo->qtdFi = 0;
+	novo->linha = num_lin;
+	novo->coluna = num_char;
 	sprintf(novo->valor, "%i", val);
 	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	novo->fi = NULL;
+	novo->params = NULL;
 	return novo;
 }
 
@@ -1098,9 +1136,12 @@ Node* novaFolhaText(char* val){
 	Node* novo = (Node*) malloc(sizeof(Node));
 	novo->valor = (char*) malloc(sizeof(char) * strlen(val));
 	novo->qtdFi = 0;
+	novo->linha = num_lin;
+	novo->coluna = num_char;
 	novo->valor = strdup(val);
 	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	novo->fi = NULL;
+	novo->params = NULL;
 	return novo;
 }
 

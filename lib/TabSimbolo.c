@@ -297,7 +297,7 @@ void printTab(TabSimbolos* raiz){
 	else{
 		TabSimbolos atual;
 		atual = *raiz;
-		printf("CHAVE\tQUANTIDADE\tVAR/FUNC\tTIPO\t\tVALOR\tPARAMS\n");
+		printf("CHAVE\tQUANTIDADE\tVAR/FUNC\tTIPO\t\tVALOR\tPARAMETROS\n");
 
 		while(atual != NULL){
 			printf("%d\t%6d\t%14s\t\t", atual->chave, atual->qtd, atual->isVar == VAR ? "VAR" : (atual->isVar == FUNC ? "FUNC" : (atual->isVar == KEYWORD ? "Keyword" : "Outro")));
