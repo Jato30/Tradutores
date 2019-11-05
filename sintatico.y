@@ -109,12 +109,10 @@
 programa:
 			lista_decl {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "decl_func ", NULL);
 
 				Node** lista1 = (Node**) malloc(sizeof(Node*));
-				lista1[0] = (Node*) malloc(sizeof(Node));
 				lista1[0] = $$;
 				raiz = (Node*) malloc(sizeof(Node));
 				raiz = novoNo(1, lista, "programa ", NULL);
@@ -125,8 +123,6 @@ programa:
 lista_decl:
 			declaracao rec_decls {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "declaracao rec_decls ", NULL);
@@ -139,8 +135,6 @@ rec_decls:
 			}
 			| declaracao rec_decls {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "declaracao rec_decls ", NULL);
@@ -151,13 +145,11 @@ rec_decls:
 declaracao:
 			decl_var {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "decl_var ", NULL);
 			}
 			| decl_func {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "decl_func ", NULL);
 			}
@@ -166,8 +158,6 @@ declaracao:
 decl_var:
 			tipo_especif var FIM_EXPRESS {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "tipo_especif var ; ", NULL);
@@ -202,15 +192,11 @@ decl_var:
 decl_func:
 			tipo_especif var INI_PARAM params FIM_PARAM instruc_composta {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 4);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
-				lista[2] = (Node*) malloc(sizeof(Node));
-				lista[3] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
-				lista[3] = $4;
-				lista[4] = $6;
-				$$ = novoNo(4, lista, "tipo_especif var ( params ) instruc_composta ", NULL);
+				lista[2] = $4;
+				lista[3] = $6;
+				$$ = novoNo(4, lista, "tipo_especif var ( params ) instruc_composta ", $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
 
 				TYPE type;
 				switch($1->valor[0]){
@@ -279,7 +265,6 @@ params:
 			}
 			| lista_param {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "lista_param ", NULL);
 			}
@@ -289,8 +274,6 @@ params:
 lista_param:
 			param rec_paramlist {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "param rec_paramlist ", NULL);
@@ -303,8 +286,6 @@ rec_paramlist:
 			}
 			| SEPARA_ARG param rec_paramlist {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $2;
 				lista[1] = $3;
 				$$ = novoNo(2, lista, ", param rec_paramlist ", NULL);
@@ -315,8 +296,6 @@ rec_paramlist:
 param:
 			tipo_especif endereco {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				Parametro* param = (Parametro*) malloc(sizeof(Parametro));
@@ -341,15 +320,13 @@ param:
 						param->tipo = Literal;
 						break;
 				}
-				param->nome = $2->valor;
+				param->nome = strdup($2->valor);
 				param->isEnd = 1;
 				param->prox = NULL;
 				$$ = novoNo(2, lista, "tipo_especif endereco ", param);
 			}
 			| tipo_especif var {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				Parametro* param = (Parametro*) malloc(sizeof(Parametro));
@@ -374,7 +351,7 @@ param:
 						param->tipo = Literal;
 						break;
 				}
-				param->nome = $2->valor;
+				param->nome = strdup($2->valor);
 				param->isEnd = 0;
 				param->prox = NULL;
 				$$ = novoNo(2, lista, "tipo_especif var ", param);
@@ -384,8 +361,6 @@ param:
 instruc_composta:
 			INI_INSTRUC decl_local lista_instruc FIM_INSTRUC {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $2;
 				lista[1] = $3;
 				$$ = novoNo(2, lista, "{ decl_local lista_instruc } ", NULL);
@@ -396,20 +371,17 @@ instruc_composta:
 decl_local:
 			rec_declocs {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "rec_declocs ", NULL);
 			}
 			;
 
 rec_declocs:
-			/* %empty */ { $$ = NULL;
-
+			/* %empty */ {
+				$$ = NULL;
 			}
 			| decl_var rec_declocs {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "decl_var rec_declocs ", NULL);
@@ -420,7 +392,6 @@ rec_declocs:
 lista_instruc:
 			rec_instrucs {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "rec_instrucs ", NULL);
 			}
@@ -428,12 +399,10 @@ lista_instruc:
 
 rec_instrucs:
 			/* %empty */ {
-
+				$$ = NULL;
 			}
 			| instrucao rec_instrucs {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "instrucao rec_instrucs ", NULL);
@@ -444,31 +413,26 @@ rec_instrucs:
 instrucao:
 			instruc_expr {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "instruc_expr ", NULL);
 			}
 			| instruc_composta {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "instruc_composta ", NULL);
 			}
 			| instruc_cond {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "instruc_cond ", NULL);
 			}
 			| instruc_iterac {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "instruc_iterac ", NULL);
 			}
 			| instruc_return {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "instruc_return ", NULL);
 			}
@@ -477,13 +441,11 @@ instrucao:
 instruc_expr:
 			expressao FIM_EXPRESS {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "expressao ; ", NULL);
 			}
 			| FIM_EXPRESS {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText(";");
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
 			}
@@ -494,10 +456,6 @@ instruc_cond:
 			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 4);
 				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
-				lista[2] = (Node*) malloc(sizeof(Node));
-				lista[3] = (Node*) malloc(sizeof(Node));
-				
 				lista[0] = novaFolhaText("if");
 				lista[1] = $3;
 				lista[2] = $6;
@@ -508,13 +466,12 @@ instruc_cond:
 			;
 
 fat_if:
-			/* %empty */ {$$ = NULL;
-
+			/* %empty */ {
+				$$ = NULL;
 			}
 			| ELSE INI_INSTRUC instrucao FIM_INSTRUC {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("else");
 				lista[1] = $3;
 				$$ = novoNo(2, lista, "ELSE { instrucao } ", NULL);
@@ -526,11 +483,6 @@ instruc_iterac:
 			FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 5);
 				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
-				lista[2] = (Node*) malloc(sizeof(Node));
-				lista[3] = (Node*) malloc(sizeof(Node));
-				lista[4] = (Node*) malloc(sizeof(Node));
-				
 				lista[0] = novaFolhaText("for");
 				lista[1] = $3;
 				lista[2] = $5;
@@ -545,7 +497,6 @@ instruc_return:
 			RETURN expressao FIM_EXPRESS {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("return");
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "RETURN expressao ; ", NULL);
@@ -555,17 +506,13 @@ instruc_return:
 expressao:
 			var atrop expressao {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
-				lista[2] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
-				lista[1] = $3;
+				lista[2] = $3;
 				$$ = novoNo(3, lista, "var atrop expressao ", NULL);
 			}
 			| express_simp {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "express_simp ", NULL);
 			}
@@ -576,7 +523,7 @@ var:
 			ID {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText($1);
+				lista[0] = novaFolhaText(strdup($1));
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
 			}
 			;
@@ -584,8 +531,6 @@ var:
 express_simp:
 			express_soma fat_express {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(1, lista, "express_soma fat_express ", NULL);
@@ -593,13 +538,11 @@ express_simp:
 			;
 
 fat_express:
-			/* %empty */ { $$ = NULL;
-
+			/* %empty */ {
+				$$ = NULL;
 			}
 			| relop express_soma {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "relop express_soma ", NULL);
@@ -610,8 +553,6 @@ fat_express:
 express_soma:
 			termo rec_plusexpress {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(1, lista, "termo rec_plusexpress ", NULL);
@@ -619,14 +560,11 @@ express_soma:
 			;
 
 rec_plusexpress:
-			/* %empty */ { $$ = NULL;
-
+			/* %empty */ {
+				$$ = NULL;
 			}
 			| addop termo rec_plusexpress {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
-				lista[2] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
@@ -638,8 +576,6 @@ rec_plusexpress:
 termo:
 			factor rec_timesexpress {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(1, lista, "factor rec_timesexpress ", NULL);
@@ -647,14 +583,11 @@ termo:
 			;
 
 rec_timesexpress:
-			/* %empty */ { $$ = NULL;
-
+			/* %empty */ {
+				$$ = NULL;
 			}
 			| mulop factor rec_timesexpress {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
-				lista[2] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
@@ -666,31 +599,26 @@ rec_timesexpress:
 factor:
 			INI_PARAM expressao FIM_PARAM {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $2;
 				$$ = novoNo(1, lista, "( expressao ) ", NULL);
 			}
 			| endereco {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "endereco ", NULL);
 			}
 			| var {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "var ", NULL);
 			}
 			| chamada {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "chamada ", NULL);
 			}
 			| num {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "num ", NULL);
 			}
@@ -705,7 +633,6 @@ endereco:
 			ACESSO_END var {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("&");
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "ACESSO_END var ", NULL);
@@ -715,8 +642,6 @@ endereco:
 chamada:
 			nome_func INI_PARAM arg FIM_PARAM{
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $3;
 				$$ = novoNo(2, lista, "var ( arg ) ", NULL);
@@ -798,7 +723,6 @@ arg:
 			}
 			| lista_arg {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "lista_arg ", NULL);
 			}
@@ -808,8 +732,6 @@ arg:
 lista_arg:
 			expressao rec_args {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				lista[1] = $2;
 				$$ = novoNo(2, lista, "expressao rec_args ", NULL);
@@ -822,8 +744,6 @@ rec_args:
 			}
 			| SEPARA_ARG expressao rec_args {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[1] = (Node*) malloc(sizeof(Node));
 				lista[0] = $2;
 				lista[1] = $3;
 				$$ = novoNo(2, lista, ", expressao rec_args ", NULL);
@@ -903,7 +823,6 @@ relop:
 			}
 			| logop {
 				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, "logop ", NULL);
 			}
@@ -985,7 +904,7 @@ num:
 %%
 
 
-
+// Conta digitos em um float
 int contDigf(double val){
 	int i = ((int) val);
 	char aux;
@@ -1010,45 +929,40 @@ int contDigf(double val){
 }
 
 void printArvore(Node *raiz, int tabs){
+	if(tabs == 0){
+		printf("-----------------------------------------------\nArvore\n\n");
+	}
+
 	if(raiz != NULL){
 		int i;
-		if(tabs == 0){
-			printf("-----------------------------------------------\nArvore\n\n");
-		}
-		printf("line:%4d", raiz->linha );
+		printf("line:%2d", raiz->linha );
 
 		for(i = 0; i < tabs; ++i){
-			printf("   ");
+			printf("       ");
 		}
 		printf("%s%s", raiz->valor , raiz->fi != NULL ? "{\n" : "\n"); // imprime o valor do no e abre chave para caso nao seja uma folha
 
 		int j = 0;
-		Node* filho = NULL;
-		if(raiz->fi != NULL){ // se nao eh uma folha
-			filho = (raiz->fi[j] != NULL ? raiz->fi[j] : NULL); /* filho aponta pro filho da raiz se nao for nulo */
-		}
-		while(filho != NULL){ // percorre todos os filhos da raiz
-			for(i = 0; filho != NULL; i++){ // percorre todos os filhos dos filhos recursivamente
-				printArvore(filho, tabs + 1);
-				filho = filho->fi != NULL ? (filho->fi[i] != NULL ? filho->fi[i] : NULL /* ultimo filho da lista*/ ) : NULL /* eh uma folha*/;
-			}
-			j++;
-			filho = NULL;
-			if(raiz->fi != NULL){
-				filho = raiz->fi[j] != NULL ? raiz->fi[j] : NULL;
+		Node* atual = raiz;
+		// percorre todos os filhos da raiz
+		if(atual->fi != NULL){
+			for(i = 0; atual->fi[i] != NULL; i++){ // percorre todos os filhos dos filhos recursivamente
+				printArvore(atual->fi[i], tabs + 1);
 			}
 		}
-		printf("line:%4d", raiz->linha );
+
+		printf("line:%2d", raiz->linha );
 		for(i = 0; i < tabs; ++i){
-			printf("   ");
+			printf("       ");
 		}
 		if(raiz->fi != NULL){ // se eh uma folha
 			printf("}");
 		}
 		printf("\n");
-		if(tabs == 0){
-			printf("-----------------------------------------------\n");
-		}
+	}
+
+	if(tabs == 0){
+		printf("-----------------------------------------------\n");
 	}
 
 }
@@ -1092,10 +1006,9 @@ void destroiArvore(Node *raiz){
 
 
 Node* novoNo(int quantidade, Filhos* filhos, char* valor, Parametro* params){
-  	Node* novo = (Node*) malloc(sizeof(Node));
+	Node* novo = (Node*) malloc(sizeof(Node));
 	novo->fi = filhos;
 	novo->qtdFi = quantidade;
-	novo->valor = (char*) malloc(sizeof(char) * strlen(valor) +1);
 	novo->valor = strdup(valor);
 	novo->linha = -1;
 	novo->coluna = -1;
@@ -1134,7 +1047,6 @@ Node* novaFolhaInt(int val){
 
 Node* novaFolhaText(char* val){
 	Node* novo = (Node*) malloc(sizeof(Node));
-	novo->valor = (char*) malloc(sizeof(char) * strlen(val));
 	novo->qtdFi = 0;
 	novo->linha = num_lin;
 	novo->coluna = num_char;
