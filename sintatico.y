@@ -185,7 +185,7 @@ decl_var:
 						break;
 				}
 
-				insere(&tabela, strdup($2->valor), VAR, type, 0, NULL);
+				insere(&tabela, strdup($2->valor), "", VAR, type, 0, NULL);
 			}
 			;
 
@@ -228,7 +228,7 @@ decl_func:
 						aux_qtd = $4->params->qtd;
 					}
 				}
-				insere(&tabela, strdup($2->valor), FUNC, type, aux_qtd, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
+				insere(&tabela, strdup($2->valor), "", FUNC, type, aux_qtd, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
 			}
 			;
 
@@ -445,9 +445,7 @@ instruc_expr:
 				$$ = novoNo(1, lista, "expressao ; ", NULL);
 			}
 			| FIM_EXPRESS {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = novaFolhaText(";");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = NULL;
 			}
 			;
 
@@ -533,7 +531,7 @@ express_simp:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(1, lista, "express_soma fat_express ", NULL);
+				$$ = novoNo(2, lista, "express_soma fat_express ", NULL);
 			}
 			;
 
@@ -555,7 +553,7 @@ express_soma:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(1, lista, "termo rec_plusexpress ", NULL);
+				$$ = novoNo(2, lista, "termo rec_plusexpress ", NULL);
 			}
 			;
 
@@ -578,7 +576,7 @@ termo:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(1, lista, "factor rec_timesexpress ", NULL);
+				$$ = novoNo(2, lista, "factor rec_timesexpress ", NULL);
 			}
 			;
 
@@ -625,7 +623,7 @@ factor:
 			| LITERAL {
 				$$ = novaFolhaText(strdup($1));
 
-				insere(&tabela, strdup($$->valor), OTHER, Literal, 0, NULL);
+				insere(&tabela, "texto", strdup($$->valor), OTHER, Literal, 0, NULL);
 			}
 			;
 
@@ -886,7 +884,7 @@ num:
 				lista[0] = novaFolhaInt($1);
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
 
-				insere(&tabela, strdup($$->valor), VAR, Inteiro, 0, NULL);
+				insere(&tabela, "", strdup($$->valor), VAR, Inteiro, 0, NULL);
 			}
 			| DECIMAL {
 				Node** lista = (Node**) malloc(sizeof(Node*));
@@ -894,7 +892,7 @@ num:
 				lista[0] = novaFolhaFloat($1);
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
 
-				insere(&tabela, strdup($$->valor), VAR, Decimal, 0, NULL);
+				insere(&tabela, "", strdup($$->valor), VAR, Decimal, 0, NULL);
 			}
 			;
 
@@ -928,43 +926,19 @@ int contDigf(double val){
 
 }
 
-void printArvore(Node *raiz, int tabs){
-	if(tabs == 0){
-		printf("-----------------------------------------------\nArvore\n\n");
-	}
-
-	if(raiz != NULL){
-		int i;
-		printf("line:%2d", raiz->linha );
-
+void printArvore(Node *raiz, int tabs) {
+	int i;
+	if (raiz != NULL) {
 		for(i = 0; i < tabs; ++i){
-			printf("       ");
+			printf("   ");
 		}
-		printf("%s%s", raiz->valor , raiz->fi != NULL ? "{\n" : "\n"); // imprime o valor do no e abre chave para caso nao seja uma folha
-
-		int j = 0;
-		Node* atual = raiz;
-		// percorre todos os filhos da raiz
-		if(atual->fi != NULL){
-			for(i = 0; atual->fi[i] != NULL; i++){ // percorre todos os filhos dos filhos recursivamente
-				printArvore(atual->fi[i], tabs + 1);
-			}
+		if (raiz->valor != NULL) {
+			printf("%s\n", raiz->valor);
 		}
-
-		printf("line:%2d", raiz->linha );
-		for(i = 0; i < tabs; ++i){
-			printf("       ");
+		for(i = 0; i < raiz->qtdFi; i++){
+			printArvore(raiz->fi[i], tabs + 1);
 		}
-		if(raiz->fi != NULL){ // se eh uma folha
-			printf("}");
-		}
-		printf("\n");
 	}
-
-	if(tabs == 0){
-		printf("-----------------------------------------------\n");
-	}
-
 }
 
 void destroiArvore(Node *raiz){
@@ -1067,7 +1041,7 @@ int main(void){
 	printArvore(raiz, 0);
 	printTab(&tabela);
 	destroiArvore(raiz);
-	// destroiTab(&tabela);
+	destroiTab(&tabela);
 	return 0;
 }
 

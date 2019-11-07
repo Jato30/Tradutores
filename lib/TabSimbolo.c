@@ -8,15 +8,15 @@
 void criaTab(TabSimbolos* raiz){
 	(*raiz) = NULL;
 
-	insere(raiz, "int", KEYWORD, Inteiro, 0, NULL);
-	insere(raiz, "float", KEYWORD, Decimal, 0, NULL);
-	insere(raiz, "point", KEYWORD, Ponto, 0, NULL);
-	insere(raiz, "shape", KEYWORD, Forma, 0, NULL);
+	insere(raiz, "int", "", KEYWORD, Inteiro, 0, NULL);
+	insere(raiz, "float", "", KEYWORD, Decimal, 0, NULL);
+	insere(raiz, "point", "",  KEYWORD, Ponto, 0, NULL);
+	insere(raiz, "shape", "", KEYWORD, Forma, 0, NULL);
 
-	insere(raiz, "return", OTHER, other, 0, NULL);
-	insere(raiz, "if", OTHER, other, 0, NULL);
-	insere(raiz, "else", OTHER, other, 0, NULL);
-	insere(raiz, "for", OTHER, other, 0, NULL);
+	insere(raiz, "return", "", OTHER, other, 0, NULL);
+	insere(raiz, "if", "", OTHER, other, 0, NULL);
+	insere(raiz, "else", "", OTHER, other, 0, NULL);
+	insere(raiz, "for", "", OTHER, other, 0, NULL);
 
 	Parametro* printInt = (Parametro*) malloc(sizeof(Parametro));
 	printInt->nome = (char*) malloc(sizeof(char) * 6);
@@ -32,7 +32,7 @@ void criaTab(TabSimbolos* raiz){
 	printInt->prox->tipo = Inteiro;
 	printInt->prox->isEnd = 0;
 
-	insere(raiz, "printInt", FUNC, Inteiro, 2, printInt);
+	insere(raiz, "printInt", "", FUNC, Inteiro, 2, printInt);
 
 
 	Parametro* printFloat = (Parametro*) malloc(sizeof(Parametro));
@@ -49,7 +49,7 @@ void criaTab(TabSimbolos* raiz){
 	printFloat->prox->tipo = Decimal;
 	printFloat->prox->isEnd = 0;
 
-	insere(raiz, "printFloat", FUNC, Inteiro, 2, printFloat);
+	insere(raiz, "printFloat", "", FUNC, Inteiro, 2, printFloat);
 
 
 	Parametro* printPoint = (Parametro*) malloc(sizeof(Parametro));
@@ -66,7 +66,7 @@ void criaTab(TabSimbolos* raiz){
 	printPoint->prox->tipo = Ponto;
 	printPoint->prox->isEnd = 0;
 
-	insere(raiz, "printPoint", FUNC, Inteiro, 2, printPoint);
+	insere(raiz, "printPoint", "", FUNC, Inteiro, 2, printPoint);
 
 
 	Parametro* printShape = (Parametro*) malloc(sizeof(Parametro));
@@ -83,7 +83,7 @@ void criaTab(TabSimbolos* raiz){
 	printShape->prox->tipo = Forma;
 	printShape->prox->isEnd = 0;
 
-	insere(raiz, "printShape", FUNC, Inteiro, 2, printShape);
+	insere(raiz, "printShape", "", FUNC, Inteiro, 2, printShape);
 
 
 	Parametro* scanInt = (Parametro*) malloc(sizeof(Parametro));
@@ -100,7 +100,7 @@ void criaTab(TabSimbolos* raiz){
 	scanInt->prox->tipo = Inteiro;
 	scanInt->prox->isEnd = 0;
 
-	insere(raiz, "scanInt", FUNC, Inteiro, 2, scanInt);
+	insere(raiz, "scanInt", "", FUNC, Inteiro, 2, scanInt);
 
 
 	Parametro* scanFloat = (Parametro*) malloc(sizeof(Parametro));
@@ -117,7 +117,7 @@ void criaTab(TabSimbolos* raiz){
 	scanFloat->prox->tipo = Decimal;
 	scanFloat->prox->isEnd = 0;
 
-	insere(raiz, "scanFloat", FUNC, Inteiro, 2, scanFloat);
+	insere(raiz, "scanFloat", "", FUNC, Inteiro, 2, scanFloat);
 
 
 	Parametro* constroiPoint = (Parametro*) malloc(sizeof(Parametro));
@@ -141,7 +141,7 @@ void criaTab(TabSimbolos* raiz){
 	constroiPoint->prox->prox->tipo = Decimal;
 	constroiPoint->prox->prox->isEnd = 0;
 
-	insere(raiz, "constroiPoint", FUNC, Inteiro, 3, constroiPoint);
+	insere(raiz, "constroiPoint", "", FUNC, Inteiro, 3, constroiPoint);
 
 
 	Parametro* constroiShape = (Parametro*) malloc(sizeof(Parametro));
@@ -158,7 +158,7 @@ void criaTab(TabSimbolos* raiz){
 	constroiShape->prox->tipo = Ponto;
 	constroiShape->prox->isEnd = 0;
 
-	insere(raiz, "constroiShape", FUNC, Inteiro, 2, constroiShape);
+	insere(raiz, "constroiShape", "", FUNC, Inteiro, 2, constroiShape);
 
 
 	Parametro* Perimetro = (Parametro*) malloc(sizeof(Parametro));
@@ -168,7 +168,7 @@ void criaTab(TabSimbolos* raiz){
 	Perimetro->tipo = Forma;
 	Perimetro->isEnd = 0;
 
-	insere(raiz, "Perimetro", FUNC, Decimal, 0, Perimetro);
+	insere(raiz, "Perimetro", "", FUNC, Decimal, 0, Perimetro);
 
 
 	Parametro* IsIn = (Parametro*) malloc(sizeof(Parametro));
@@ -185,7 +185,7 @@ void criaTab(TabSimbolos* raiz){
 	IsIn->prox->tipo = Ponto;
 	IsIn->prox->isEnd = 0;
 
-	insere(raiz, "IsIn", FUNC, Inteiro, 2, IsIn);
+	insere(raiz, "IsIn", "", FUNC, Inteiro, 2, IsIn);
 
 
 	Parametro* IsCollided = (Parametro*) malloc(sizeof(Parametro));
@@ -202,41 +202,84 @@ void criaTab(TabSimbolos* raiz){
 	IsCollided->prox->tipo = Forma;
 	IsCollided->prox->isEnd = 0;
 
-	insere(raiz, "IsCollided", FUNC, Inteiro, 2, IsCollided);
+	insere(raiz, "IsCollided", "", FUNC, Inteiro, 2, IsCollided);
 }
 
 // RETORNO: retorna a chave do elemento encontrado, -1 se nao existir
-int buscaTab(TabSimbolos* raiz, char* valor){
+int buscaTabNome(TabSimbolos* raiz, char* nome){
 	if((*raiz) == NULL){
 		// printf("\nTabela vazia\n");
+		return -1;
+	}
+	else if(nome == NULL || strcmp(nome, "")){
+		// printf("\nNome vazio\n");
 		return -1;
 	}
 	else{
 		TabSimbolos atual;
 		atual = (*raiz);
 		while(atual != NULL){
-			if(strcmp(atual->valor, valor) == 0){
-				// printf("\tJa existe %s na tabela de simbolos\n", valor);
+			if(strcmp("", atual->nome != NULL ? atual->nome : "") == 0){}
+			else if(strcmp(atual->nome != NULL ? atual->nome : "", nome) == 0){
+				// printf("\tJa existe %s na tabela de simbolos\n", nome);
 				return atual->chave;
 			}
 			atual = atual->prox;
 		}
 
 		// printf("Nenhuma ocorrencia repetida.\n");
-		free(atual);
-		atual = NULL;
 		return -1;
 	}
 }
 
-void insere(TabSimbolos* raiz, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params){
+// RETORNO: retorna a chave do elemento encontrado, -1 se nao existir
+int buscaTabVal(TabSimbolos* raiz, char* valor){
+	if((*raiz) == NULL){
+		// printf("\nTabela vazia\n");
+		return -1;
+	}
+	else if(valor == NULL || strcmp(valor, "")){
+		// printf("\nValor vazio\n");
+		return -1;
+	}
+	else{
+		TabSimbolos atual;
+		atual = (*raiz);
+		while(atual != NULL){
+			if(strcmp("", atual->valor != NULL ? atual->valor : "") == 0){}
+			else if(strcmp(atual->valor != NULL ? atual->valor : "", valor) == 0){
+				// printf("\tJa existe %s na tabela de simbolos\n", nome);
+				return atual->chave;
+			}
+			atual = atual->prox;
+		}
 
-	int busca = buscaTab(raiz, valor);
+		// printf("Nenhuma ocorrencia repetida.\n");
+		return -1;
+	}
+}
+
+void insere(TabSimbolos* raiz, char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params){
+
+	int busca = buscaTabNome(raiz, nome);
+	// if(busca == -1){
+	// 	busca = buscaTabVal(raiz, valor);
+	// }
 	if(busca == -1){
 		if(*raiz == NULL){  //Lista vazia
 			*raiz = (TabSimbolos) malloc(sizeof(Simbolo));
-			(*raiz)->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
-			strcpy((*raiz)->valor, valor);
+			if(strcmp("", nome) == 0){
+				(*raiz)->nome = NULL;
+			}
+			else{
+				(*raiz)->nome = strdup(nome);
+			}
+			if(strcmp("", valor) == 0){
+				(*raiz)->valor = NULL;
+			}
+			else{
+				(*raiz)->valor = strdup(valor);
+			}
 			(*raiz)->chave = 1;
 			(*raiz)->qtd = 1;
 			(*raiz)->isVar = isVar;
@@ -245,6 +288,7 @@ void insere(TabSimbolos* raiz, char* valor, int isVar, TYPE tipo, int qtdParams,
 			if(isVar == FUNC){
 				(*raiz)->qtdParams = qtdParams;
 				(*raiz)->params = params;
+				(*raiz)->tabContexto = NULL;
 			}
 		}
 		else{
@@ -259,8 +303,18 @@ void insere(TabSimbolos* raiz, char* valor, int isVar, TYPE tipo, int qtdParams,
 			aux_chave++;
 
 			ultimoLista->prox = (TabSimbolos) malloc(sizeof(Simbolo));
-			ultimoLista->prox->valor = (char*) malloc(sizeof(char) * strlen(valor) + 1);
-			strcpy(ultimoLista->prox->valor, valor);
+			if(strcmp("", nome) == 0){
+				ultimoLista->prox->nome = NULL;
+			}
+			else{
+				ultimoLista->prox->nome = strdup(nome);
+			}
+			if(strcmp("", valor) == 0){
+				ultimoLista->prox->valor = NULL;
+			}
+			else{
+				ultimoLista->prox->valor = strdup(valor);
+			}
 			ultimoLista->prox->chave = aux_chave;
 			ultimoLista->prox->qtd = 1;
 			ultimoLista->prox->isVar = isVar;
@@ -297,7 +351,7 @@ void printTab(TabSimbolos* raiz){
 	else{
 		TabSimbolos atual;
 		atual = *raiz;
-		printf("CHAVE\tQUANTIDADE\tVAR/FUNC\tTIPO\t\tVALOR\tPARAMETROS\n");
+		printf("CHAVE\tQUANTIDADE\tVAR/FUNC\tTIPO\t\tNOME\t   CONTEUDO\tPARAMETROS\n");
 
 		while(atual != NULL){
 			printf("%d\t%6d\t%14s\t\t", atual->chave, atual->qtd, atual->isVar == VAR ? "VAR" : (atual->isVar == FUNC ? "FUNC" : (atual->isVar == KEYWORD ? "Keyword" : "Outro")));
@@ -326,7 +380,7 @@ void printTab(TabSimbolos* raiz){
 					printf("Outro\t");
 					break;
 			}
-			printf("%14s\t", atual->valor);
+			printf("%14s%14s\t", atual->nome != NULL ? atual->nome : "(nulo)", atual->valor != NULL ? atual->valor : "(nulo)");
 
 			if(atual->isVar == FUNC){
 				printf("(");
@@ -368,12 +422,35 @@ void printTab(TabSimbolos* raiz){
 
 }
 
+void destroiParams(Parametro* parametro){
+	if(parametro != NULL){
+		if(parametro->prox != NULL){
+			destroiParams(parametro->prox);
+		}
+		// if(parametro->nome != NULL){
+		// 	free(parametro->nome);
+			parametro->nome = NULL;
+		// }
+		free(parametro);
+		parametro = NULL;
+	}
+}
+
 void destroiTab(TabSimbolos* raiz){
+	int i = 0;
 	if((*raiz) != NULL){
 		if((*raiz)->prox != NULL){
 			destroiTab(&((*raiz)->prox));
 		}
 
+		if((*raiz)->isVar == FUNC){
+			destroiParams((*raiz)->params);
+			if((*raiz)->tabContexto != NULL){
+				destroiTab((*raiz)->tabContexto);
+			}
+		}
+		free((*raiz)->nome);
+		(*raiz)->nome = NULL;
 		free((*raiz)->valor);
 		(*raiz)->valor = NULL;
 		free(*raiz);

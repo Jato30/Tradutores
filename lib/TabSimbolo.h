@@ -25,7 +25,8 @@ typedef struct Parametro{
 } Parametro;
 
 typedef struct Simbolo{
-	char* valor;
+	char* valor; // valor da variavel
+	char* nome; // nome da variavel
 	int qtd; // Quantidade de vezes que aparece
 	int chave; // Numero do no, valor unico.
 	int isVar; // flag que determina se variavel ou funcao
@@ -33,15 +34,18 @@ typedef struct Simbolo{
 	int qtdParams;
 	Parametro *params; // para ser usado somente se for funcao
 	struct Simbolo *prox;
+	struct Simbolo **tabContexto;
 } Simbolo;
 
 typedef Simbolo* TabSimbolos;
 
 void criaTab(TabSimbolos* raiz);
-int buscaTab(TabSimbolos* raiz, char* valor);
+int buscaTabNome(TabSimbolos* raiz, char* nome);
+int buscaTabVal(TabSimbolos* raiz, char* nome);
 int checa_warn(char* valor, int lin, int col);
-void insere(TabSimbolos* raiz, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params);
+void insere(TabSimbolos* raiz, char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params);
 void printTab(TabSimbolos* raiz);
+void destroiParams(Parametro* parametro);
 void destroiTab(TabSimbolos* raiz);
 
 
