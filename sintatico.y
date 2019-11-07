@@ -502,17 +502,26 @@ instruc_return:
 			;
 
 expressao:
-			var atrop expressao {
+			var atrop express_simp {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
-				$$ = novoNo(3, lista, "var atrop expressao ", NULL);
+				$$ = novoNo(3, lista, "var atrop express_simp ", NULL);
+
+				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
+				chave--;
+				TabSimbolos item = tabela;
+				for(i = 0; i < chave; i++){
+					item = item->prox;
+				}
+				item->valor = strdup($3->valor);
+				// printf("\t\t ########################## nome: %s / TAB[%d].nome = %s / valor = %s ##########\n\n", strdup($1->valor), chave+1, item->nome, item->valor);
 			}
 			| express_simp {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "express_simp ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			;
 
@@ -1038,7 +1047,7 @@ void yyerror(char const *s){
 int main(void){
 	criaTab(&tabela);
 	yyparse();
-	printArvore(raiz, 0);
+	// printArvore(raiz, 0);
 	printTab(&tabela);
 	destroiArvore(raiz);
 	destroiTab(&tabela);
