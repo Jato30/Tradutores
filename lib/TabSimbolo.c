@@ -211,7 +211,7 @@ int buscaTabNome(TabSimbolos* raiz, char* nome){
 		// printf("\nTabela vazia\n");
 		return -1;
 	}
-	else if(nome == NULL || strcmp(nome, "")){
+	else if(nome == NULL || strcmp(nome, "") == 0){
 		// printf("\nNome vazio\n");
 		return -1;
 	}
@@ -220,11 +220,11 @@ int buscaTabNome(TabSimbolos* raiz, char* nome){
 		atual = (*raiz);
 		while(atual != NULL){
 			if(strcmp("", atual->nome != NULL ? atual->nome : "") == 0){}
-			else if(strcmp(atual->nome != NULL ? atual->nome : "", nome) == 0){
+			else if(strcmp(atual->nome, nome) == 0){
 				// printf("\tJa existe %s na tabela de simbolos\n", nome);
 				return atual->chave;
 			}
-			atual = atual->prox;
+			atual = atual->prox != NULL ? atual->prox : NULL;
 		}
 
 		// printf("Nenhuma ocorrencia repetida.\n");
@@ -238,7 +238,7 @@ int buscaTabVal(TabSimbolos* raiz, char* valor){
 		// printf("\nTabela vazia\n");
 		return -1;
 	}
-	else if(valor == NULL || strcmp(valor, "")){
+	else if(valor == NULL || strcmp(valor, "") == 0){
 		// printf("\nValor vazio\n");
 		return -1;
 	}
