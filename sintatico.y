@@ -488,7 +488,7 @@ expressao:
 			| express_simp {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, strdup($1->valor), NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL); // here
 			}
 			;
 
@@ -522,7 +522,7 @@ express_soma:
 			termo {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "termo ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL); // here
 			}
 			| termo addop express_soma {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
@@ -538,14 +538,95 @@ termo:
 			factor {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, strdup($1->valor), NULL);
+
+				int i = 0, chave = buscaTabNome(&tabela, $1->valor); // here
+				chave--;
+				TabSimbolos item = tabela;
+				for(i = 0; i < chave; i++){
+					item = item->prox;
+				}
+
+				$$ = novoNo(1, lista, strdup(item->valor), NULL);
 			}
 			| factor mulop termo {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
-				$$ = novoNo(3, lista, , NULL);
+
+				int i = 0, chave = buscaTabNome(&tabela, $1->valor); // here
+				chave--;
+				TabSimbolos item = tabela;
+				for(i = 0; i < chave; i++){
+					item = item->prox;
+				}
+				i = 0;
+				chave = 0;
+				chave = buscaTabNome(&tabela, $3->valor); // here
+				chave--;
+				TabSimbolos item2 = tabela;
+				for(i = 0; i < chave; i++){
+					item2 = item2->prox;
+				}
+				int isInt = 0;
+				int erro = 0;
+				double fval1, fval2, fvalfinal;
+				int ival1, ival2, ivalfinal;
+				char timesop = '*';
+				char overop = '/';
+				if(item1->tipo == Decimal || item2->tipo == Decimal){
+					fval1 = atof(item1->valor);
+					fval2 = atof(item2->valor);
+					isInt = 0;
+				}
+				else if(item1->tipo == Inteiro && item2->tipo == Inteiro){
+					ival1 = atoi(item1->valor);
+					ival2 = atoi(item2->valor);
+					isInt = 1;
+				}
+				else{
+					printf("### ERRO: expressao com tipos nao encontrados [%d][%d]\n", $1->linha, $1->coluna);
+					erro = 1;
+				}
+
+				switch($2->valor[0]){
+					case '*':
+						if(isInt == 1){
+							ivalfinal = ival1 * ival2;
+						}
+						else{
+							fvalfinal = fval1 * fval2;
+						}
+						break;
+					case '/':
+						if(isInt == 1){
+							ivalfinal = ival1 * ival2;
+						}
+						else{
+							fvalfinal = fval1 / fval2;
+						}
+						break;
+					default:
+						printf("\t### ERRO: %s operador nao encontrado [%d][%d]\n", $2->valor, $2->linha, $2->coluna);
+						erro = 1;
+						break;
+				}
+
+				char* val;
+				if(erro != 1){
+					if(isInt == 1){
+						val = (char*) malloc(sizeof(char) * contDigtf(ivalfinal) + 1);
+						sprintf(val, "%d", ivalfinal);
+					}
+					else{
+						val = (char*) malloc(sizeof(char) * contDigtf(fvalfinal) + 1);
+						sprintf(val, "%lf", fvalfinal);
+					}
+				}
+
+				$$ = novoNo(3, lista, strdup(val), NULL); // here
+
+				val = NULL;
 			}
 			;
 
@@ -589,7 +670,14 @@ endereco:
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("&");
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "ACESSO_END var ", NULL); // here
+
+				char* val = (char*) malloc(sizeof(char) * (1 + strlen($2->valor)) + 1);
+				strcat(val, "&");
+				strcat(val, strdup($2->valor);
+				$$ = novoNo(2, lista, strdup(val), NULL); // here
+
+				free(val);
+				val = NULL;
 			}
 			;
 
@@ -598,7 +686,17 @@ chamada:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $3;
-				$$ = novoNo(2, lista, strcat(strdup($1->valor), '(', strdup($3->valor), ')'), NULL); // here
+
+				int size = (strlen($1->valor) + 1 + strlen($3->valor) + 1);
+				char* val = (char*) malloc(sizeof(char) * (size) + 1);
+				strcat(val, strdup($1->valor));
+				strcat(val, "(");
+				strcat(val, strdup($3->valor));
+				strcat(val, ")");
+				$$ = novoNo(2, lista, strdup(val), NULL); // here
+
+				free(val);
+				val = NULL;
 			}
 			;
 
@@ -669,6 +767,11 @@ nome_func:
 				lista[0] = novaFolhaText("IsCollided");
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
 			}
+			| var {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = $1;
+				$$ = novoNo(1, lista, strdup($1->valor), NULL); // here
+			}
 			;
 
 arg:
@@ -687,7 +790,7 @@ lista_arg:
 			expressao {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "expressao ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| expressao SEPARA_ARG lista_arg {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
@@ -771,7 +874,7 @@ relop:
 			| logop {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, strdup($1->valor), NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL); // here
 			}
 			;
 
