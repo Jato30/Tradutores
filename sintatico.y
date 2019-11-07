@@ -79,12 +79,11 @@
 
 
 %type <node> num addop mulop logop relop atrop
-%type <node> rec_args lista_arg arg nome_func chamada endereco factor
-%type <node> rec_timesexpress termo
-%type <node> rec_plusexpress express_soma fat_express express_simp var expressao instruc_return
-%type <node> instruc_iterac fat_if instruc_cond instruc_expr instrucao rec_instrucs lista_instruc
-%type <node> rec_declocs decl_local instruc_composta param rec_paramlist lista_param params
-%type <node> tipo_especif decl_func decl_var declaracao rec_decls lista_decl programa
+%type <node> lista_arg arg nome_func chamada endereco factor termo
+%type <node> express_soma express_simp var expressao instruc_return
+%type <node> instruc_iterac instruc_cond instruc_expr instrucao lista_instruc
+%type <node> decl_local instruc_composta param lista_param params
+%type <node> tipo_especif decl_func decl_var declaracao lista_decl programa
 
 
 %union{
@@ -121,23 +120,16 @@ programa:
 			;
 
 lista_decl:
-			declaracao rec_decls {
+			declaracao {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = $1;
+				$$ = novoNo(1, lista, "declaracao ", NULL);
+			}
+			| declaracao lista_decl {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "declaracao rec_decls ", NULL);
-			}
-			;
-
-rec_decls:
-			/* %empty */ {
-				$$ = NULL;
-			}
-			| declaracao rec_decls {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = $1;
-				lista[1] = $2;
-				$$ = novoNo(2, lista, "declaracao rec_decls ", NULL);
+				$$ = novoNo(2, lista, "declaracao lista_decl ", NULL);
 			}
 			;
 
@@ -272,23 +264,16 @@ params:
 
 
 lista_param:
-			param rec_paramlist {
+			param {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = $1;
+				$$ = novoNo(1, lista, "param ", NULL);
+			}
+			| param SEPARA_ARG lista_param {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
-				lista[1] = $2;
-				$$ = novoNo(2, lista, "param rec_paramlist ", NULL);
-			}
-			;
-
-rec_paramlist:
-			/* %empty */ {
-				$$ = NULL;
-			}
-			| SEPARA_ARG param rec_paramlist {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = $2;
 				lista[1] = $3;
-				$$ = novoNo(2, lista, ", param rec_paramlist ", NULL);
+				$$ = novoNo(2, lista, "param, lista_param ", NULL);
 			}
 			;
 
@@ -369,43 +354,27 @@ instruc_composta:
 
 
 decl_local:
-			rec_declocs {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = $1;
-				$$ = novoNo(1, lista, "rec_declocs ", NULL);
-			}
-			;
-
-rec_declocs:
 			/* %empty */ {
 				$$ = NULL;
 			}
-			| decl_var rec_declocs {
+			| decl_var decl_local {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "decl_var rec_declocs ", NULL);
+				$$ = novoNo(2, lista, "decl_var decl_local ", NULL);
 			}
 			;
 
 
 lista_instruc:
-			rec_instrucs {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = $1;
-				$$ = novoNo(1, lista, "rec_instrucs ", NULL);
-			}
-			;
-
-rec_instrucs:
 			/* %empty */ {
 				$$ = NULL;
 			}
-			| instrucao rec_instrucs {
+			| instrucao lista_instruc {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "instrucao rec_instrucs ", NULL);
+				$$ = novoNo(2, lista, "instrucao lista_instruc ", NULL);
 			}
 			;
 
@@ -451,28 +420,26 @@ instruc_expr:
 
 
 instruc_cond:
-			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC fat_if {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 4);
+			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC {
+				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("if");
 				lista[1] = $3;
 				lista[2] = $6;
-				lista[3] = $8;
 
-				$$ = novoNo(4, lista, "IF ( expressao ) { instrucao } fat_if ", NULL);
+				$$ = novoNo(3, lista, "IF ( expressao ) { instrucao } ", NULL);
 			}
-			;
-
-fat_if:
-			/* %empty */ {
-				$$ = NULL;
-			}
-			| ELSE INI_INSTRUC instrucao FIM_INSTRUC {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
+			| IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC {
+				Node** lista = (Node**) malloc(sizeof(Node*) * 5);
 				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("else");
+				lista[0] = novaFolhaText("if");
 				lista[1] = $3;
-				$$ = novoNo(2, lista, "ELSE { instrucao } ", NULL);
+				lista[2] = $6;
+				lista[3] = (Node*) malloc(sizeof(Node));
+				lista[3] = novaFolhaText("else");
+				lista[4] = $10;
+
+				$$ = novoNo(5, lista, "IF ( expressao ) { instrucao } else { instrucao } ", NULL);
 			}
 			;
 
@@ -516,7 +483,7 @@ expressao:
 					item = item->prox;
 				}
 				item->valor = strdup($3->valor);
-				// printf("\t\t ########################## nome: %s / TAB[%d].nome = %s / valor = %s ##########\n\n", strdup($1->valor), chave+1, item->nome, item->valor);
+				// printf("\t\t ########################## nome: %s / TAB[%d].nome = %s / valor = %s ##########\n\n, strdup($1->valor), chave+1, item->nome, item->valor);
 			}
 			| express_simp {
 				Node** lista = (Node**) malloc(sizeof(Node*));
@@ -536,69 +503,49 @@ var:
 			;
 
 express_simp:
-			express_soma fat_express {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
+			express_soma {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = $1;
+				$$ = novoNo(1, lista, "express_soma ", NULL);
+			}
+			| express_soma relop express_soma {
+				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "express_soma fat_express ", NULL);
-			}
-			;
-
-fat_express:
-			/* %empty */ {
-				$$ = NULL;
-			}
-			| relop express_soma {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = $1;
-				lista[1] = $2;
-				$$ = novoNo(2, lista, "relop express_soma ", NULL);
+				lista[2] = $3;
+				$$ = novoNo(3, lista, "express_soma relop express_soma ", NULL);
 			}
 			;
 
 
 express_soma:
-			termo rec_plusexpress {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
+			termo {
+				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				lista[1] = $2;
-				$$ = novoNo(2, lista, "termo rec_plusexpress ", NULL);
+				$$ = novoNo(1, lista, "termo ", NULL);
 			}
-			;
-
-rec_plusexpress:
-			/* %empty */ {
-				$$ = NULL;
-			}
-			| addop termo rec_plusexpress {
+			| termo addop express_soma {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
-				$$ = novoNo(3, lista, "addop termo rec_plusexpress ", NULL);
+				$$ = novoNo(3, lista, "termo addop express_soma ", NULL);
 			}
 			;
 
 
 termo:
-			factor rec_timesexpress {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
+			factor {
+				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				lista[1] = $2;
-				$$ = novoNo(2, lista, "factor rec_timesexpress ", NULL);
+				$$ = novoNo(1, lista, "factor ", NULL);
 			}
-			;
-
-rec_timesexpress:
-			/* %empty */ {
-				$$ = NULL;
-			}
-			| mulop factor rec_timesexpress {
+			| factor mulop termo {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
-				$$ = novoNo(3, lista, "mulop factor rec_timesexpress ", NULL);
+				$$ = novoNo(3, lista, "factor mulop termo ", NULL);
 			}
 			;
 
@@ -607,17 +554,17 @@ factor:
 			INI_PARAM expressao FIM_PARAM {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $2;
-				$$ = novoNo(1, lista, "( expressao ) ", NULL);
+				$$ = novoNo(1, lista, "( strdup($2->valor) ) ", NULL);
 			}
 			| endereco {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "endereco ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| var {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "var ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| chamada {
 				Node** lista = (Node**) malloc(sizeof(Node*));
@@ -627,7 +574,7 @@ factor:
 			| num {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "num ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| LITERAL {
 				$$ = novaFolhaText(strdup($1));
@@ -737,23 +684,16 @@ arg:
 
 
 lista_arg:
-			expressao rec_args {
+			expressao {
+				Node** lista = (Node**) malloc(sizeof(Node*));
+				lista[0] = $1;
+				$$ = novoNo(1, lista, "expressao ", NULL);
+			}
+			| expressao SEPARA_ARG lista_arg {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
-				lista[1] = $2;
-				$$ = novoNo(2, lista, "expressao rec_args ", NULL);
-			}
-			;
-
-rec_args:
-			/* %empty */ {
-				$$ = NULL;
-			}
-			| SEPARA_ARG expressao rec_args {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = $2;
 				lista[1] = $3;
-				$$ = novoNo(2, lista, ", expressao rec_args ", NULL);
+				$$ = novoNo(2, lista, "expressao, lista_arg ", NULL);
 			}
 			;
 
@@ -1047,7 +987,7 @@ void yyerror(char const *s){
 int main(void){
 	criaTab(&tabela);
 	yyparse();
-	// printArvore(raiz, 0);
+	printArvore(raiz, 0);
 	printTab(&tabela);
 	destroiArvore(raiz);
 	destroiTab(&tabela);
