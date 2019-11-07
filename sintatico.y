@@ -538,14 +538,14 @@ termo:
 			factor {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "factor ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| factor mulop termo {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
-				$$ = novoNo(3, lista, "factor mulop termo ", NULL);
+				$$ = novoNo(3, lista, , NULL);
 			}
 			;
 
@@ -554,7 +554,7 @@ factor:
 			INI_PARAM expressao FIM_PARAM {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $2;
-				$$ = novoNo(1, lista, "( strdup($2->valor) ) ", NULL);
+				$$ = novoNo(1, lista, "( strdup($2->valor) ) ", NULL); // here
 			}
 			| endereco {
 				Node** lista = (Node**) malloc(sizeof(Node*));
@@ -579,7 +579,7 @@ factor:
 			| LITERAL {
 				$$ = novaFolhaText(strdup($1));
 
-				insere(&tabela, "texto", strdup($$->valor), OTHER, Literal, 0, NULL);
+				insere(&tabela, "texto", strdup($1->valor), OTHER, Literal, 0, NULL);
 			}
 			;
 
@@ -589,7 +589,7 @@ endereco:
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("&");
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "ACESSO_END var ", NULL);
+				$$ = novoNo(2, lista, "ACESSO_END var ", NULL); // here
 			}
 			;
 
@@ -598,7 +598,7 @@ chamada:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $3;
-				$$ = novoNo(2, lista, "var ( arg ) ", NULL);
+				$$ = novoNo(2, lista, strcat(strdup($1->valor), '(', strdup($3->valor), ')'), NULL); // here
 			}
 			;
 
@@ -693,7 +693,7 @@ lista_arg:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $3;
-				$$ = novoNo(2, lista, "expressao, lista_arg ", NULL);
+				$$ = novoNo(2, lista, "expressao, lista_arg ", NULL); // here cat
 			}
 			;
 
@@ -771,7 +771,7 @@ relop:
 			| logop {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "logop ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			;
 
