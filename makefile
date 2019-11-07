@@ -13,12 +13,13 @@ DEVFLAGS= -Wall -pedantic -Wextra
 DEBFLAGS= -ggdb -O0
 PATH= ../Tradutores/
 LIBS= $(wildcard $(PATH)lib/*.c)
-BIN= $(PATH)bin
+BIN= $(PATH)bin/
 
 
 #Arquivos que devem ser compilados:
 C_FILES= $(wildcard $(PATH)*.c)
 FLEX_FILES= $(wildcard $(PATH)*.l)
+BISON_FILES= $(wildcard $(PATH)*.y)
 
 
 #Nome do executável
@@ -26,43 +27,22 @@ EXEC = exec
 
 
 all:
-	clear
 	bison -dv sintatico.y --report=all
-	flex -l lexico.l
-	gcc sintatico.tab.c lex.yy.c -o exec -lfl
+	flex lexico.l
+	gcc $(LIBS) sintatico.tab.c lex.yy.c -o exec -lfl
 
 gramatica:
-	bison -d sintatico.y
+	bison -dv sintatico.y --report=all
 
 lexico:
 	flex lexico.l
 
 
-#all: lexico
-#	gcc sintatico.tab.c lex.yy.c
 
-#gramatica:
-#	bison -d sintatico.y
-
-#lexico: gramatica
-#lexico:
-#	flex lexico.l
-
-
-$(EXEC): lex.yy.c $(FLEX_FILES)
-$(EXEC):
-	flex $(FLEX_FILES)
-	gcc lex.yy.c $(FLAGS)
-
-dev: FLAGS += $(DEVFLAGS)
-dev: all
-
-debug: FLAGS += $(DEBFLAGS)
-debug: all
 
 clean:
 	$(RM) $(BIN)$(EXEC)
-	$(RM) $(BIN)lex.yy.c
+	$(RM) $(wildcard $(PATH)$(BIN)*.c)
 
 
 again: clean
