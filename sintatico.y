@@ -109,12 +109,9 @@ programa:
 			lista_decl {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "decl_func ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 
-				Node** lista1 = (Node**) malloc(sizeof(Node*));
-				lista1[0] = $$;
-				raiz = (Node*) malloc(sizeof(Node));
-				raiz = novoNo(1, lista, "programa ", NULL);
+				raiz = $$;
 				printf("\nCOMPILACAO CONCLUIDA\n");
 			}
 			;
@@ -123,13 +120,22 @@ lista_decl:
 			declaracao {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "declaracao ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| declaracao lista_decl {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "declaracao lista_decl ", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (strlen($1->valor) + strlen($2->valor)) + 1);
+				strcat(val, strdup($1->valor));
+				strcat(val, strdup($2->valor));
+				$$ = novoNo(2, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
 			}
 			;
 
@@ -138,12 +144,12 @@ declaracao:
 			decl_var {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "decl_var ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| decl_func {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "decl_func ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			;
 
@@ -152,32 +158,50 @@ decl_var:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "tipo_especif var ; ", NULL);
 
 				TYPE type;
+				char* val;
 				switch($1->valor[0]){
 					case 'i':
 						type = Inteiro;
-					break;
+						val = (char*) malloc(sizeof(char) * (4 + strlen($2->valor) + 1) + 1);
+						strcat(val, "int ");
+						break;
 
 					case 'f':
 						type = Decimal;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor) + 1) + 1);
+						strcat(val, "float ");
+						break;
 
 					case 'p':
 						type = Ponto;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor) + 1) + 1);
+						strcat(val, "point ");
+						break;
 
 					case 's':
 						type = Forma;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor) + 1) + 1);
+						strcat(val, "shape ");
+						break;
 				
 					default:
 						type = Literal;
+						val = (char*) malloc(sizeof(char) * (8 + strlen($2->valor) + 1) + 1);
+						strcat(val, "Literal ");
 						break;
 				}
+				insere(&tabela, strdup($2->valor), "", VAR, type, 0, NULL);
 
-				insere(&tabela, $2->valor, "", VAR, type, 0, NULL);
+
+
+				strcat(val, strdup($2->valor));
+				strcat(val, ";");
+				$$ = novoNo(2, lista, val, NULL);
+
+				free(val);
+				val = NULL;
 			}
 			;
 
@@ -188,30 +212,44 @@ decl_func:
 				lista[1] = $2;
 				lista[2] = $4;
 				lista[3] = $6;
-				$$ = novoNo(4, lista, "tipo_especif var ( params ) instruc_composta ", $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
+				
 
 				TYPE type;
+				char* val;
 				switch($1->valor[0]){
 					case 'i':
 						type = Inteiro;
-					break;
+						val = (char*) malloc(sizeof(char) * (4 + strlen($2->valor) + 8) + 1);
+						strcat(val, "int ");
+						break;
 
 					case 'f':
 						type = Decimal;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor) + 8) + 1);
+						strcat(val, "float ");
+						break;
 
 					case 'p':
 						type = Ponto;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor) + 8) + 1);
+						strcat(val, "point ");
+						break;
 
 					case 's':
 						type = Forma;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor) + 8) + 1);
+						strcat(val, "shape ");
+						break;
 				
 					default:
 						type = Literal;
+						val = (char*) malloc(sizeof(char) * (8 + strlen($2->valor) + 8) + 1);
+						strcat(val, "Literal ");
 						break;
 				}
+				strcat(val, strdup($2->valor));
+				strcat(val, "(params)");
+				$$ = novoNo(4, lista, val, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
 
 
 				int aux_qtd = 0;
@@ -221,6 +259,10 @@ decl_func:
 					}
 				}
 				insere(&tabela, strdup($2->valor), "", FUNC, type, aux_qtd, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
+
+				
+				free(val);
+				val = NULL;
 			}
 			;
 
@@ -282,6 +324,8 @@ lista_param:
 					atual = atual->prox;
 				}
 				atual->prox = $3->params;
+
+
 				$$ = novoNo(2, lista, "param, lista_param ", parametro);
 			}
 			;
@@ -293,62 +337,106 @@ param:
 				lista[0] = $1;
 				lista[1] = $2;
 				Parametro* param = (Parametro*) malloc(sizeof(Parametro));
+
+				
+				char* val;
+
 				switch($1->valor[0]){
 					case 'i':
 						param->tipo = Inteiro;
-					break;
+						val = (char*) malloc(sizeof(char) * (4 + 1 + strlen($2->valor)) + 1);
+						strcat(val, "int ");
+						break;
 
 					case 'f':
 						param->tipo = Decimal;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + 1 + strlen($2->valor)) + 1);
+						strcat(val, "float ");
+						break;
 
 					case 'p':
 						param->tipo = Ponto;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + 1 + strlen($2->valor)) + 1);
+						strcat(val, "point ");
+						break;
 
 					case 's':
 						param->tipo = Forma;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + 1 + strlen($2->valor)) + 1);
+						strcat(val, "shape ");
+						break;
 				
 					default:
+						val = (char*) malloc(sizeof(char) * (8 + 1 + strlen($2->valor)) + 1);
+						strcat(val, "Literal ");
 						param->tipo = Literal;
 						break;
 				}
 				param->nome = strdup($2->valor);
 				param->isEnd = 1;
 				param->prox = NULL;
-				$$ = novoNo(2, lista, "tipo_especif endereco ", param);
+
+
+				strcat(val, "&");
+				strcat(val, strdup($2->valor));
+				$$ = novoNo(2, lista, strdup(val), param);
+
+				free(val);
+				val = NULL;
+				
+
 			}
 			| tipo_especif var {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
+
+
+				char* val;
+
 				Parametro* param = (Parametro*) malloc(sizeof(Parametro));
 				switch($1->valor[0]){
 					case 'i':
 						param->tipo = Inteiro;
-					break;
+						val = (char*) malloc(sizeof(char) * (4 + strlen($2->valor)) + 1);
+						strcat(val, "int ");
+						break;
 
 					case 'f':
 						param->tipo = Decimal;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor)) + 1);
+						strcat(val, "float ");
+						break;
 
 					case 'p':
 						param->tipo = Ponto;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor)) + 1);
+						strcat(val, "point ");
+						break;
 
 					case 's':
 						param->tipo = Forma;
-					break;
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor)) + 1);
+						strcat(val, "shape ");
+						break;
 				
 					default:
+						val = (char*) malloc(sizeof(char) * (8 + strlen($2->valor)) + 1);
+						strcat(val, "Literal ");
 						param->tipo = Literal;
 						break;
 				}
 				param->nome = strdup($2->valor);
 				param->isEnd = 0;
 				param->prox = NULL;
-				$$ = novoNo(2, lista, "tipo_especif var ", param);
+
+
+				strcat(val, strdup($2->valor));
+				$$ = novoNo(2, lista, strdup(val), param);
+
+				free(val);
+				val = NULL;
+
 			}
 			;
 
@@ -357,7 +445,22 @@ instruc_composta:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $2;
 				lista[1] = $3;
-				$$ = novoNo(2, lista, "{ decl_local lista_instruc } ", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (1 + $2 != NULL ? ($2->valor != NULL ? strlen($2->valor) : 0) : 0 + $3 != NULL ? ($3->valor != NULL ? strlen($3->valor) : 0) : 0 + 1) + 1);
+				strcat(val, "{");
+				if($2 != NULL && $2->valor != NULL){
+					strcat(val, strdup($2->valor));
+				}
+				if($3 != NULL && $3->valor != NULL){
+					strcat(val, strdup($3->valor));
+				}
+				strcat(val, "}");
+				$$ = novoNo(2, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
 			}
 			;
 
@@ -370,7 +473,19 @@ decl_local:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "decl_var decl_local ", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (strlen($1->valor) + ($2 != NULL ? ($2->valor != NULL ? strlen($2->valor) : 0) : 0)) + 1);
+				strcat(val, strdup($1->valor));
+				if($2 != NULL && $2->valor != NULL){
+					strcat(val, strdup($2->valor));
+				}
+				$$ = novoNo(2, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
+
 			}
 			;
 
@@ -383,7 +498,19 @@ lista_instruc:
 				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
 				lista[0] = $1;
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "instrucao lista_instruc ", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (strlen($1->valor) + ($2 != NULL ? ($2->valor != NULL ? strlen($2->valor) : 0) : 0)) + 1);
+				strcat(val, strdup($1->valor));
+				if($2 != NULL && $2->valor != NULL){
+					strcat(val, strdup($2->valor));
+				}
+				$$ = novoNo(2, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
+
 			}
 			;
 
@@ -392,27 +519,27 @@ instrucao:
 			instruc_expr {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "instruc_expr ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| instruc_composta {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "instruc_composta ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| instruc_cond {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "instruc_cond ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| instruc_iterac {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "instruc_iterac ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| instruc_return {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "instruc_return ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			;
 
@@ -420,7 +547,17 @@ instruc_expr:
 			expressao FIM_EXPRESS {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "expressao ; ", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (strlen($1->valor) + 1) + 1);
+				strcat(val, strdup($1->valor));
+				strcat(val, ";");
+				$$ = novoNo(1, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
+
 			}
 			| FIM_EXPRESS {
 				$$ = NULL;
@@ -436,6 +573,16 @@ instruc_cond:
 				lista[1] = $3;
 				lista[2] = $6;
 
+				char* val = (char*) malloc(sizeof(char) * (3 + strlen($3->valor) + 1) + 1);
+				strcat(val, "if(");
+				strcat(val, strdup($3->valor));
+				strcat(val, ")");
+				$$ = novoNo(3, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
 				$$ = novoNo(3, lista, "IF ( expressao ) { instrucao } ", NULL);
 			}
 			| IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC {
@@ -448,7 +595,18 @@ instruc_cond:
 				lista[3] = novaFolhaText("else");
 				lista[4] = $10;
 
-				$$ = novoNo(5, lista, "IF ( expressao ) { instrucao } else { instrucao } ", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (3 + strlen($3->valor) + 8) + 1);
+				strcat(val, "if(");
+				strcat(val, strdup($3->valor));
+				strcat(val, ")...else");
+				$$ = novoNo(5, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
+
 			}
 			;
 
@@ -463,7 +621,23 @@ instruc_iterac:
 				lista[3] = $7;
 				lista[4] = $10;
 
-				$$ = novoNo(5, lista, "FOR ( expressao ; express_simp ; expressao ) { instrucao }", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (4 + strlen($3->valor) + strlen($5->valor) + strlen($7->valor) + 3) + 1);
+				strcat(val, "for(");
+				strcat(val, strdup($3->valor));
+				strcat(val, ";");
+				strcat(val, strdup($5->valor));
+				strcat(val, ";");
+				strcat(val, strdup($7->valor));
+				strcat(val, ")");
+				$$ = novoNo(5, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
+
+
 			}
 			;
 
@@ -473,7 +647,18 @@ instruc_return:
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("return");
 				lista[1] = $2;
-				$$ = novoNo(2, lista, "RETURN expressao ; ", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (7 + strlen($2->valor) + 1) + 1);
+				strcat(val, "return ");
+				strcat(val, strdup($2->valor));
+				strcat(val, ";");
+				$$ = novoNo(2, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
+
 			}
 			;
 
@@ -483,7 +668,17 @@ expressao:
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
-				$$ = novoNo(3, lista, "var atrop express_simp ", NULL);
+
+				char* val = (char*) malloc(sizeof(char) * (strlen($1->valor) + strlen($2->valor) + strlen($3->valor)) + 1);
+				strcat(val, strdup($1->valor));
+				strcat(val, strdup($2->valor));
+				strcat(val, strdup($3->valor));
+				$$ = novoNo(3, lista, strdup(val), NULL);
+
+				free(val);
+				val = NULL;
+
+
 
 				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
 				chave--;
@@ -515,7 +710,7 @@ express_simp:
 			express_soma {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
-				$$ = novoNo(1, lista, "express_soma ", NULL);
+				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| express_soma relop express_soma {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
@@ -742,7 +937,7 @@ factor:
 				strcat(val, strdup($2->valor));
 				strcat(val, ")");
 				
-				$$ = novoNo(1, lista, val, NULL);
+				$$ = novoNo(1, lista, strdup(val), NULL);
 
 				free(val);
 				val = NULL;
@@ -1306,24 +1501,24 @@ void destroiArvore(Node *raiz){
 			}
 		}
 		if(raiz->valor != NULL){
-			free(raiz->valor);
+			// free(raiz->valor);
 			raiz->valor = NULL;
 		}
 		if(raiz->params != NULL){
 			Parametro* atual = raiz->params;
 			Parametro* proximo = raiz->params->prox;
-			do{
-				atual = atual->prox;
-				free(raiz->params->prox);
-				raiz->params->prox = NULL;
-				free(raiz->params->nome);
-				raiz->params->nome = NULL;
-			} while(atual != NULL);
+			while(proximo != NULL){
+				while(proximo->prox != NULL){
+					proximo = proximo->prox;
+				}
+				if(proximo->nome != NULL){
+					free(proximo->nome);
+					proximo->nome = NULL;
+				}
+				free(proximo);
 
-			free(raiz->params->nome);
-			raiz->params->nome = NULL;
-			free(raiz->params);
-			raiz->params = NULL;
+				proximo = atual;
+			}
 		}
 
 		free(raiz);
