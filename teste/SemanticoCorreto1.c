@@ -1,7 +1,7 @@
 
 int main(){
 
-	int per;
+	float per;
 
 	int x;
 	x = 2;

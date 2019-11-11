@@ -94,19 +94,22 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 {LITERAL} 		{
 					num_char += strlen(yytext);
 
-					int i, j = 0;
-					char* aux = (char*) malloc(sizeof(char) * (strlen(yytext) - 1));
-					for(i = 1; i < (strlen(yytext) - 1); i++){
-						aux[j] = yytext[i];
-						j++;
-					}
-					aux[j] = '\0';
-					yylval->LITERAL = (char*) malloc(sizeof(char) * strlen(aux));
-					strcpy(yylval->LITERAL, aux);
-					free(aux);
-					aux = NULL;
+					/*
+						int i, j = 0;
+						char* aux = (char*) malloc(sizeof(char) * (strlen(yytext) - 1));
+						for(i = 1; i < (strlen(yytext) - 1); i++){
+							aux[j] = yytext[i];
+							j++;
+						}
+						aux[j] = '\0';
+						yylval->LITERAL = (char*) malloc(sizeof(char) * strlen(aux));
+						strcpy(yylval->LITERAL, aux);
+						free(aux);
+						aux = NULL;
+					*/
 
-					printf("String constante: \"%s\"\n", yylval->LITERAL);
+					yylval->LITERAL = strdup(yytext);
+					printf("String constante: %s\n", yylval->LITERAL);
 
 					return (LITERAL);
 				}

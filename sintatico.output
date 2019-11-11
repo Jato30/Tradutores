@@ -88,7 +88,7 @@ Grammar
    59          | PERIMETRO
    60          | ISIN
    61          | ISCOLLIDED
-   62          | var
+   62          | ID
 
    63 arg: %empty
    64    | lista_arg
@@ -150,7 +150,7 @@ ISCOLLIDED (276) 61
 LITERAL (277) 48
 INTEIRO (278) 86
 DECIMAL (279) 87
-ID (280) 36
+ID (280) 36 62
 LT (281) 72
 GT (282) 73
 LE (283) 74
@@ -219,7 +219,7 @@ instruc_return (68)
 expressao (69)
     on left: 34 35, on right: 28 30 31 32 33 43 65 66
 var (70)
-    on left: 36, on right: 6 17 34 45 49 62
+    on left: 36, on right: 6 17 34 45 49
 express_simp (71)
     on left: 37 38, on right: 32 34 35
 express_soma (72)
@@ -381,7 +381,7 @@ State 10
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
 
     PRINTINT       shift, and go to state 13
     PRINTFLOAT     shift, and go to state 14
@@ -493,19 +493,18 @@ State 23
 
 State 24
 
-   36 var: ID .
+   36 var: ID .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, ATR, PLUS_ATR, MINUS_ATR, TIMES_ATR, OVER_ATR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   62 nome_func: ID .  [INI_PARAM]
 
-    $default  reduce using rule 36 (var)
+    INI_PARAM  reduce using rule 62 (nome_func)
+    $default   reduce using rule 36 (var)
 
 
 State 25
 
     6 decl_var: tipo_especif var . FIM_EXPRESS
-   62 nome_func: var .  [INI_PARAM]
 
     FIM_EXPRESS  shift, and go to state 27
-
-    $default  reduce using rule 62 (nome_func)
 
 
 State 26
@@ -556,18 +555,18 @@ State 29
    36 var: . ID
    49 endereco: . ACESSO_END var
 
-    ID          shift, and go to state 24
-    ACESSO_END  shift, and go to state 33
+    ID          shift, and go to state 33
+    ACESSO_END  shift, and go to state 34
 
-    var       go to state 34
-    endereco  go to state 35
+    var       go to state 35
+    endereco  go to state 36
 
 
 State 30
 
     7 decl_func: tipo_especif nome_func INI_PARAM params . FIM_PARAM instruc_composta
 
-    FIM_PARAM  shift, and go to state 36
+    FIM_PARAM  shift, and go to state 37
 
 
 State 31
@@ -582,46 +581,53 @@ State 32
    14 lista_param: param .  [FIM_PARAM]
    15            | param . SEPARA_ARG lista_param
 
-    SEPARA_ARG  shift, and go to state 37
+    SEPARA_ARG  shift, and go to state 38
 
     $default  reduce using rule 14 (lista_param)
 
 
 State 33
 
-   36 var: . ID
-   49 endereco: ACESSO_END . var
+   36 var: ID .
 
-    ID  shift, and go to state 24
-
-    var  go to state 38
+    $default  reduce using rule 36 (var)
 
 
 State 34
+
+   36 var: . ID
+   49 endereco: ACESSO_END . var
+
+    ID  shift, and go to state 33
+
+    var  go to state 39
+
+
+State 35
 
    17 param: tipo_especif var .
 
     $default  reduce using rule 17 (param)
 
 
-State 35
+State 36
 
    16 param: tipo_especif endereco .
 
     $default  reduce using rule 16 (param)
 
 
-State 36
+State 37
 
     7 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM . instruc_composta
    18 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
 
-    INI_INSTRUC  shift, and go to state 39
+    INI_INSTRUC  shift, and go to state 40
 
-    instruc_composta  go to state 40
+    instruc_composta  go to state 41
 
 
-State 37
+State 38
 
     8 tipo_especif: . INT
     9             | . FLOAT
@@ -639,18 +645,18 @@ State 37
     SHAPE  shift, and go to state 4
 
     tipo_especif  go to state 29
-    lista_param   go to state 41
+    lista_param   go to state 42
     param         go to state 32
 
 
-State 38
+State 39
 
    49 endereco: ACESSO_END var .
 
     $default  reduce using rule 49 (endereco)
 
 
-State 39
+State 40
 
     6 decl_var: . tipo_especif var FIM_EXPRESS
     8 tipo_especif: . INT
@@ -668,26 +674,26 @@ State 39
 
     $default  reduce using rule 19 (decl_local)
 
-    decl_var      go to state 42
-    tipo_especif  go to state 43
-    decl_local    go to state 44
+    decl_var      go to state 43
+    tipo_especif  go to state 44
+    decl_local    go to state 45
 
 
-State 40
+State 41
 
     7 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM instruc_composta .
 
     $default  reduce using rule 7 (decl_func)
 
 
-State 41
+State 42
 
    15 lista_param: param SEPARA_ARG lista_param .
 
     $default  reduce using rule 15 (lista_param)
 
 
-State 42
+State 43
 
     6 decl_var: . tipo_especif var FIM_EXPRESS
     8 tipo_especif: . INT
@@ -705,22 +711,22 @@ State 42
 
     $default  reduce using rule 19 (decl_local)
 
-    decl_var      go to state 42
-    tipo_especif  go to state 43
-    decl_local    go to state 45
+    decl_var      go to state 43
+    tipo_especif  go to state 44
+    decl_local    go to state 46
 
 
-State 43
+State 44
 
     6 decl_var: tipo_especif . var FIM_EXPRESS
    36 var: . ID
 
-    ID  shift, and go to state 24
+    ID  shift, and go to state 33
 
-    var  go to state 46
+    var  go to state 25
 
 
-State 44
+State 45
 
    18 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
    18                 | INI_INSTRUC decl_local . lista_instruc FIM_INSTRUC
@@ -765,7 +771,7 @@ State 44
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -788,9 +794,9 @@ State 44
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    INI_INSTRUC    shift, and go to state 39
+    INI_INSTRUC    shift, and go to state 40
     FIM_EXPRESS    shift, and go to state 54
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     $default  reduce using rule 21 (lista_instruc)
 
@@ -813,18 +819,11 @@ State 44
     num               go to state 71
 
 
-State 45
+State 46
 
    20 decl_local: decl_var decl_local .
 
     $default  reduce using rule 20 (decl_local)
-
-
-State 46
-
-    6 decl_var: tipo_especif var . FIM_EXPRESS
-
-    FIM_EXPRESS  shift, and go to state 27
 
 
 State 47
@@ -873,7 +872,7 @@ State 49
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -893,7 +892,7 @@ State 49
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     expressao     go to state 74
     var           go to state 63
@@ -959,7 +958,7 @@ State 53
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -979,7 +978,7 @@ State 53
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     expressao     go to state 75
     var           go to state 63
@@ -1059,7 +1058,7 @@ State 57
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -1082,9 +1081,9 @@ State 57
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    INI_INSTRUC    shift, and go to state 39
+    INI_INSTRUC    shift, and go to state 40
     FIM_EXPRESS    shift, and go to state 54
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     $default  reduce using rule 21 (lista_instruc)
 
@@ -1146,7 +1145,6 @@ State 63
 
    34 expressao: var . atrop express_simp
    45 factor: var .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   62 nome_func: var .  [INI_PARAM]
    67 atrop: . ATR
    68      | . PLUS_ATR
    69      | . MINUS_ATR
@@ -1159,8 +1157,7 @@ State 63
     TIMES_ATR  shift, and go to state 82
     OVER_ATR   shift, and go to state 83
 
-    INI_PARAM  reduce using rule 62 (nome_func)
-    $default   reduce using rule 45 (factor)
+    $default  reduce using rule 45 (factor)
 
     atrop  go to state 84
 
@@ -1293,7 +1290,7 @@ State 72
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -1313,7 +1310,7 @@ State 72
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     expressao     go to state 103
     var           go to state 63
@@ -1358,7 +1355,7 @@ State 73
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -1378,7 +1375,7 @@ State 73
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     expressao     go to state 104
     var           go to state 63
@@ -1491,7 +1488,7 @@ State 84
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -1511,7 +1508,7 @@ State 84
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     var           go to state 107
     express_simp  go to state 108
@@ -1614,7 +1611,7 @@ State 94
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -1634,7 +1631,7 @@ State 94
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     var           go to state 107
     express_soma  go to state 109
@@ -1694,7 +1691,7 @@ State 98
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -1714,7 +1711,7 @@ State 98
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     var           go to state 107
     express_soma  go to state 110
@@ -1765,7 +1762,7 @@ State 101
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -1785,7 +1782,7 @@ State 101
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     var        go to state 107
     termo      go to state 111
@@ -1827,7 +1824,7 @@ State 102
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    63 arg: . %empty  [FIM_PARAM]
    64    | . lista_arg
    65 lista_arg: . expressao
@@ -1851,7 +1848,7 @@ State 102
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     $default  reduce using rule 63 (arg)
 
@@ -1900,11 +1897,9 @@ State 106
 
 State 107
 
-   45 factor: var .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   62 nome_func: var .  [INI_PARAM]
+   45 factor: var .
 
-    INI_PARAM  reduce using rule 62 (nome_func)
-    $default   reduce using rule 45 (factor)
+    $default  reduce using rule 45 (factor)
 
 
 State 108
@@ -1996,7 +1991,7 @@ State 116
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -2016,7 +2011,7 @@ State 116
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     var           go to state 107
     express_simp  go to state 120
@@ -2059,7 +2054,7 @@ State 117
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    65 lista_arg: . expressao
    66          | . expressao SEPARA_ARG lista_arg
    66          | expressao SEPARA_ARG . lista_arg
@@ -2082,7 +2077,7 @@ State 117
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     expressao     go to state 112
     var           go to state 63
@@ -2148,7 +2143,7 @@ State 119
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -2171,9 +2166,9 @@ State 119
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    INI_INSTRUC    shift, and go to state 39
+    INI_INSTRUC    shift, and go to state 40
     FIM_EXPRESS    shift, and go to state 54
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     instruc_composta  go to state 55
     instrucao         go to state 122
@@ -2246,7 +2241,7 @@ State 123
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -2266,7 +2261,7 @@ State 123
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     expressao     go to state 125
     var           go to state 63
@@ -2354,7 +2349,7 @@ State 128
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -2377,9 +2372,9 @@ State 128
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    INI_INSTRUC    shift, and go to state 39
+    INI_INSTRUC    shift, and go to state 40
     FIM_EXPRESS    shift, and go to state 54
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     instruc_composta  go to state 55
     instrucao         go to state 130
@@ -2442,7 +2437,7 @@ State 129
    59          | . PERIMETRO
    60          | . ISIN
    61          | . ISCOLLIDED
-   62          | . var
+   62          | . ID
    86 num: . INTEIRO
    87    | . DECIMAL
 
@@ -2465,9 +2460,9 @@ State 129
     DECIMAL        shift, and go to state 52
     ID             shift, and go to state 24
     INI_PARAM      shift, and go to state 53
-    INI_INSTRUC    shift, and go to state 39
+    INI_INSTRUC    shift, and go to state 40
     FIM_EXPRESS    shift, and go to state 54
-    ACESSO_END     shift, and go to state 33
+    ACESSO_END     shift, and go to state 34
 
     instruc_composta  go to state 55
     instrucao         go to state 131

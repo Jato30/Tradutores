@@ -261,11 +261,15 @@ int buscaTabVal(TabSimbolos* raiz, char* valor){
 
 void insere(TabSimbolos* raiz, char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params){
 
-	int busca = buscaTabNome(raiz, nome);
+	int busca = 0;
+	if(tipo != Literal){
+		busca = buscaTabNome(raiz, nome);
+	}
+	busca--;
 	// if(busca == -1){
 	// 	busca = buscaTabVal(raiz, valor);
 	// }
-	if(busca == -1){
+	if(busca < 0){
 		if(*raiz == NULL){  //Lista vazia
 			*raiz = (TabSimbolos) malloc(sizeof(Simbolo));
 			if(strcmp("", nome) == 0){
@@ -427,10 +431,10 @@ void destroiParams(Parametro* parametro){
 		if(parametro->prox != NULL){
 			destroiParams(parametro->prox);
 		}
-		// if(parametro->nome != NULL){
-		// 	free(parametro->nome);
+		if(parametro->nome != NULL){
+			//free(parametro->nome);
 			parametro->nome = NULL;
-		// }
+		}
 		free(parametro);
 		parametro = NULL;
 	}
@@ -444,14 +448,20 @@ void destroiTab(TabSimbolos* raiz){
 		}
 
 		if((*raiz)->isVar == FUNC){
-			destroiParams((*raiz)->params);
+			if((*raiz)->params != NULL){
+				destroiParams((*raiz)->params);
+			}
 			if((*raiz)->tabContexto != NULL){
-				destroiTab((*raiz)->tabContexto);
+				//destroiTab((*raiz)->tabContexto);
 			}
 		}
-		free((*raiz)->nome);
+		if((*raiz)->nome != NULL){
+			//free((*raiz)->nome);
+		}
+		if((*raiz)->valor != NULL){
+			//free((*raiz)->valor);
+		}
 		(*raiz)->nome = NULL;
-		free((*raiz)->valor);
 		(*raiz)->valor = NULL;
 		free(*raiz);
 		(*raiz) = NULL;
