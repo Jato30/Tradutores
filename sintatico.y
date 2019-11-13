@@ -10,11 +10,11 @@
 	typedef struct Arvore Node;
 	typedef Node* Filhos;
 	
-	int contDigf(double val);
+	int contDigf(float val);
 	void printArvore(Node *raiz, int tabs);
 	void destroiArvore(Node *raiz);
 	Node* novoNo(int quantidade, Filhos* filhos, char* valor, Parametro* params);
-	Node* novaFolhaFloat(double val);
+	Node* novaFolhaFloat(float val);
 	Node* novaFolhaInt(int val);
 	Node* novaFolhaText(char* val);
 	
@@ -30,7 +30,9 @@
 		Parametro* params;
 	};
 
-	TabSimbolos tabela;
+	Contexto ctx_global;
+	Contexto* ctx_atual;
+
 	Node* raiz = NULL;
 	extern int num_lin;
 	extern int num_char;
@@ -89,7 +91,7 @@
 
 %union{
 	int INTEIRO;
-	double DECIMAL;
+	float DECIMAL;
 	char ID[33];
 	char* op;
 	char* LITERAL;
@@ -193,7 +195,7 @@ decl_var:
 						strcat(val, "Literal ");
 						break;
 				}
-				insere(&tabela, strdup($2->valor), "", VAR, type, 0, NULL);
+				insere(strdup($2->valor), "", VAR, type, 0, NULL);
 
 
 
@@ -207,12 +209,12 @@ decl_var:
 			;
 
 decl_func:
-			tipo_especif nome_func INI_PARAM params FIM_PARAM instruc_composta {
+			tipo_especif nome_func INI_PARAM params FIM_PARAM {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 4);
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $4;
-				lista[3] = $6;
+				
 				
 
 				TYPE type;
@@ -250,7 +252,7 @@ decl_func:
 				}
 				strcat(val, strdup($2->valor));
 				strcat(val, "(params)");
-				$$ = novoNo(4, lista, val, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
+				$<node>$ = novoNo(4, lista, val, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
 
 
 				int aux_qtd = 0;
@@ -259,11 +261,20 @@ decl_func:
 						aux_qtd = $4->params->qtd;
 					}
 				}
-				insere(&tabela, strdup($2->valor), "", FUNC, type, aux_qtd, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
+				Simbolo* item = insere(strdup($2->valor), "", FUNC, type, aux_qtd, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
 
 				
 				free(val);
 				val = NULL;
+
+
+				ctx_atual = item->interno;
+
+
+			} instruc_composta {
+				$$->fi[3] = $<node>6;
+
+				ctx_atual = ctx_atual->criador->meu;
 			}
 			;
 
@@ -684,26 +695,29 @@ expressao:
 				val = NULL;
 
 
-				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
-				chave--;
-				TabSimbolos item = tabela;
-				for(i = 0; i < chave; i++){
-					item = item->prox;
-				}
-				if(chave < 0){
+				TabSimbolos item = buscaTabNome($1->valor);
+				if(item == NULL){
 					printf("\t### ERRO: [%s] uso de variavel nao declarada. [%d][%d]\n", $1->valor, $1->linha, $1->coluna);
 				}
-				$$->tipo = item->tipo;
-				if($1->valor[0] == '\"'){
-					$$->tipo = Literal;
-				}
-
-				TYPE tipo_express_simp = $3->tipo;
-				if(item->tipo != tipo_express_simp){
-					printf("\t ### ERRO: [%s] tipo incompativel para atribuicao. [%d][%d]\n", item->nome, $1->linha, $1->coluna);
-				}
 				else{
-					item->valor = strdup($3->valor);
+					$$->tipo = item->tipo;
+
+					if($1->valor[0] == '\"'){
+						$$->tipo = Literal;
+					}
+
+					TYPE tipo_express_simp = $3->tipo;
+					if(item->tipo != tipo_express_simp){
+						if(item->tipo == Inteiro && tipo_express_simp == Decimal){
+							printf("\t### ADVERTENCIA: [%s] expressao truncada para atribuicao. [%d][%d]\n", item->nome, $1->linha, $1->coluna);
+						}
+						else if(item->tipo != Decimal || tipo_express_simp != Inteiro){
+							printf("\t### ERRO: [%s] tipo incompativel para atribuicao. [%d][%d]\n", item->nome, $1->linha, $1->coluna);
+						}
+					}
+					else{
+						item->valor = strdup($3->valor);
+					}
 				}
 
 
@@ -750,7 +764,7 @@ express_simp:
 
 				$$ = novoNo(3, lista, strdup(val), NULL);
 
-				if($1->tipo == Decimal || $3->tipo == Decimal){
+				if(($1->tipo == Decimal && ($3->tipo == Inteiro || $3->tipo == Decimal)) || ($3->tipo == Decimal && ($1->tipo == Inteiro || $1->tipo == Decimal))){
 					$$->tipo = Decimal;
 					if($1->tipo != $3->tipo){
 						printf("\t### ADVERTENCIA: [%s %s %s] Operacao relacional sobre tipos distintos, inteiro e decimal. [%d][%d]\n", $1->tipo == Inteiro ? "int" : "float", $2->valor, $3->tipo == Inteiro ? "int" : "float", $2->linha, $2->coluna);
@@ -796,40 +810,30 @@ express_soma:
 
 
 
-				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
-				chave--;
-				TabSimbolos item1 = tabela;
-				for(i = 0; i < chave; i++){
-					item1 = item1->prox;
-				}
-				i = 0;
-				chave = 0;
-				chave = buscaTabNome(&tabela, $3->valor);
-				chave--;
-				TabSimbolos item2 = tabela;
-				for(i = 0; i < chave; i++){
-					item2 = item2->prox;
-				}
+				TabSimbolos item1 = buscaTabNome($1->valor);
+				TabSimbolos item2 = buscaTabNome($3->valor);
 				int isInt = 0;
 				int erro = 0;
-				double fval1, fval2, fvalfinal;
+				float fval1, fval2, fvalfinal;
 				int ival1, ival2, ivalfinal;
-				if(item1->tipo == Decimal || item2->tipo == Decimal){
-					fval1 = atof(item1->valor);
-					fval2 = atof(item2->valor);
-					isInt = 0;
-					$$->tipo = Decimal;
-				}
-				else if(item1->tipo == Inteiro && item2->tipo == Inteiro){
-					ival1 = atoi(item1->valor);
-					ival2 = atoi(item2->valor);
-					isInt = 1;
-					$$->tipo = Inteiro;
-				}
-				else{
-					printf("\t### ERRO: expressao [%s] com tipos nao encontrados [%d][%d]\n", $2->valor, $1->linha, $1->coluna);
+				if(item1->tipo != Inteiro && item1->tipo != Decimal || item2->tipo != Inteiro && item2->tipo != Decimal){
+					printf("\t### ERRO: expressao [%s] com tipos incorretos [%d][%d]\n", $2->valor, $1->linha, $1->coluna);
 					erro = 1;
 					$$->tipo = other;
+				}
+				else{
+					if(item1->tipo == Decimal || item2->tipo == Decimal){
+						fval1 = atof(item1->valor);
+						fval2 = atof(item2->valor);
+						isInt = 0;
+						$$->tipo = Decimal;
+					}
+					else if(item1->tipo == Inteiro && item2->tipo == Inteiro){
+						ival1 = atoi(item1->valor);
+						ival2 = atoi(item2->valor);
+						isInt = 1;
+						$$->tipo = Inteiro;
+					}
 				}
 
 
@@ -899,42 +903,33 @@ termo:
 				free(val);
 				val = NULL;
 
-				
 
-				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
-				chave--;
-				TabSimbolos item1 = tabela;
-				for(i = 0; i < chave; i++){
-					item1 = item1->prox;
-				}
-				i = 0;
-				chave = 0;
-				chave = buscaTabNome(&tabela, $3->valor);
-				chave--;
-				TabSimbolos item2 = tabela;
-				for(i = 0; i < chave; i++){
-					item2 = item2->prox;
-				}
+
+
+				TabSimbolos item1 = buscaTabNome($1->valor);
+				TabSimbolos item2 = buscaTabNome($3->valor);
 				int isInt = 0;
 				int erro = 0;
-				double fval1, fval2, fvalfinal;
+				float fval1, fval2, fvalfinal;
 				int ival1, ival2, ivalfinal;
-				if(item1->tipo == Decimal || item2->tipo == Decimal){
-					fval1 = atof(item1->valor);
-					fval2 = atof(item2->valor);
-					isInt = 0;
-					$$->tipo = Decimal;
-				}
-				else if(item1->tipo == Inteiro && item2->tipo == Inteiro){
-					ival1 = atoi(item1->valor);
-					ival2 = atoi(item2->valor);
-					isInt = 1;
-					$$->tipo = Inteiro;
-				}
-				else{
-					printf("\t### ERRO: expressao com tipos nao encontrados [%d][%d]\n", $1->linha, $1->coluna);
+				if(item1->tipo != Inteiro && item1->tipo != Decimal || item2->tipo != Inteiro && item2->tipo != Decimal){
+					printf("\t### ERRO: expressao com tipos incompativeis [%d][%d]\n", $1->linha, $1->coluna);
 					erro = 1;
 					$$->tipo = other;
+				}
+				else{
+					if(item1->tipo == Decimal || item2->tipo == Decimal){
+						fval1 = atof(item1->valor);
+						fval2 = atof(item2->valor);
+						isInt = 0;
+						$$->tipo = Decimal;
+					}
+					else if(item1->tipo == Inteiro && item2->tipo == Inteiro){
+						ival1 = atoi(item1->valor);
+						ival2 = atoi(item2->valor);
+						isInt = 1;
+						$$->tipo = Inteiro;
+					}
 				}
 
 				switch($2->valor[0]){
@@ -948,14 +943,24 @@ termo:
 						break;
 					case '/':
 						if(isInt == 1){
-							ivalfinal = ival1 / ival2;
+							if(ival2 == 0){
+								printf("\t### ERRO [%d / %d] divisão por zero. [%d][%d]\n", ival1, ival2, $1->linha, $1->coluna);
+							}
+							else{
+								ivalfinal = ival1 / ival2;
+							}
 						}
 						else{
-							fvalfinal = fval1 / fval2;
+							if(fval2 == 0){
+								printf("\t### ERRO [%f / %f] divisão por zero. [%d][%d]\n", fval1, fval2, $1->linha, $1->coluna);
+							}
+							else{
+								fvalfinal = fval1 / fval2;
+							}
 						}
 						break;
 					default:
-						printf("\t### ERRO: %s operador nao encontrado [%d][%d]\n", $2->valor, $2->linha, $2->coluna);
+						printf("\t### ERRO: [%s] operador nao encontrado [%d][%d]\n", $2->valor, $2->linha, $2->coluna);
 						erro = 1;
 						break;
 				}
@@ -998,12 +1003,9 @@ factor:
 				lista[0] = $1;
 				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 
-				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
-				chave--;
-				TabSimbolos item = tabela;
-				for(i = 0; i < chave; i++){
-					item = item->prox;
-				}
+
+
+				TabSimbolos item = buscaTabNome($1->valor);
 				$$->tipo = item->tipo;
 			}
 			| var {
@@ -1011,12 +1013,9 @@ factor:
 				lista[0] = $1;
 				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 
-				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
-				chave--;
-				TabSimbolos item = tabela;
-				for(i = 0; i < chave; i++){
-					item = item->prox;
-				}
+
+
+				TabSimbolos item = buscaTabNome($1->valor);
 				$$->tipo = item->tipo;
 			}
 			| chamada {
@@ -1024,31 +1023,26 @@ factor:
 				lista[0] = $1;
 				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 
-				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
-				chave--;
-				TabSimbolos item = tabela;
-				for(i = 0; i < chave; i++){
-					item = item->prox;
+				TabSimbolos item = buscaTabNome($1->valor);
+				if(item != NULL){
+					$$->tipo = item->tipo;
 				}
-				$$->tipo = item->tipo;
+				else{
+					$$->tipo = other;
+				}
 			}
 			| num {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 
-				int i = 0, chave = buscaTabVal(&tabela, $1->valor);
-				chave--;
-				TabSimbolos item = tabela;
-				for(i = 0; i < chave; i++){
-					item = item->prox;
-				}
+				TabSimbolos item = buscaTabVal($1->valor);
 				$$->tipo = item->tipo;
 			}
 			| LITERAL {
 				$$ = novaFolhaText(strdup($1));
 				$$->tipo = Literal;
-				insere(&tabela, "texto", strdup($$->valor), OTHER, Literal, 0, NULL);
+				insere("texto", strdup($$->valor), OTHER, Literal, 0, NULL);
 			}
 			;
 
@@ -1065,12 +1059,7 @@ endereco:
 				$$ = novoNo(2, lista, strdup(val), NULL);
 
 
-				int i = 0, chave = buscaTabNome(&tabela, $2->valor);
-				chave--;
-				TabSimbolos item = tabela;
-				for(i = 0; i < chave; i++){
-					item = item->prox;
-				}
+				TabSimbolos item = buscaTabNome($2->valor);
 				$$->tipo = item->tipo;
 
 
@@ -1101,18 +1090,15 @@ chamada:
 
 
 
-				int i = 0, chave = buscaTabNome(&tabela, $1->valor);
-				chave--;
-				TabSimbolos item = tabela;
-				for(i = 0; i < chave; i++){
-					item = item->prox;
-				}
-				$$->tipo = item->tipo;
-				i = 0;
-				if(chave < 0){
+				TabSimbolos item = buscaTabNome($1->valor);
+
+				if(item == NULL){
 					printf("\t### ERRO: [%s] funcao nao declarada [%d][%d]\n", $1->valor, $1->linha, $1->coluna);
 				}
 				else{
+					$$->tipo = item->tipo;
+
+
 					if(item->params != NULL && ($3 != NULL ? ($3->valor != NULL ? $3->valor : NULL) : NULL) == NULL ){ // se param eh nulo e os agrs nao
 						printf("\t### ERRO: [%s] funcao faltando argumentos [%d][%d]\n", $1->valor, $1->linha, $1->coluna);
 					}
@@ -1418,15 +1404,11 @@ lista_arg:
 				
 				
 				int i = 0, chave = 0;
-				TabSimbolos item = tabela;
-				chave = buscaTabVal(&tabela, $1->valor);
-				chave--;
-				if(chave < 0){
-					chave = buscaTabNome(&tabela, $1->valor);
+				TabSimbolos item = buscaTabVal($1->valor);
+				if(item == NULL){
+					item = buscaTabNome($1->valor);
 				}
-				for(i = 0; i < chave; i++){
-					item = item->prox;
-				}
+
 
 
 				parametro->tipo = item->tipo;
@@ -1588,7 +1570,10 @@ num:
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
 				$$->tipo = Inteiro;
 
-				insere(&tabela, "", strdup($$->valor), VAR, Inteiro, 0, NULL);
+				int size = sizeof(char) * contDigf($1) + 1;
+				char* valor = (char*) malloc(size);
+				sprintf(valor, "%d", $1);
+				insere("", valor, VAR, Inteiro, 0, NULL);
 			}
 			| DECIMAL {
 				Node** lista = (Node**) malloc(sizeof(Node*));
@@ -1597,7 +1582,9 @@ num:
 				$$ = novoNo(1, lista, lista[0]->valor, NULL);
 				$$->tipo = Decimal;
 
-				insere(&tabela, "", strdup($$->valor), VAR, Decimal, 0, NULL);
+				char* valor = (char*) malloc(sizeof(char) * contDigf($1) + 1);
+				gcvt($1, contDigf($1) + 1, valor);
+				insere("", valor, VAR, Decimal, 0, NULL);
 			}
 			;
 
@@ -1608,10 +1595,14 @@ num:
 
 
 // Conta digitos em um float
-int contDigf(double val){
+int contDigf(float val){
 	int i = ((int) val);
 	char aux;
-	int count = 1; // primeiro digito da parte inteira
+	int count = 0;
+	
+	if(i == 0){ // primeiro digito da parte inteira
+		count++;
+	}
 
 	while(i >= 1){
 		count++;
@@ -1687,7 +1678,7 @@ Node* novoNo(int quantidade, Filhos* filhos, char* valor, Parametro* params){
 	return novo;
 }
 
-Node* novaFolhaFloat(double val){
+Node* novaFolhaFloat(float val){
 	Node* novo = (Node*) malloc(sizeof(Node));
 	novo->valor = (char*) malloc(sizeof(char) * (contDigf(val) + 1));
 	novo->qtdFi = 0;
@@ -1702,7 +1693,7 @@ Node* novaFolhaFloat(double val){
 
 Node* novaFolhaInt(int val){
 	Node* novo = (Node*) malloc(sizeof(Node));
-	novo->valor = (char*) malloc(sizeof(char) * (contDigf((double)val) + 1));
+	novo->valor = (char*) malloc(sizeof(char) * (contDigf((float)val) + 1));
 	novo->qtdFi = 0;
 	novo->linha = num_lin;
 	novo->coluna = num_char;
@@ -1730,12 +1721,12 @@ void yyerror(char const *s){
 }
 
 int main(void){
-	criaTab(&tabela);
+	criaTab();
 	yyparse();
-	// printArvore(raiz, 0);
-	printTab(&tabela);
+	// printArvore(0);
+	printTab();
 	destroiArvore(raiz);
-	destroiTab(&tabela);
+	destroiTab();
 	return 0;
 }
 

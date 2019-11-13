@@ -24,6 +24,8 @@ typedef struct Parametro{
 	
 } Parametro;
 
+struct Contexto;
+
 typedef struct Simbolo{
 	char* valor; // valor da variavel
 	char* nome; // nome da variavel
@@ -34,19 +36,29 @@ typedef struct Simbolo{
 	int qtdParams;
 	Parametro *params; // para ser usado somente se for funcao
 	struct Simbolo *prox;
-	struct Simbolo **tabContexto;
+	struct Contexto *meu;
+	struct Contexto *interno;
 } Simbolo;
 
 typedef Simbolo* TabSimbolos;
 
-void criaTab(TabSimbolos* raiz);
-int buscaTabNome(TabSimbolos* raiz, char* nome);
-int buscaTabVal(TabSimbolos* raiz, char* nome);
+typedef struct Contexto{
+	Simbolo* criador;
+	Simbolo* primeiro;
+} Contexto;
+
+void criaTab();
+int buscaAquiNome(char* nome);
+int buscaAquiVal(char* valor);
+Simbolo* buscaTabNome(char* nome);
+Simbolo* buscaTabVal(char* valor);
 int checa_warn(char* valor, int lin, int col);
-void insere(TabSimbolos* raiz, char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params);
-void printTab(TabSimbolos* raiz);
+Simbolo* insere(char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params);
+void printAqui(Contexto* contexto);
+void printTab();
 void destroiParams(Parametro* parametro);
-void destroiTab(TabSimbolos* raiz);
+void destroiAqui(Contexto* contexto);
+void destroiTab();
 
 
 #endif // __TABSIMBOLO_H__

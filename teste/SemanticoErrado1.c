@@ -1,5 +1,8 @@
+int x;
+
 int oi(){
 	nada = 1;
+	x = 32;
 	return 0;
 }
 
