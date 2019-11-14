@@ -32,6 +32,7 @@ typedef struct Simbolo{
 	int qtd; // Quantidade de vezes que aparece
 	int chave; // Numero do no, valor unico.
 	int isVar; // flag que determina se variavel ou funcao
+	int isEnd; // flag que determina se endereco ou valor (1: endereco / 0: valor)
 	TYPE tipo; // para definir os tipos basicos (se funcao, tipo do retorno)
 	int qtdParams;
 	Parametro *params; // para ser usado somente se for funcao
@@ -48,8 +49,8 @@ typedef struct Contexto{
 } Contexto;
 
 void criaTab();
-int buscaAquiNome(char* nome);
-int buscaAquiVal(char* valor);
+Simbolo* buscaAquiNome(char* nome);
+Simbolo* buscaAquiVal(char* valor);
 Simbolo* buscaTabNome(char* nome);
 Simbolo* buscaTabVal(char* valor);
 int checa_warn(char* valor, int lin, int col);

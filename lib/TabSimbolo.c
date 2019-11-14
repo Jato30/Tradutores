@@ -211,40 +211,49 @@ void criaTab(){
 
 }
 
-int buscaAquiNome(char* nome){
+Simbolo* buscaAquiNome(char* nome){
 	if(ctx_atual->primeiro != NULL){
 		TabSimbolos atual = ctx_atual->primeiro;
-		
+
 		while(atual != NULL){
-			if(strcmp(atual->nome != NULL ? atual->nome : "", "")){
-				return -1;
-			}
-			if(strcmp(atual->nome != NULL ? atual->nome : "", nome) == 0){
-				return atual->chave;
+			if(strcmp(atual->nome != NULL ? atual->nome : "", "") != 0){
+				if(strcmp(atual->nome != NULL ? atual->nome : "", nome) == 0){
+					return atual;
+				}
 			}
 			atual = atual->prox;
 		}
 	}
 
-	return -1;
+	char* temp_nome = strdup(nome);
+	if(temp_nome != NULL){
+		if(temp_nome[0] == '&'){
+			int i;
+			for(i = 0; temp_nome[i] != '\0'; i++){
+				temp_nome[i] = nome[i+1];
+			}
+			return buscaAquiNome(temp_nome);
+		}
+	}
+
+	return NULL;
 }
 
-int buscaAquiVal(char* valor){
+Simbolo* buscaAquiVal(char* valor){
 	if(ctx_atual->primeiro != NULL){
 		TabSimbolos atual = ctx_atual->primeiro;
 		
 		while(atual != NULL){
 			if(strcmp(atual->valor != NULL ? atual->valor : "", "")){
-				return -1;
-			}
-			if(strcmp(atual->valor != NULL ? atual->valor : "", valor) == 0){
-				return atual->chave;
+				if(strcmp(atual->valor != NULL ? atual->valor : "", valor) == 0){
+					return atual;
+				}
 			}
 			atual = atual->prox;
 		}
 	}
 
-	return -1;
+	return NULL;
 }
 
 // RETORNO: retorna a chave do elemento encontrado, -1 se nao existir
@@ -267,6 +276,17 @@ Simbolo* buscaTabNome(char* nome){
 			return atual;
 		}
 		atual = atual->prox;
+	}
+
+	char* temp_nome = strdup(nome);
+	if(temp_nome != NULL){
+		if(temp_nome[0] == '&'){
+			int i;
+			for(i = 0; temp_nome[i] != '\0'; i++){
+				temp_nome[i] = nome[i+1];
+			}
+			return buscaTabNome(temp_nome);
+		}
 	}
 
 	return NULL;
@@ -299,7 +319,7 @@ Simbolo* buscaTabVal(char* valor){
 
 Simbolo* insere(char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params){
 	static unsigned int prox_chave = 0;
-	int busca = -1;
+	Simbolo* busca = NULL;
 	if(tipo != Literal){
 		if(strcmp(nome != NULL ? nome : "", "") == 0){
 			busca = buscaAquiVal(valor);
@@ -311,7 +331,7 @@ Simbolo* insere(char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Pa
 	// if(busca == -1){
 	// 	busca = buscaAquiVal(raiz, valor);
 	// }
-	if(busca < 0){
+	if(busca == NULL){
 		TabSimbolos novo = (TabSimbolos) malloc(sizeof(Simbolo));
 		if(strcmp("", nome) == 0){
 			novo->nome = NULL;
@@ -328,6 +348,12 @@ Simbolo* insere(char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Pa
 		novo->chave = prox_chave++;
 		novo->qtd = 1;
 		novo->isVar = isVar;
+		novo->isEnd = 0;
+		if(novo->nome != NULL){
+			if(novo->nome[0] == '&'){
+				novo->isEnd = 1;
+			}
+		}
 		novo->tipo = tipo;
 		novo->meu = ctx_atual;
 		novo->prox = NULL;
@@ -355,14 +381,8 @@ Simbolo* insere(char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Pa
 		}
 	}
 	else{
-		TabSimbolos atual = ctx_atual->primeiro;
-		while(atual != NULL){
-			if(atual->chave == busca){
-				atual->qtd++;
-				return atual;
-			}
-			atual = atual->prox;
-		}
+		busca->qtd++;
+		return busca;
 	}
 
 }
@@ -373,39 +393,50 @@ void printAqui(Contexto* contexto){
 		if(inicial != NULL){
 			printf("\n\n\n######## TABELA DE SIMBOLOS, CONTEXTO: %s ########\n\n", contexto->criador == NULL ? "global" : contexto->criador->nome);
 
-			printf("CHAVE QTD VAR/FUNC\tTIPO\t\tNOME\t\tCONTEUDO\tPARAMETROS\n");
+			printf("CHAVE QTD VAR/FUNC     TIPO\t    NOME\tCONTEUDO\tPARAMETROS\n");
 
 			while(inicial != NULL){
-				printf(" %3d %3d  %6s\t", inicial->chave, inicial->qtd, inicial->isVar == VAR ? "VAR" : (inicial->isVar == FUNC ? "FUNC" : (inicial->isVar == KEYWORD ? "Keyword" : "Outro")));
+				printf(" %3d %3d  %7s", inicial->chave, inicial->qtd, inicial->isVar == VAR ? "VAR" : (inicial->isVar == FUNC ? "FUNC" : (inicial->isVar == KEYWORD ? "Keyword" : "Outro")));
 				switch(inicial->tipo){
 					case Inteiro:
-						printf("int\t");
+						printf("%10s", "int");
 					break;
 
 					case Decimal:
-						printf("float\t");
+						printf("%10s", "float");
 					break;
 
 					case Ponto:
-						printf("point\t");
+						printf("%10s", "point");
 					break;
 
 					case Forma:
-						printf("shape\t");
+						printf("%10s", "shape");
 					break;
 
 					case Literal:
-						printf("Literal\t");
+						printf("%10s", "Literal");
 					break;
 				
 					default:
-						printf("Outro\t");
+						printf("%10s", "Outro");
 						break;
 				}
-				printf("%14s %21s\t", inicial->nome != NULL ? inicial->nome : "(nulo)", inicial->valor != NULL ? inicial->valor : "(nulo)");
+				if(inicial->isEnd == 1){
+					int i = 0;
+					char* temp_nome = (char*) malloc(sizeof(char) * (1 + strlen(inicial->nome)) + 1);
+					temp_nome[0] = '&';
+					do{
+						temp_nome[++i] = inicial->nome[i];
+					} while(temp_nome[i] != '\0');
+					printf("%13s%14s", temp_nome != NULL ? temp_nome : "(nulo)", inicial->valor != NULL ? inicial->valor : "(nulo)");
+				}
+				else{
+					printf("%13s%14s", inicial->nome != NULL ? inicial->nome : "(nulo)", inicial->valor != NULL ? inicial->valor : "(nulo)");
+				}
 
 				if(inicial->isVar == FUNC){
-					printf("(");
+					printf("%5s", "(");
 					int i;
 					Parametro* atual2;
 					atual2 = inicial->params;
@@ -487,26 +518,28 @@ void destroiAqui(Contexto* contexto){
 		TabSimbolos atual;
 		atual = contexto->primeiro;
 		while(atual != NULL){
-			if(atual->nome != NULL && strcmp(atual->nome, "") != 0){
-				free(atual->nome);
-			}
-			atual->nome = NULL;
-			if(atual->valor != NULL && strcmp(atual->valor, "") != 0){
-				free(atual->valor);
-			}
-			atual->valor = NULL;
-			if(atual->params != NULL){
-				destroiParams(atual->params);
-				atual->params = NULL;
-			}
-
-
-			if(atual->interno != NULL){
-				if(atual->interno->primeiro != NULL){
-					destroiAqui(atual->interno);
+			if(atual->isEnd != 1){
+				if(atual->nome != NULL && strcmp(atual->nome, "") != 0){
+					free(atual->nome);
 				}
-			}
+				atual->nome = NULL;
+				if(atual->valor != NULL && strcmp(atual->valor, "") != 0){
+					free(atual->valor);
+				}
+				atual->valor = NULL;
+				if(atual->params != NULL){
+					destroiParams(atual->params);
+					atual->params = NULL;
+				}
 
+
+				if(atual->interno != NULL){
+					if(atual->interno->primeiro != NULL){
+						destroiAqui(atual->interno);
+					}
+				}
+
+			}
 			TabSimbolos temp = atual->prox;
 			if(atual->prox != NULL){
 				free(atual->prox);

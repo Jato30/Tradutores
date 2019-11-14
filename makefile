@@ -8,34 +8,40 @@ CD = cd
 MAKE = make
 
 
-FLAGS = 
-DEVFLAGS= -Wall -pedantic -Wextra
-DEBFLAGS= -ggdb -O0
-PATH= ../Tradutores/
+FLAGS = -lfl
+DEBFLAGS = -W -Wall -ansi -pedantic -Wextra -ggdb -O0
+PATH= ./
 LIBS= $(wildcard $(PATH)lib/*.c)
 BIN= $(PATH)bin/
+OBJ= ./sintatico.tab.c ./lexico.yy.c
+CC = gcc
+
+BISON= bison
+FLEX= flex
+BFLAGS= -dv
+BDEBFLAGS= --report=all
 
 
 #Arquivos que devem ser compilados:
 C_FILES= $(wildcard $(PATH)*.c)
-FLEX_FILES= $(wildcard $(PATH)*.l)
-BISON_FILES= $(wildcard $(PATH)*.y)
+FLEX_FILES= $(PATH)lexico.l
+BISON_FILES= $(PATH)sintatico.y
 
 
 #Nome do executável
 EXEC = exec
 
 
-all:
-	bison -dv sintatico.y --report=all
-	flex lexico.l
-	gcc $(LIBS) sintatico.tab.c lex.yy.c -o exec -lfl
+all: $(EXEC)
 
-gramatica:
-	bison -dv sintatico.y --report=all
+$(EXEC): $(OBJ)
+	$(CC) $(LIBS) $^ -o $@ $(FLAGS)
 
-lexico:
-	flex lexico.l
+./sintatico.tab.c: $(BISON_FILES)
+	$(BISON) $(BFLAGS) $^ $(BDEBFLAGS)
+
+./lexico.yy.c: $(FLEX_FILES)
+	$(FLEX) $^
 
 
 
