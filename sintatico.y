@@ -49,26 +49,7 @@
 %token <DECIMAL> DECIMAL
 %token <ID> ID
 
-%token LT
-%token GT
-%token LE
-%token GE
-%token EQ
-%token NE
-%token NOT
-%token AND
-%token OR
-
-%token ATR
-%token PLUS_ATR
-%token MINUS_ATR
-%token TIMES_ATR
-%token OVER_ATR
-
-%token PLUS_OP
-%token MINUS_OP
-%token TIMES_OP
-%token OVER_OP
+%token <ID> LT GT LE GE EQ NE NOT AND OR ATR PLUS_ATR MINUS_ATR TIMES_ATR OVER_ATR PLUS_OP MINUS_OP TIMES_OP OVER_OP
 
 %token INI_PARAM
 %token FIM_PARAM
@@ -196,15 +177,20 @@ decl_var:
 						break;
 				}
 
-				insere(strdup($2->valor), "", VAR, type, 0, NULL);
-
-
+				Simbolo* novo = buscaAquiNome(strdup($2->valor));
+				if(novo != NULL){
+					printf("\t\t### ERRO: [%s] declaracao de variavel ja existente. [%d][%d]\n", strdup($2->valor), $2->linha, $2->coluna);
+				}
+				else{
+					insere(strdup($2->valor), "", VAR, type, 0, NULL);
+				}
 
 				strcat(val, strdup($2->valor));
 				strcat(val, ";");
 				$$ = novoNo(2, lista, val, NULL);
-				TYPE tipo = $1->tipo;
-				$$->tipo = tipo;
+				$$->tipo = $1->tipo;
+				$2->tipo = $1->tipo;
+
 
 				free(val);
 				val = NULL;
@@ -267,13 +253,15 @@ decl_func:
 					}
 				}
 
+
+
+				Simbolo* novo = buscaTabNome(strdup($2->valor));
+				if(novo != NULL){
+					printf("\t\t### ERRO: [%s] multipla declaracao de funcao. [%d][%d]\n", strdup($2->valor), $2->linha, $2->coluna);
+				}
+
+
 				Simbolo* item = insere(strdup($2->valor), "", FUNC, type, aux_qtd, $4 != NULL ? ($4->params != NULL ? $4->params : NULL) : NULL);
-
-				
-				free(val);
-				val = NULL;
-
-
 
 				ctx_atual = item->interno;
 
@@ -282,6 +270,9 @@ decl_func:
 					insere(temp->nome, "", VAR, temp->tipo, 0, NULL);
 					temp = temp->prox;
 				}
+
+				free(val);
+				val = NULL;
 
 
 			} instruc_composta {
@@ -374,32 +365,32 @@ param:
 				switch($1->valor[0]){
 					case 'i':
 						param->tipo = Inteiro;
-						val = (char*) malloc(sizeof(char) * (4 + 1 + strlen($2->valor)) + 1);
+						val = (char*) malloc(sizeof(char) * (4 + strlen($2->valor)) + 1);
 						strcat(val, "int ");
 						break;
 
 					case 'f':
 						param->tipo = Decimal;
-						val = (char*) malloc(sizeof(char) * (6 + 1 + strlen($2->valor)) + 1);
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor)) + 1);
 						strcat(val, "float ");
 						break;
 
 					case 'p':
 						param->tipo = Ponto;
-						val = (char*) malloc(sizeof(char) * (6 + 1 + strlen($2->valor)) + 1);
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor)) + 1);
 						strcat(val, "point ");
 						break;
 
 					case 's':
 						param->tipo = Forma;
-						val = (char*) malloc(sizeof(char) * (6 + 1 + strlen($2->valor)) + 1);
+						val = (char*) malloc(sizeof(char) * (6 + strlen($2->valor)) + 1);
 						strcat(val, "shape ");
 						break;
 				
 					default:
-						val = (char*) malloc(sizeof(char) * (8 + 1 + strlen($2->valor)) + 1);
-						strcat(val, "Literal ");
 						param->tipo = Literal;
+						val = (char*) malloc(sizeof(char) * (8 + strlen($2->valor)) + 1);
+						strcat(val, "Literal ");
 						break;
 				}
 				param->nome = strdup($2->valor);
@@ -407,7 +398,6 @@ param:
 				param->prox = NULL;
 
 
-				strcat(val, "&");
 				strcat(val, strdup($2->valor));
 				$$ = novoNo(2, lista, strdup(val), param);
 				TYPE tipo = $1->tipo;
@@ -465,8 +455,8 @@ param:
 
 				strcat(val, strdup($2->valor));
 				$$ = novoNo(2, lista, strdup(val), param);
-				TYPE tipo = $1->tipo;
-				$$->tipo = tipo;
+				$$->tipo = $1->tipo;
+				$2->tipo = $1->tipo;
 
 				free(val);
 				val = NULL;
@@ -726,6 +716,7 @@ expressao:
 					printf("\t### ERRO: [%s] uso de variavel nao declarada. [%d][%d]\n", $1->valor, $1->linha, $1->coluna);
 				}
 				else{
+					$1->tipo = item->tipo;
 					$$->tipo = item->tipo;
 
 					if($1->valor[0] == '\"'){
@@ -747,7 +738,7 @@ expressao:
 									strcpy(item->valor, item2->valor != NULL ? item2->valor : "");
 								}
 								else{
-									printf("\t\t### ADVERTENCIA: [%s] atribuição de valor vazio. [%d][%d]\n", $3->valor, $3->linha, $3->coluna);
+									//printf("\t\t### ADVERTENCIA: [%s] atribuicao de valor vazio. [%d][%d]\n", $3->valor, $3->linha, $3->coluna);
 								}
 							}
 							else{
@@ -757,12 +748,12 @@ expressao:
 									strcpy(item->valor, item2->valor != NULL ? item2->valor : "");
 								}
 								else{
-									printf("\t\t### ADVERTENCIA: [%s] atribuição de valor vazio. [%d][%d]\n", $3->valor, $3->linha, $3->coluna);
+									//printf("\t\t### ADVERTENCIA: [%s] atribuicao de valor vazio. [%d][%d]\n", $3->valor, $3->linha, $3->coluna);
 								}
 							}
 						}
 						else{
-							printf("\t\t### ERRO: [%s] valor inexistente na atribuição. [%d][%d]\n", $3->valor, $3->linha, $3->coluna);
+							printf("\t\t### ERRO: [%s] valor inexistente na atribuicao. [%d][%d]\n", $3->valor, $3->linha, $3->coluna);
 						}
 					}
 				}
@@ -785,10 +776,8 @@ expressao:
 
 var:
 			ID {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText(strdup($1));
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText(strdup($1));
+				$$->tipo = other;
 			}
 			;
 
@@ -1096,18 +1085,15 @@ factor:
 			;
 
 endereco:
-			ACESSO_END var {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("&");
-				lista[1] = $2;
-
-				char* val = (char*) malloc(sizeof(char) * strlen($2->valor) + 1);
-				strcat(val, strdup($2->valor));
-				$$ = novoNo(2, lista, strdup(val), NULL);
+			ACESSO_END ID {
+				char* val = (char*) malloc(sizeof(char) * (1 + strlen($2)) + 1);
+				strcat(val, "&");
+				strcat(val, strdup($2));
+				$$ = novaFolhaText(strdup(val));
+				$$->tipo = other;
 
 
-				TabSimbolos item = buscaTabNome(strdup($2->valor));
+				TabSimbolos item = buscaTabNome(strdup(val));
 				if(item != NULL){
 					item->isEnd = 1;
 					$$->tipo = item->tipo;
@@ -1226,7 +1212,12 @@ chamada:
 										break;
 								}
 								if(parametro->tipo != argumento->tipo){
-									printf("\t### ERRO: [%s] tipo do argumento incompativel, para a funcao [%s], esperado [%s] [%d][%d]\n", tipo_lido, $1->valor, tipo_esperado, $3->linha, $3->coluna);
+									if(parametro->tipo == Inteiro && argumento->tipo == Decimal){
+										printf("\t### ADVERTENCIA: [%s] argumento truncado, para a funcao [%s], esperado [%s] [%d][%d]\n", tipo_lido, $1->valor, tipo_esperado, $3->linha, $3->coluna);
+									}
+									else if(parametro->tipo != Decimal && argumento->tipo != Inteiro){
+										printf("\t### ERRO: [%s] tipo do argumento incompativel, para a funcao [%s], esperado [%s] [%d][%d]\n", tipo_lido, $1->valor, tipo_esperado, $3->linha, $3->coluna);
+									}
 								}
 								if(parametro->isEnd != argumento->isEnd){
 									if(parametro->isEnd == 0){
@@ -1251,25 +1242,27 @@ chamada:
 									if(isNome == 0 && strcmp(arg_passado->valor != NULL ? arg_passado->valor : "" , "") == 0 ){
 										isNome = -1; // Nao, nenhum
 									}
-									if(item->interno != NULL){
-										ctx_atual = item->interno;
+									if(isNome == 1){
+										if(item->interno != NULL){
+											ctx_atual = item->interno;
 
-										Simbolo* arg_recebido;
-										arg_recebido = buscaAquiNome(parametro->nome);
+											Simbolo* arg_recebido;
+											arg_recebido = buscaAquiNome(parametro->nome);
 
-										if(arg_recebido != NULL){
-											if(arg_recebido->isEnd == 1){
-												arg_recebido = arg_passado;
+											if(arg_recebido != NULL){
+												if(arg_recebido->isEnd == 1){
+													arg_recebido = arg_passado;
+												}
+
+												if(strcmp(arg_passado->valor != NULL ? arg_passado->valor : "", "") != 0){
+													arg_recebido->valor = (char*) malloc(sizeof(char) * strlen(arg_passado->valor) + 1);
+													strcpy(arg_recebido->valor, arg_passado->valor != NULL ? arg_passado->valor : "");
+												}
+
 											}
 
-											if(strcmp(arg_passado->valor != NULL ? arg_passado->valor : "", "") != 0){
-												arg_recebido->valor = (char*) malloc(sizeof(char) * strlen(arg_passado->valor) + 1);
-												strcpy(arg_recebido->valor, arg_passado->valor != NULL ? arg_passado->valor : "");
-											}
-
+											ctx_atual = ctx_temp;
 										}
-
-										ctx_atual = ctx_temp;
 									}
 
 
@@ -1363,87 +1356,52 @@ chamada:
 
 nome_func:
 			PRINTINT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("printInt");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("printInt");
 				$$->tipo = Inteiro;
 			}
 			| PRINTFLOAT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("printFloat");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("printFloat");
 				$$->tipo = Inteiro;
 			}
 			| PRINTPOINT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("printPoint");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("printPoint");
 				$$->tipo = Inteiro;
 			}
 			| PRINTSHAPE {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("printShape");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("printShape");
 				$$->tipo = Inteiro;
 			}
 			| SCANINT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("scanInt");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("scanInt");
 				$$->tipo = Inteiro;
 			}
 			| SCANFLOAT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("scanFloat");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("scanFloat");
 				$$->tipo = Inteiro;
 			}
 			| CONSTROIPOINT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("constroiPoint");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("constroiPoint");
 				$$->tipo = Inteiro;
 			}
 			| CONSTROISHAPE {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("constroiShape");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("constroiShape");
 				$$->tipo = Inteiro;
 			}
 			| PERIMETRO {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("Perimetro");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("Perimetro");
 				$$->tipo = Decimal;
 			}
 			| ISIN {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("IsIn");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("IsIn");
 				$$->tipo = Inteiro;
 			}
 			| ISCOLLIDED {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("IsCollided");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText("IsCollided");
 				$$->tipo = Inteiro;
 			}
 			| ID {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText(strdup($1));
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText(strdup($1));
+				$$->tipo = other;
 			}
 			;
 
@@ -1471,16 +1429,15 @@ lista_arg:
 					Parametro* parametro = (Parametro*) malloc(sizeof(Parametro));
 					parametro->tipo = $1->tipo;
 					parametro->nome = strdup($1->valor);
-
+					parametro->isEnd = 0;
 					if($1->valor[0] == '&'){
 						parametro->isEnd = 1;
 					}
 
 					parametro->prox = NULL;
 
-					TYPE tipo = $1->tipo;
 					$$ = novoNo(1, lista, strdup($1->valor), parametro);
-					$$->tipo = tipo;
+					$$->tipo = parametro->tipo;
 				}
 				else{
 					$$ = NULL;
@@ -1499,17 +1456,10 @@ lista_arg:
 				Parametro* parametro = (Parametro*) malloc(sizeof(Parametro));
 				
 				
-				int i = 0, chave = 0;
-				TabSimbolos item = buscaTabVal($1->valor);
-				if(item == NULL){
-					item = buscaTabNome(strdup($1->valor));
-				}
-
-
-
-				parametro->tipo = item->tipo;
+				
+				parametro->tipo = $1->tipo;
 				parametro->nome = strdup($1->valor);
-
+				parametro->isEnd = 0;
 				if($1->valor[0] == '&'){
 					parametro->isEnd = 1;
 				}
@@ -1521,9 +1471,8 @@ lista_arg:
 				}
 				atual->prox = $3->params;
 
-				TYPE tipo = $1->tipo;
 				$$ = novoNo(2, lista, strdup(val), parametro);
-				$$->tipo = tipo;
+				$$->tipo = parametro->tipo;
 
 				free(val);
 				val = NULL;
@@ -1533,73 +1482,51 @@ lista_arg:
 
 atrop:
 			ATR { 
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("=");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| PLUS_ATR {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("+=");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| MINUS_ATR {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("-=");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| TIMES_ATR {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("*=");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| OVER_ATR {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("/=");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			;
 
 relop:
 			LT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("<");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| GT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText(">");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| LE {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("<=");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| GE {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("=>");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| EQ {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("==");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| NE {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("!=");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| logop {
 				Node** lista = (Node**) malloc(sizeof(Node*));
@@ -1610,61 +1537,44 @@ relop:
 
 logop:
 			NOT {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("!");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| AND {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("&&");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| OR {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("||");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			;
 
 addop:
 			PLUS_OP {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("+");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| MINUS_OP {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("-");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			;
 
 mulop:
 			TIMES_OP {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("*");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			| OVER_OP {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("/");
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaText($1);
+				$$->tipo = other;
 			}
 			;
 
 num:
 			INTEIRO {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaInt($1);
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaInt($1);
 				$$->tipo = Inteiro;
 
 				int size = sizeof(char) * contDigf($1) + 1;
@@ -1673,10 +1583,7 @@ num:
 				insere("", valor, VAR, Inteiro, 0, NULL);
 			}
 			| DECIMAL {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaFloat($1);
-				$$ = novoNo(1, lista, lista[0]->valor, NULL);
+				$$ = novaFolhaFloat($1);
 				$$->tipo = Decimal;
 
 				char* valor = (char*) malloc(sizeof(char) * contDigf($1) + 1);
@@ -1764,8 +1671,8 @@ Node* novoNo(int quantidade, Filhos* filhos, char* valor, Parametro* params){
 	novo->fi = filhos;
 	novo->qtdFi = quantidade;
 	novo->valor = strdup(valor);
-	novo->linha = -1;
-	novo->coluna = -1;
+	novo->linha = num_lin;
+	novo->coluna = num_char;
 
 	novo->params = params != NULL ? params : NULL;
 

@@ -93,7 +93,7 @@ void criaTab(){
 
 	Parametro* scanInt = (Parametro*) malloc(sizeof(Parametro));
 	scanInt->nome = (char*) malloc(sizeof(char) * 4);
-	scanInt->nome = "var";
+	scanInt->nome = "&var";
 	scanInt->qtd = 2;
 	scanInt->tipo = Inteiro;
 	scanInt->isEnd = 1;
@@ -110,7 +110,7 @@ void criaTab(){
 
 	Parametro* scanFloat = (Parametro*) malloc(sizeof(Parametro));
 	scanFloat->nome = (char*) malloc(sizeof(char) * 4);
-	scanFloat->nome = "var";
+	scanFloat->nome = "&var";
 	scanFloat->qtd = 2;
 	scanFloat->tipo = Decimal;
 	scanFloat->isEnd = 1;
@@ -127,7 +127,7 @@ void criaTab(){
 
 	Parametro* constroiPoint = (Parametro*) malloc(sizeof(Parametro));
 	constroiPoint->nome = (char*) malloc(sizeof(char) * 4);
-	constroiPoint->nome = "var";
+	constroiPoint->nome = "&var";
 	constroiPoint->qtd = 3;
 	constroiPoint->tipo = Ponto;
 	constroiPoint->isEnd = 1;
@@ -151,7 +151,7 @@ void criaTab(){
 
 	Parametro* constroiShape = (Parametro*) malloc(sizeof(Parametro));
 	constroiShape->nome = (char*) malloc(sizeof(char) * 4);
-	constroiShape->nome = "var";
+	constroiShape->nome = "&var";
 	constroiShape->qtd = 2;
 	constroiShape->tipo = Forma;
 	constroiShape->isEnd = 1;
@@ -266,6 +266,21 @@ Simbolo* buscaTabNome(char* nome){
 			if(strcmp(atual->nome != NULL ? atual->nome : "", nome) == 0){
 				return atual;
 			}
+			if(strcmp(atual->nome != NULL ? atual->nome : "", "") != 0){
+				char* temp_atual = strdup(atual->nome);
+				if(temp_atual != NULL){
+					if(temp_atual[0] == '&'){
+						int i;
+						for(i = 0; temp_atual[i] != '\0'; i++){
+							temp_atual[i] = atual->nome[i+1];
+						}
+						if(strcmp(temp_atual != NULL ? temp_atual : "", nome) == 0){
+							return atual;
+						}
+					}
+				}
+			}
+
 			atual = atual->prox;
 		}
 		contexto = contexto->criador->meu;
@@ -422,18 +437,9 @@ void printAqui(Contexto* contexto){
 						printf("%10s", "Outro");
 						break;
 				}
-				if(inicial->isEnd == 1){
-					int i = 0;
-					char* temp_nome = (char*) malloc(sizeof(char) * (1 + strlen(inicial->nome)) + 1);
-					temp_nome[0] = '&';
-					do{
-						temp_nome[++i] = inicial->nome[i];
-					} while(temp_nome[i] != '\0');
-					printf("%13s%14s", temp_nome != NULL ? temp_nome : "(nulo)", inicial->valor != NULL ? inicial->valor : "(nulo)");
-				}
-				else{
-					printf("%13s%14s", inicial->nome != NULL ? inicial->nome : "(nulo)", inicial->valor != NULL ? inicial->valor : "(nulo)");
-				}
+
+				printf("%13s%14s", inicial->nome != NULL ? (strcmp(inicial->nome, "") != 0 ? inicial->nome : "(nulo)") : "(nulo)", inicial->valor != NULL ? inicial->valor : "(nulo)");
+
 
 				if(inicial->isVar == FUNC){
 					printf("%5s", "(");
@@ -463,7 +469,7 @@ void printAqui(Contexto* contexto){
 								break;
 						}
 
-						printf("%s%s%s", atual2->isEnd == 0 ? "" : "&", atual2->nome, atual2->prox != NULL ? ", " : "");
+						printf("%s%s", atual2->nome, atual2->prox != NULL ? ", " : "");
 					}
 					printf(")");
 

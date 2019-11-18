@@ -6,8 +6,14 @@ int oi(){
 	return 0;
 }
 
+int oi(shape oi){
+	return 0;
+}
+
 int main(){
 
+	float per;
+	int per;
 	float per;
 
 	int x;
