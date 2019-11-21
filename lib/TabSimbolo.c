@@ -260,6 +260,10 @@ Simbolo* buscaAquiVal(char* valor){
 Simbolo* buscaTabNome(char* nome){
 	TabSimbolos atual = ctx_atual->primeiro;
 	Contexto* contexto = ctx_atual;
+
+	if(strcmp(nome != NULL ? nome : "", "") == 0){
+		return NULL;
+	}
 	
 	while(contexto->criador != NULL){
 		while(atual != NULL){

@@ -1,2521 +1,2534 @@
 Grammar
 
-    0 $accept: programa $end
+    0 $accept: inicial $end
 
-    1 programa: lista_decl
+    1 inicial: programa
 
-    2 lista_decl: declaracao
-    3           | declaracao lista_decl
+    2 programa: lista_decl
 
-    4 declaracao: decl_var
-    5           | decl_func
+    3 lista_decl: declaracao
+    4           | declaracao lista_decl
 
-    6 decl_var: tipo_especif var FIM_EXPRESS
+    5 declaracao: decl_var
+    6           | decl_func
 
-    7 @1: %empty
+    7 decl_var: tipo_especif var FIM_EXPRESS
 
-    8 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM @1 instruc_composta
+    8 @1: %empty
 
-    9 tipo_especif: INT
-   10             | FLOAT
-   11             | POINT
-   12             | SHAPE
+    9 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM @1 instruc_composta
 
-   13 params: %empty
-   14       | lista_param
+   10 tipo_especif: INT
+   11             | FLOAT
+   12             | POINT
+   13             | SHAPE
 
-   15 lista_param: param
-   16            | param SEPARA_ARG lista_param
+   14 params: %empty
+   15       | lista_param
 
-   17 param: tipo_especif endereco
-   18      | tipo_especif var
+   16 lista_param: param
+   17            | param SEPARA_ARG lista_param
 
-   19 instruc_composta: INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
+   18 param: tipo_especif endereco
+   19      | tipo_especif var
 
-   20 decl_local: %empty
-   21           | decl_var decl_local
+   20 instruc_composta: INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
 
-   22 lista_instruc: %empty
-   23              | instrucao lista_instruc
+   21 decl_local: %empty
+   22           | decl_var decl_local
 
-   24 instrucao: instruc_expr
-   25          | instruc_composta
-   26          | instruc_cond
-   27          | instruc_iterac
-   28          | instruc_return
+   23 lista_instruc: %empty
+   24              | instrucao lista_instruc
 
-   29 instruc_expr: expressao FIM_EXPRESS
-   30             | FIM_EXPRESS
+   25 instrucao: instruc_expr
+   26          | instruc_composta
+   27          | instruc_cond
+   28          | instruc_iterac
+   29          | instruc_return
 
-   31 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   32             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   30 instruc_expr: expressao FIM_EXPRESS
+   31             | FIM_EXPRESS
 
-   33 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   32 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   33             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
 
-   34 instruc_return: RETURN expressao FIM_EXPRESS
+   34 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
 
-   35 expressao: var atrop express_simp
-   36          | express_simp
+   35 instruc_return: RETURN expressao FIM_EXPRESS
 
-   37 var: ID
+   36 expressao: var atrop express_simp
+   37          | express_simp
 
-   38 express_simp: express_soma
-   39             | express_soma relop express_soma
+   38 var: ID
 
-   40 express_soma: termo
-   41             | termo addop express_soma
+   39 express_simp: express_soma
+   40             | express_soma relop express_soma
 
-   42 termo: factor
-   43      | factor mulop termo
+   41 express_soma: termo
+   42             | termo addop express_soma
 
-   44 factor: INI_PARAM expressao FIM_PARAM
-   45       | endereco
-   46       | var
-   47       | chamada
-   48       | num
-   49       | LITERAL
+   43 termo: factor
+   44      | factor mulop termo
 
-   50 endereco: ACESSO_END ID
+   45 factor: INI_PARAM expressao FIM_PARAM
+   46       | endereco
+   47       | var
+   48       | chamada
+   49       | num
+   50       | LITERAL
 
-   51 chamada: nome_func INI_PARAM arg FIM_PARAM
+   51 endereco: ACESSO_END ID
 
-   52 nome_func: PRINTINT
-   53          | PRINTFLOAT
-   54          | PRINTPOINT
-   55          | PRINTSHAPE
-   56          | SCANINT
-   57          | SCANFLOAT
-   58          | CONSTROIPOINT
-   59          | CONSTROISHAPE
-   60          | PERIMETRO
-   61          | ISIN
-   62          | ISCOLLIDED
-   63          | ID
+   52 chamada: nome_func INI_PARAM arg FIM_PARAM
 
-   64 arg: %empty
-   65    | lista_arg
+   53 nome_func: PRINTINT
+   54          | PRINTFLOAT
+   55          | PRINTPOINT
+   56          | PRINTSHAPE
+   57          | SCANINT
+   58          | SCANFLOAT
+   59          | CONSTROIPOINT
+   60          | CONSTROISHAPE
+   61          | PERIMETRO
+   62          | ISIN
+   63          | ISCOLLIDED
+   64          | ID
 
-   66 lista_arg: expressao
-   67          | expressao SEPARA_ARG lista_arg
+   65 arg: %empty
+   66    | lista_arg
 
-   68 atrop: ATR
-   69      | PLUS_ATR
-   70      | MINUS_ATR
-   71      | TIMES_ATR
-   72      | OVER_ATR
+   67 lista_arg: expressao
+   68          | expressao SEPARA_ARG lista_arg
 
-   73 relop: LT
-   74      | GT
-   75      | LE
-   76      | GE
-   77      | EQ
-   78      | NE
-   79      | logop
+   69 atrop: ATR
+   70      | PLUS_ATR
+   71      | MINUS_ATR
+   72      | TIMES_ATR
+   73      | OVER_ATR
 
-   80 logop: NOT
-   81      | AND
-   82      | OR
+   74 relop: LT
+   75      | GT
+   76      | LE
+   77      | GE
+   78      | EQ
+   79      | NE
+   80      | logop
 
-   83 addop: PLUS_OP
-   84      | MINUS_OP
+   81 logop: NOT
+   82      | AND
+   83      | OR
 
-   85 mulop: TIMES_OP
-   86      | OVER_OP
+   84 addop: PLUS_OP
+   85      | MINUS_OP
 
-   87 num: INTEIRO
-   88    | DECIMAL
+   86 mulop: TIMES_OP
+   87      | OVER_OP
+
+   88 num: INTEIRO
+   89    | DECIMAL
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-IF (258) 31 32
-ELSE (259) 32
-FOR (260) 33
-RETURN (261) 34
-INT (262) 9
-FLOAT (263) 10
-POINT (264) 11
-SHAPE (265) 12
-PRINTINT (266) 52
-PRINTFLOAT (267) 53
-PRINTPOINT (268) 54
-PRINTSHAPE (269) 55
-SCANINT (270) 56
-SCANFLOAT (271) 57
-CONSTROIPOINT (272) 58
-CONSTROISHAPE (273) 59
-PERIMETRO (274) 60
-ISIN (275) 61
-ISCOLLIDED (276) 62
-LITERAL (277) 49
-INTEIRO (278) 87
-DECIMAL (279) 88
-ID (280) 37 50 63
-LT (281) 73
-GT (282) 74
-LE (283) 75
-GE (284) 76
-EQ (285) 77
-NE (286) 78
-NOT (287) 80
-AND (288) 81
-OR (289) 82
-ATR (290) 68
-PLUS_ATR (291) 69
-MINUS_ATR (292) 70
-TIMES_ATR (293) 71
-OVER_ATR (294) 72
-PLUS_OP (295) 83
-MINUS_OP (296) 84
-TIMES_OP (297) 85
-OVER_OP (298) 86
-INI_PARAM (299) 8 31 32 33 44 51
-FIM_PARAM (300) 8 31 32 33 44 51
-INI_INSTRUC (301) 19 31 32 33
-FIM_INSTRUC (302) 19 31 32 33
-FIM_EXPRESS (303) 6 29 30 33 34
-SEPARA_ARG (304) 16 67
-ACESSO_END (305) 50
+IF (258) 32 33
+ELSE (259) 33
+FOR (260) 34
+RETURN (261) 35
+INT (262) 10
+FLOAT (263) 11
+POINT (264) 12
+SHAPE (265) 13
+PRINTINT (266) 53
+PRINTFLOAT (267) 54
+PRINTPOINT (268) 55
+PRINTSHAPE (269) 56
+SCANINT (270) 57
+SCANFLOAT (271) 58
+CONSTROIPOINT (272) 59
+CONSTROISHAPE (273) 60
+PERIMETRO (274) 61
+ISIN (275) 62
+ISCOLLIDED (276) 63
+LITERAL (277) 50
+INTEIRO (278) 88
+DECIMAL (279) 89
+ID (280) 38 51 64
+LT (281) 74
+GT (282) 75
+LE (283) 76
+GE (284) 77
+EQ (285) 78
+NE (286) 79
+NOT (287) 81
+AND (288) 82
+OR (289) 83
+ATR (290) 69
+PLUS_ATR (291) 70
+MINUS_ATR (292) 71
+TIMES_ATR (293) 72
+OVER_ATR (294) 73
+PLUS_OP (295) 84
+MINUS_OP (296) 85
+TIMES_OP (297) 86
+OVER_OP (298) 87
+INI_PARAM (299) 9 32 33 34 45 52
+FIM_PARAM (300) 9 32 33 34 45 52
+INI_INSTRUC (301) 20 32 33 34
+FIM_INSTRUC (302) 20 32 33 34
+FIM_EXPRESS (303) 7 30 31 34 35
+SEPARA_ARG (304) 17 68
+ACESSO_END (305) 51
 
 
 Nonterminals, with rules where they appear
 
 $accept (51)
     on left: 0
-programa (52)
+inicial (52)
     on left: 1, on right: 0
-lista_decl (53)
-    on left: 2 3, on right: 1 3
-declaracao (54)
-    on left: 4 5, on right: 2 3
-decl_var (55)
-    on left: 6, on right: 4 21
-decl_func (56)
-    on left: 8, on right: 5
-@1 (57)
-    on left: 7, on right: 8
-tipo_especif (58)
-    on left: 9 10 11 12, on right: 6 8 17 18
-params (59)
-    on left: 13 14, on right: 8
-lista_param (60)
-    on left: 15 16, on right: 14 16
-param (61)
-    on left: 17 18, on right: 15 16
-instruc_composta (62)
-    on left: 19, on right: 8 25
-decl_local (63)
-    on left: 20 21, on right: 19 21
-lista_instruc (64)
-    on left: 22 23, on right: 19 23
-instrucao (65)
-    on left: 24 25 26 27 28, on right: 23 31 32 33
-instruc_expr (66)
-    on left: 29 30, on right: 24
-instruc_cond (67)
-    on left: 31 32, on right: 26
-instruc_iterac (68)
-    on left: 33, on right: 27
-instruc_return (69)
+programa (53)
+    on left: 2, on right: 1
+lista_decl (54)
+    on left: 3 4, on right: 2 4
+declaracao (55)
+    on left: 5 6, on right: 3 4
+decl_var (56)
+    on left: 7, on right: 5 22
+decl_func (57)
+    on left: 9, on right: 6
+@1 (58)
+    on left: 8, on right: 9
+tipo_especif (59)
+    on left: 10 11 12 13, on right: 7 9 18 19
+params (60)
+    on left: 14 15, on right: 9
+lista_param (61)
+    on left: 16 17, on right: 15 17
+param (62)
+    on left: 18 19, on right: 16 17
+instruc_composta (63)
+    on left: 20, on right: 9 26
+decl_local (64)
+    on left: 21 22, on right: 20 22
+lista_instruc (65)
+    on left: 23 24, on right: 20 24
+instrucao (66)
+    on left: 25 26 27 28 29, on right: 24 32 33 34
+instruc_expr (67)
+    on left: 30 31, on right: 25
+instruc_cond (68)
+    on left: 32 33, on right: 27
+instruc_iterac (69)
     on left: 34, on right: 28
-expressao (70)
-    on left: 35 36, on right: 29 31 32 33 34 44 66 67
-var (71)
-    on left: 37, on right: 6 18 35 46
-express_simp (72)
-    on left: 38 39, on right: 33 35 36
-express_soma (73)
-    on left: 40 41, on right: 38 39 41
-termo (74)
-    on left: 42 43, on right: 40 41 43
-factor (75)
-    on left: 44 45 46 47 48 49, on right: 42 43
-endereco (76)
-    on left: 50, on right: 17 45
-chamada (77)
-    on left: 51, on right: 47
-nome_func (78)
-    on left: 52 53 54 55 56 57 58 59 60 61 62 63, on right: 8 51
-arg (79)
-    on left: 64 65, on right: 51
-lista_arg (80)
-    on left: 66 67, on right: 65 67
-atrop (81)
-    on left: 68 69 70 71 72, on right: 35
-relop (82)
-    on left: 73 74 75 76 77 78 79, on right: 39
-logop (83)
-    on left: 80 81 82, on right: 79
-addop (84)
-    on left: 83 84, on right: 41
-mulop (85)
-    on left: 85 86, on right: 43
-num (86)
-    on left: 87 88, on right: 48
+instruc_return (70)
+    on left: 35, on right: 29
+expressao (71)
+    on left: 36 37, on right: 30 32 33 34 35 45 67 68
+var (72)
+    on left: 38, on right: 7 19 36 47
+express_simp (73)
+    on left: 39 40, on right: 34 36 37
+express_soma (74)
+    on left: 41 42, on right: 39 40 42
+termo (75)
+    on left: 43 44, on right: 41 42 44
+factor (76)
+    on left: 45 46 47 48 49 50, on right: 43 44
+endereco (77)
+    on left: 51, on right: 18 46
+chamada (78)
+    on left: 52, on right: 48
+nome_func (79)
+    on left: 53 54 55 56 57 58 59 60 61 62 63 64, on right: 9 52
+arg (80)
+    on left: 65 66, on right: 52
+lista_arg (81)
+    on left: 67 68, on right: 66 68
+atrop (82)
+    on left: 69 70 71 72 73, on right: 36
+relop (83)
+    on left: 74 75 76 77 78 79 80, on right: 40
+logop (84)
+    on left: 81 82 83, on right: 80
+addop (85)
+    on left: 84 85, on right: 42
+mulop (86)
+    on left: 86 87, on right: 44
+num (87)
+    on left: 88 89, on right: 49
 
 
 State 0
 
-    0 $accept: . programa $end
-    1 programa: . lista_decl
-    2 lista_decl: . declaracao
-    3           | . declaracao lista_decl
-    4 declaracao: . decl_var
-    5           | . decl_func
-    6 decl_var: . tipo_especif var FIM_EXPRESS
-    8 decl_func: . tipo_especif nome_func INI_PARAM params FIM_PARAM @1 instruc_composta
-    9 tipo_especif: . INT
-   10             | . FLOAT
-   11             | . POINT
-   12             | . SHAPE
+    0 $accept: . inicial $end
+    1 inicial: . programa
+    2 programa: . lista_decl
+    3 lista_decl: . declaracao
+    4           | . declaracao lista_decl
+    5 declaracao: . decl_var
+    6           | . decl_func
+    7 decl_var: . tipo_especif var FIM_EXPRESS
+    9 decl_func: . tipo_especif nome_func INI_PARAM params FIM_PARAM @1 instruc_composta
+   10 tipo_especif: . INT
+   11             | . FLOAT
+   12             | . POINT
+   13             | . SHAPE
 
     INT    shift, and go to state 1
     FLOAT  shift, and go to state 2
     POINT  shift, and go to state 3
     SHAPE  shift, and go to state 4
 
-    programa      go to state 5
-    lista_decl    go to state 6
-    declaracao    go to state 7
-    decl_var      go to state 8
-    decl_func     go to state 9
-    tipo_especif  go to state 10
+    inicial       go to state 5
+    programa      go to state 6
+    lista_decl    go to state 7
+    declaracao    go to state 8
+    decl_var      go to state 9
+    decl_func     go to state 10
+    tipo_especif  go to state 11
 
 
 State 1
 
-    9 tipo_especif: INT .
-
-    $default  reduce using rule 9 (tipo_especif)
-
-
-State 2
-
-   10 tipo_especif: FLOAT .
+   10 tipo_especif: INT .
 
     $default  reduce using rule 10 (tipo_especif)
 
 
-State 3
+State 2
 
-   11 tipo_especif: POINT .
+   11 tipo_especif: FLOAT .
 
     $default  reduce using rule 11 (tipo_especif)
 
 
-State 4
+State 3
 
-   12 tipo_especif: SHAPE .
+   12 tipo_especif: POINT .
 
     $default  reduce using rule 12 (tipo_especif)
 
 
+State 4
+
+   13 tipo_especif: SHAPE .
+
+    $default  reduce using rule 13 (tipo_especif)
+
+
 State 5
 
-    0 $accept: programa . $end
+    0 $accept: inicial . $end
 
-    $end  shift, and go to state 11
+    $end  shift, and go to state 12
 
 
 State 6
 
-    1 programa: lista_decl .
+    1 inicial: programa .
 
-    $default  reduce using rule 1 (programa)
+    $default  reduce using rule 1 (inicial)
 
 
 State 7
 
-    2 lista_decl: . declaracao
-    2           | declaracao .  [$end]
-    3           | . declaracao lista_decl
-    3           | declaracao . lista_decl
-    4 declaracao: . decl_var
-    5           | . decl_func
-    6 decl_var: . tipo_especif var FIM_EXPRESS
-    8 decl_func: . tipo_especif nome_func INI_PARAM params FIM_PARAM @1 instruc_composta
-    9 tipo_especif: . INT
-   10             | . FLOAT
-   11             | . POINT
-   12             | . SHAPE
+    2 programa: lista_decl .
+
+    $default  reduce using rule 2 (programa)
+
+
+State 8
+
+    3 lista_decl: . declaracao
+    3           | declaracao .  [$end]
+    4           | . declaracao lista_decl
+    4           | declaracao . lista_decl
+    5 declaracao: . decl_var
+    6           | . decl_func
+    7 decl_var: . tipo_especif var FIM_EXPRESS
+    9 decl_func: . tipo_especif nome_func INI_PARAM params FIM_PARAM @1 instruc_composta
+   10 tipo_especif: . INT
+   11             | . FLOAT
+   12             | . POINT
+   13             | . SHAPE
 
     INT    shift, and go to state 1
     FLOAT  shift, and go to state 2
     POINT  shift, and go to state 3
     SHAPE  shift, and go to state 4
 
-    $default  reduce using rule 2 (lista_decl)
+    $default  reduce using rule 3 (lista_decl)
 
-    lista_decl    go to state 12
-    declaracao    go to state 7
-    decl_var      go to state 8
-    decl_func     go to state 9
-    tipo_especif  go to state 10
-
-
-State 8
-
-    4 declaracao: decl_var .
-
-    $default  reduce using rule 4 (declaracao)
+    lista_decl    go to state 13
+    declaracao    go to state 8
+    decl_var      go to state 9
+    decl_func     go to state 10
+    tipo_especif  go to state 11
 
 
 State 9
 
-    5 declaracao: decl_func .
+    5 declaracao: decl_var .
 
     $default  reduce using rule 5 (declaracao)
 
 
 State 10
 
-    6 decl_var: tipo_especif . var FIM_EXPRESS
-    8 decl_func: tipo_especif . nome_func INI_PARAM params FIM_PARAM @1 instruc_composta
-   37 var: . ID
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
+    6 declaracao: decl_func .
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    ID             shift, and go to state 24
-
-    var        go to state 25
-    nome_func  go to state 26
+    $default  reduce using rule 6 (declaracao)
 
 
 State 11
 
-    0 $accept: programa $end .
+    7 decl_var: tipo_especif . var FIM_EXPRESS
+    9 decl_func: tipo_especif . nome_func INI_PARAM params FIM_PARAM @1 instruc_composta
+   38 var: . ID
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
 
-    $default  accept
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    ID             shift, and go to state 25
+
+    var        go to state 26
+    nome_func  go to state 27
 
 
 State 12
 
-    3 lista_decl: declaracao lista_decl .
+    0 $accept: inicial $end .
 
-    $default  reduce using rule 3 (lista_decl)
+    $default  accept
 
 
 State 13
 
-   52 nome_func: PRINTINT .
+    4 lista_decl: declaracao lista_decl .
 
-    $default  reduce using rule 52 (nome_func)
+    $default  reduce using rule 4 (lista_decl)
 
 
 State 14
 
-   53 nome_func: PRINTFLOAT .
+   53 nome_func: PRINTINT .
 
     $default  reduce using rule 53 (nome_func)
 
 
 State 15
 
-   54 nome_func: PRINTPOINT .
+   54 nome_func: PRINTFLOAT .
 
     $default  reduce using rule 54 (nome_func)
 
 
 State 16
 
-   55 nome_func: PRINTSHAPE .
+   55 nome_func: PRINTPOINT .
 
     $default  reduce using rule 55 (nome_func)
 
 
 State 17
 
-   56 nome_func: SCANINT .
+   56 nome_func: PRINTSHAPE .
 
     $default  reduce using rule 56 (nome_func)
 
 
 State 18
 
-   57 nome_func: SCANFLOAT .
+   57 nome_func: SCANINT .
 
     $default  reduce using rule 57 (nome_func)
 
 
 State 19
 
-   58 nome_func: CONSTROIPOINT .
+   58 nome_func: SCANFLOAT .
 
     $default  reduce using rule 58 (nome_func)
 
 
 State 20
 
-   59 nome_func: CONSTROISHAPE .
+   59 nome_func: CONSTROIPOINT .
 
     $default  reduce using rule 59 (nome_func)
 
 
 State 21
 
-   60 nome_func: PERIMETRO .
+   60 nome_func: CONSTROISHAPE .
 
     $default  reduce using rule 60 (nome_func)
 
 
 State 22
 
-   61 nome_func: ISIN .
+   61 nome_func: PERIMETRO .
 
     $default  reduce using rule 61 (nome_func)
 
 
 State 23
 
-   62 nome_func: ISCOLLIDED .
+   62 nome_func: ISIN .
 
     $default  reduce using rule 62 (nome_func)
 
 
 State 24
 
-   37 var: ID .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, ATR, PLUS_ATR, MINUS_ATR, TIMES_ATR, OVER_ATR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   63 nome_func: ID .  [INI_PARAM]
+   63 nome_func: ISCOLLIDED .
 
-    INI_PARAM  reduce using rule 63 (nome_func)
-    $default   reduce using rule 37 (var)
+    $default  reduce using rule 63 (nome_func)
 
 
 State 25
 
-    6 decl_var: tipo_especif var . FIM_EXPRESS
+   38 var: ID .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, ATR, PLUS_ATR, MINUS_ATR, TIMES_ATR, OVER_ATR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   64 nome_func: ID .  [INI_PARAM]
 
-    FIM_EXPRESS  shift, and go to state 27
+    INI_PARAM  reduce using rule 64 (nome_func)
+    $default   reduce using rule 38 (var)
 
 
 State 26
 
-    8 decl_func: tipo_especif nome_func . INI_PARAM params FIM_PARAM @1 instruc_composta
+    7 decl_var: tipo_especif var . FIM_EXPRESS
 
-    INI_PARAM  shift, and go to state 28
+    FIM_EXPRESS  shift, and go to state 28
 
 
 State 27
 
-    6 decl_var: tipo_especif var FIM_EXPRESS .
+    9 decl_func: tipo_especif nome_func . INI_PARAM params FIM_PARAM @1 instruc_composta
 
-    $default  reduce using rule 6 (decl_var)
+    INI_PARAM  shift, and go to state 29
 
 
 State 28
 
-    8 decl_func: tipo_especif nome_func INI_PARAM . params FIM_PARAM @1 instruc_composta
-    9 tipo_especif: . INT
-   10             | . FLOAT
-   11             | . POINT
-   12             | . SHAPE
-   13 params: . %empty  [FIM_PARAM]
-   14       | . lista_param
-   15 lista_param: . param
-   16            | . param SEPARA_ARG lista_param
-   17 param: . tipo_especif endereco
-   18      | . tipo_especif var
+    7 decl_var: tipo_especif var FIM_EXPRESS .
 
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    POINT  shift, and go to state 3
-    SHAPE  shift, and go to state 4
-
-    $default  reduce using rule 13 (params)
-
-    tipo_especif  go to state 29
-    params        go to state 30
-    lista_param   go to state 31
-    param         go to state 32
+    $default  reduce using rule 7 (decl_var)
 
 
 State 29
 
-   17 param: tipo_especif . endereco
-   18      | tipo_especif . var
-   37 var: . ID
-   50 endereco: . ACESSO_END ID
+    9 decl_func: tipo_especif nome_func INI_PARAM . params FIM_PARAM @1 instruc_composta
+   10 tipo_especif: . INT
+   11             | . FLOAT
+   12             | . POINT
+   13             | . SHAPE
+   14 params: . %empty  [FIM_PARAM]
+   15       | . lista_param
+   16 lista_param: . param
+   17            | . param SEPARA_ARG lista_param
+   18 param: . tipo_especif endereco
+   19      | . tipo_especif var
 
-    ID          shift, and go to state 33
-    ACESSO_END  shift, and go to state 34
+    INT    shift, and go to state 1
+    FLOAT  shift, and go to state 2
+    POINT  shift, and go to state 3
+    SHAPE  shift, and go to state 4
 
-    var       go to state 35
-    endereco  go to state 36
+    $default  reduce using rule 14 (params)
+
+    tipo_especif  go to state 30
+    params        go to state 31
+    lista_param   go to state 32
+    param         go to state 33
 
 
 State 30
 
-    8 decl_func: tipo_especif nome_func INI_PARAM params . FIM_PARAM @1 instruc_composta
+   18 param: tipo_especif . endereco
+   19      | tipo_especif . var
+   38 var: . ID
+   51 endereco: . ACESSO_END ID
 
-    FIM_PARAM  shift, and go to state 37
+    ID          shift, and go to state 34
+    ACESSO_END  shift, and go to state 35
+
+    var       go to state 36
+    endereco  go to state 37
 
 
 State 31
 
-   14 params: lista_param .
+    9 decl_func: tipo_especif nome_func INI_PARAM params . FIM_PARAM @1 instruc_composta
 
-    $default  reduce using rule 14 (params)
+    FIM_PARAM  shift, and go to state 38
 
 
 State 32
 
-   15 lista_param: param .  [FIM_PARAM]
-   16            | param . SEPARA_ARG lista_param
+   15 params: lista_param .
 
-    SEPARA_ARG  shift, and go to state 38
-
-    $default  reduce using rule 15 (lista_param)
+    $default  reduce using rule 15 (params)
 
 
 State 33
 
-   37 var: ID .
+   16 lista_param: param .  [FIM_PARAM]
+   17            | param . SEPARA_ARG lista_param
 
-    $default  reduce using rule 37 (var)
-
-
-State 34
-
-   50 endereco: ACESSO_END . ID
-
-    ID  shift, and go to state 39
-
-
-State 35
-
-   18 param: tipo_especif var .
-
-    $default  reduce using rule 18 (param)
-
-
-State 36
-
-   17 param: tipo_especif endereco .
-
-    $default  reduce using rule 17 (param)
-
-
-State 37
-
-    7 @1: . %empty
-    8 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM . @1 instruc_composta
-
-    $default  reduce using rule 7 (@1)
-
-    @1  go to state 40
-
-
-State 38
-
-    9 tipo_especif: . INT
-   10             | . FLOAT
-   11             | . POINT
-   12             | . SHAPE
-   15 lista_param: . param
-   16            | . param SEPARA_ARG lista_param
-   16            | param SEPARA_ARG . lista_param
-   17 param: . tipo_especif endereco
-   18      | . tipo_especif var
-
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    POINT  shift, and go to state 3
-    SHAPE  shift, and go to state 4
-
-    tipo_especif  go to state 29
-    lista_param   go to state 41
-    param         go to state 32
-
-
-State 39
-
-   50 endereco: ACESSO_END ID .
-
-    $default  reduce using rule 50 (endereco)
-
-
-State 40
-
-    8 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM @1 . instruc_composta
-   19 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
-
-    INI_INSTRUC  shift, and go to state 42
-
-    instruc_composta  go to state 43
-
-
-State 41
-
-   16 lista_param: param SEPARA_ARG lista_param .
+    SEPARA_ARG  shift, and go to state 39
 
     $default  reduce using rule 16 (lista_param)
 
 
-State 42
+State 34
 
-    6 decl_var: . tipo_especif var FIM_EXPRESS
-    9 tipo_especif: . INT
-   10             | . FLOAT
-   11             | . POINT
-   12             | . SHAPE
-   19 instruc_composta: INI_INSTRUC . decl_local lista_instruc FIM_INSTRUC
-   20 decl_local: . %empty  [IF, FOR, RETURN, PRINTINT, PRINTFLOAT, PRINTPOINT, PRINTSHAPE, SCANINT, SCANFLOAT, CONSTROIPOINT, CONSTROISHAPE, PERIMETRO, ISIN, ISCOLLIDED, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
-   21           | . decl_var decl_local
+   38 var: ID .
+
+    $default  reduce using rule 38 (var)
+
+
+State 35
+
+   51 endereco: ACESSO_END . ID
+
+    ID  shift, and go to state 40
+
+
+State 36
+
+   19 param: tipo_especif var .
+
+    $default  reduce using rule 19 (param)
+
+
+State 37
+
+   18 param: tipo_especif endereco .
+
+    $default  reduce using rule 18 (param)
+
+
+State 38
+
+    8 @1: . %empty
+    9 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM . @1 instruc_composta
+
+    $default  reduce using rule 8 (@1)
+
+    @1  go to state 41
+
+
+State 39
+
+   10 tipo_especif: . INT
+   11             | . FLOAT
+   12             | . POINT
+   13             | . SHAPE
+   16 lista_param: . param
+   17            | . param SEPARA_ARG lista_param
+   17            | param SEPARA_ARG . lista_param
+   18 param: . tipo_especif endereco
+   19      | . tipo_especif var
 
     INT    shift, and go to state 1
     FLOAT  shift, and go to state 2
     POINT  shift, and go to state 3
     SHAPE  shift, and go to state 4
 
-    $default  reduce using rule 20 (decl_local)
+    tipo_especif  go to state 30
+    lista_param   go to state 42
+    param         go to state 33
 
-    decl_var      go to state 44
-    tipo_especif  go to state 45
-    decl_local    go to state 46
+
+State 40
+
+   51 endereco: ACESSO_END ID .
+
+    $default  reduce using rule 51 (endereco)
+
+
+State 41
+
+    9 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM @1 . instruc_composta
+   20 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
+
+    INI_INSTRUC  shift, and go to state 43
+
+    instruc_composta  go to state 44
+
+
+State 42
+
+   17 lista_param: param SEPARA_ARG lista_param .
+
+    $default  reduce using rule 17 (lista_param)
 
 
 State 43
 
-    8 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM @1 instruc_composta .
-
-    $default  reduce using rule 8 (decl_func)
-
-
-State 44
-
-    6 decl_var: . tipo_especif var FIM_EXPRESS
-    9 tipo_especif: . INT
-   10             | . FLOAT
-   11             | . POINT
-   12             | . SHAPE
-   20 decl_local: . %empty  [IF, FOR, RETURN, PRINTINT, PRINTFLOAT, PRINTPOINT, PRINTSHAPE, SCANINT, SCANFLOAT, CONSTROIPOINT, CONSTROISHAPE, PERIMETRO, ISIN, ISCOLLIDED, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
-   21           | . decl_var decl_local
-   21           | decl_var . decl_local
+    7 decl_var: . tipo_especif var FIM_EXPRESS
+   10 tipo_especif: . INT
+   11             | . FLOAT
+   12             | . POINT
+   13             | . SHAPE
+   20 instruc_composta: INI_INSTRUC . decl_local lista_instruc FIM_INSTRUC
+   21 decl_local: . %empty  [IF, FOR, RETURN, PRINTINT, PRINTFLOAT, PRINTPOINT, PRINTSHAPE, SCANINT, SCANFLOAT, CONSTROIPOINT, CONSTROISHAPE, PERIMETRO, ISIN, ISCOLLIDED, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
+   22           | . decl_var decl_local
 
     INT    shift, and go to state 1
     FLOAT  shift, and go to state 2
     POINT  shift, and go to state 3
     SHAPE  shift, and go to state 4
 
-    $default  reduce using rule 20 (decl_local)
+    $default  reduce using rule 21 (decl_local)
 
-    decl_var      go to state 44
-    tipo_especif  go to state 45
+    decl_var      go to state 45
+    tipo_especif  go to state 46
     decl_local    go to state 47
+
+
+State 44
+
+    9 decl_func: tipo_especif nome_func INI_PARAM params FIM_PARAM @1 instruc_composta .
+
+    $default  reduce using rule 9 (decl_func)
 
 
 State 45
 
-    6 decl_var: tipo_especif . var FIM_EXPRESS
-   37 var: . ID
+    7 decl_var: . tipo_especif var FIM_EXPRESS
+   10 tipo_especif: . INT
+   11             | . FLOAT
+   12             | . POINT
+   13             | . SHAPE
+   21 decl_local: . %empty  [IF, FOR, RETURN, PRINTINT, PRINTFLOAT, PRINTPOINT, PRINTSHAPE, SCANINT, SCANFLOAT, CONSTROIPOINT, CONSTROISHAPE, PERIMETRO, ISIN, ISCOLLIDED, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
+   22           | . decl_var decl_local
+   22           | decl_var . decl_local
 
-    ID  shift, and go to state 33
+    INT    shift, and go to state 1
+    FLOAT  shift, and go to state 2
+    POINT  shift, and go to state 3
+    SHAPE  shift, and go to state 4
 
-    var  go to state 25
+    $default  reduce using rule 21 (decl_local)
+
+    decl_var      go to state 45
+    tipo_especif  go to state 46
+    decl_local    go to state 48
 
 
 State 46
 
-   19 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
-   19                 | INI_INSTRUC decl_local . lista_instruc FIM_INSTRUC
-   22 lista_instruc: . %empty  [FIM_INSTRUC]
-   23              | . instrucao lista_instruc
-   24 instrucao: . instruc_expr
-   25          | . instruc_composta
-   26          | . instruc_cond
-   27          | . instruc_iterac
-   28          | . instruc_return
-   29 instruc_expr: . expressao FIM_EXPRESS
-   30             | . FIM_EXPRESS
-   31 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   32             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
-   33 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   34 instruc_return: . RETURN expressao FIM_EXPRESS
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+    7 decl_var: tipo_especif . var FIM_EXPRESS
+   38 var: . ID
 
-    IF             shift, and go to state 48
-    FOR            shift, and go to state 49
-    RETURN         shift, and go to state 50
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    INI_INSTRUC    shift, and go to state 42
-    FIM_EXPRESS    shift, and go to state 55
-    ACESSO_END     shift, and go to state 34
+    ID  shift, and go to state 34
 
-    $default  reduce using rule 22 (lista_instruc)
-
-    instruc_composta  go to state 56
-    lista_instruc     go to state 57
-    instrucao         go to state 58
-    instruc_expr      go to state 59
-    instruc_cond      go to state 60
-    instruc_iterac    go to state 61
-    instruc_return    go to state 62
-    expressao         go to state 63
-    var               go to state 64
-    express_simp      go to state 65
-    express_soma      go to state 66
-    termo             go to state 67
-    factor            go to state 68
-    endereco          go to state 69
-    chamada           go to state 70
-    nome_func         go to state 71
-    num               go to state 72
+    var  go to state 26
 
 
 State 47
 
-   21 decl_local: decl_var decl_local .
+   20 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
+   20                 | INI_INSTRUC decl_local . lista_instruc FIM_INSTRUC
+   23 lista_instruc: . %empty  [FIM_INSTRUC]
+   24              | . instrucao lista_instruc
+   25 instrucao: . instruc_expr
+   26          | . instruc_composta
+   27          | . instruc_cond
+   28          | . instruc_iterac
+   29          | . instruc_return
+   30 instruc_expr: . expressao FIM_EXPRESS
+   31             | . FIM_EXPRESS
+   32 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   33             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   34 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   35 instruc_return: . RETURN expressao FIM_EXPRESS
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    $default  reduce using rule 21 (decl_local)
+    IF             shift, and go to state 49
+    FOR            shift, and go to state 50
+    RETURN         shift, and go to state 51
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    INI_INSTRUC    shift, and go to state 43
+    FIM_EXPRESS    shift, and go to state 56
+    ACESSO_END     shift, and go to state 35
+
+    $default  reduce using rule 23 (lista_instruc)
+
+    instruc_composta  go to state 57
+    lista_instruc     go to state 58
+    instrucao         go to state 59
+    instruc_expr      go to state 60
+    instruc_cond      go to state 61
+    instruc_iterac    go to state 62
+    instruc_return    go to state 63
+    expressao         go to state 64
+    var               go to state 65
+    express_simp      go to state 66
+    express_soma      go to state 67
+    termo             go to state 68
+    factor            go to state 69
+    endereco          go to state 70
+    chamada           go to state 71
+    nome_func         go to state 72
+    num               go to state 73
 
 
 State 48
 
-   31 instruc_cond: IF . INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   32             | IF . INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   22 decl_local: decl_var decl_local .
 
-    INI_PARAM  shift, and go to state 73
+    $default  reduce using rule 22 (decl_local)
 
 
 State 49
 
-   33 instruc_iterac: FOR . INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   32 instruc_cond: IF . INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   33             | IF . INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
 
     INI_PARAM  shift, and go to state 74
 
 
 State 50
 
-   34 instruc_return: RETURN . expressao FIM_EXPRESS
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   34 instruc_iterac: FOR . INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    expressao     go to state 75
-    var           go to state 64
-    express_simp  go to state 65
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
+    INI_PARAM  shift, and go to state 75
 
 
 State 51
 
-   49 factor: LITERAL .
+   35 instruc_return: RETURN . expressao FIM_EXPRESS
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    $default  reduce using rule 49 (factor)
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    expressao     go to state 76
+    var           go to state 65
+    express_simp  go to state 66
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
 
 
 State 52
 
-   87 num: INTEIRO .
+   50 factor: LITERAL .
 
-    $default  reduce using rule 87 (num)
+    $default  reduce using rule 50 (factor)
 
 
 State 53
 
-   88 num: DECIMAL .
+   88 num: INTEIRO .
 
     $default  reduce using rule 88 (num)
 
 
 State 54
 
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   44       | INI_PARAM . expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   89 num: DECIMAL .
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    expressao     go to state 76
-    var           go to state 64
-    express_simp  go to state 65
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
+    $default  reduce using rule 89 (num)
 
 
 State 55
 
-   30 instruc_expr: FIM_EXPRESS .
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   45       | INI_PARAM . expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    $default  reduce using rule 30 (instruc_expr)
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    expressao     go to state 77
+    var           go to state 65
+    express_simp  go to state 66
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
 
 
 State 56
 
-   25 instrucao: instruc_composta .
+   31 instruc_expr: FIM_EXPRESS .
 
-    $default  reduce using rule 25 (instrucao)
+    $default  reduce using rule 31 (instruc_expr)
 
 
 State 57
 
-   19 instruc_composta: INI_INSTRUC decl_local lista_instruc . FIM_INSTRUC
-
-    FIM_INSTRUC  shift, and go to state 77
-
-
-State 58
-
-   19 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
-   22 lista_instruc: . %empty  [FIM_INSTRUC]
-   23              | . instrucao lista_instruc
-   23              | instrucao . lista_instruc
-   24 instrucao: . instruc_expr
-   25          | . instruc_composta
-   26          | . instruc_cond
-   27          | . instruc_iterac
-   28          | . instruc_return
-   29 instruc_expr: . expressao FIM_EXPRESS
-   30             | . FIM_EXPRESS
-   31 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   32             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
-   33 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   34 instruc_return: . RETURN expressao FIM_EXPRESS
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
-
-    IF             shift, and go to state 48
-    FOR            shift, and go to state 49
-    RETURN         shift, and go to state 50
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    INI_INSTRUC    shift, and go to state 42
-    FIM_EXPRESS    shift, and go to state 55
-    ACESSO_END     shift, and go to state 34
-
-    $default  reduce using rule 22 (lista_instruc)
-
-    instruc_composta  go to state 56
-    lista_instruc     go to state 78
-    instrucao         go to state 58
-    instruc_expr      go to state 59
-    instruc_cond      go to state 60
-    instruc_iterac    go to state 61
-    instruc_return    go to state 62
-    expressao         go to state 63
-    var               go to state 64
-    express_simp      go to state 65
-    express_soma      go to state 66
-    termo             go to state 67
-    factor            go to state 68
-    endereco          go to state 69
-    chamada           go to state 70
-    nome_func         go to state 71
-    num               go to state 72
-
-
-State 59
-
-   24 instrucao: instruc_expr .
-
-    $default  reduce using rule 24 (instrucao)
-
-
-State 60
-
-   26 instrucao: instruc_cond .
+   26 instrucao: instruc_composta .
 
     $default  reduce using rule 26 (instrucao)
 
 
+State 58
+
+   20 instruc_composta: INI_INSTRUC decl_local lista_instruc . FIM_INSTRUC
+
+    FIM_INSTRUC  shift, and go to state 78
+
+
+State 59
+
+   20 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
+   23 lista_instruc: . %empty  [FIM_INSTRUC]
+   24              | . instrucao lista_instruc
+   24              | instrucao . lista_instruc
+   25 instrucao: . instruc_expr
+   26          | . instruc_composta
+   27          | . instruc_cond
+   28          | . instruc_iterac
+   29          | . instruc_return
+   30 instruc_expr: . expressao FIM_EXPRESS
+   31             | . FIM_EXPRESS
+   32 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   33             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   34 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   35 instruc_return: . RETURN expressao FIM_EXPRESS
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
+
+    IF             shift, and go to state 49
+    FOR            shift, and go to state 50
+    RETURN         shift, and go to state 51
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    INI_INSTRUC    shift, and go to state 43
+    FIM_EXPRESS    shift, and go to state 56
+    ACESSO_END     shift, and go to state 35
+
+    $default  reduce using rule 23 (lista_instruc)
+
+    instruc_composta  go to state 57
+    lista_instruc     go to state 79
+    instrucao         go to state 59
+    instruc_expr      go to state 60
+    instruc_cond      go to state 61
+    instruc_iterac    go to state 62
+    instruc_return    go to state 63
+    expressao         go to state 64
+    var               go to state 65
+    express_simp      go to state 66
+    express_soma      go to state 67
+    termo             go to state 68
+    factor            go to state 69
+    endereco          go to state 70
+    chamada           go to state 71
+    nome_func         go to state 72
+    num               go to state 73
+
+
+State 60
+
+   25 instrucao: instruc_expr .
+
+    $default  reduce using rule 25 (instrucao)
+
+
 State 61
 
-   27 instrucao: instruc_iterac .
+   27 instrucao: instruc_cond .
 
     $default  reduce using rule 27 (instrucao)
 
 
 State 62
 
-   28 instrucao: instruc_return .
+   28 instrucao: instruc_iterac .
 
     $default  reduce using rule 28 (instrucao)
 
 
 State 63
 
-   29 instruc_expr: expressao . FIM_EXPRESS
+   29 instrucao: instruc_return .
 
-    FIM_EXPRESS  shift, and go to state 79
+    $default  reduce using rule 29 (instrucao)
 
 
 State 64
 
-   35 expressao: var . atrop express_simp
-   46 factor: var .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   68 atrop: . ATR
-   69      | . PLUS_ATR
-   70      | . MINUS_ATR
-   71      | . TIMES_ATR
-   72      | . OVER_ATR
+   30 instruc_expr: expressao . FIM_EXPRESS
 
-    ATR        shift, and go to state 80
-    PLUS_ATR   shift, and go to state 81
-    MINUS_ATR  shift, and go to state 82
-    TIMES_ATR  shift, and go to state 83
-    OVER_ATR   shift, and go to state 84
-
-    $default  reduce using rule 46 (factor)
-
-    atrop  go to state 85
+    FIM_EXPRESS  shift, and go to state 80
 
 
 State 65
 
-   36 expressao: express_simp .
+   36 expressao: var . atrop express_simp
+   47 factor: var .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, TIMES_OP, OVER_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   69 atrop: . ATR
+   70      | . PLUS_ATR
+   71      | . MINUS_ATR
+   72      | . TIMES_ATR
+   73      | . OVER_ATR
 
-    $default  reduce using rule 36 (expressao)
+    ATR        shift, and go to state 81
+    PLUS_ATR   shift, and go to state 82
+    MINUS_ATR  shift, and go to state 83
+    TIMES_ATR  shift, and go to state 84
+    OVER_ATR   shift, and go to state 85
+
+    $default  reduce using rule 47 (factor)
+
+    atrop  go to state 86
 
 
 State 66
 
-   38 express_simp: express_soma .  [FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   39             | express_soma . relop express_soma
-   73 relop: . LT
-   74      | . GT
-   75      | . LE
-   76      | . GE
-   77      | . EQ
-   78      | . NE
-   79      | . logop
-   80 logop: . NOT
-   81      | . AND
-   82      | . OR
+   37 expressao: express_simp .
 
-    LT   shift, and go to state 86
-    GT   shift, and go to state 87
-    LE   shift, and go to state 88
-    GE   shift, and go to state 89
-    EQ   shift, and go to state 90
-    NE   shift, and go to state 91
-    NOT  shift, and go to state 92
-    AND  shift, and go to state 93
-    OR   shift, and go to state 94
-
-    $default  reduce using rule 38 (express_simp)
-
-    relop  go to state 95
-    logop  go to state 96
+    $default  reduce using rule 37 (expressao)
 
 
 State 67
 
-   40 express_soma: termo .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   41             | termo . addop express_soma
-   83 addop: . PLUS_OP
-   84      | . MINUS_OP
+   39 express_simp: express_soma .  [FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   40             | express_soma . relop express_soma
+   74 relop: . LT
+   75      | . GT
+   76      | . LE
+   77      | . GE
+   78      | . EQ
+   79      | . NE
+   80      | . logop
+   81 logop: . NOT
+   82      | . AND
+   83      | . OR
 
-    PLUS_OP   shift, and go to state 97
-    MINUS_OP  shift, and go to state 98
+    LT   shift, and go to state 87
+    GT   shift, and go to state 88
+    LE   shift, and go to state 89
+    GE   shift, and go to state 90
+    EQ   shift, and go to state 91
+    NE   shift, and go to state 92
+    NOT  shift, and go to state 93
+    AND  shift, and go to state 94
+    OR   shift, and go to state 95
 
-    $default  reduce using rule 40 (express_soma)
+    $default  reduce using rule 39 (express_simp)
 
-    addop  go to state 99
+    relop  go to state 96
+    logop  go to state 97
 
 
 State 68
 
-   42 termo: factor .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
-   43      | factor . mulop termo
-   85 mulop: . TIMES_OP
-   86      | . OVER_OP
+   41 express_soma: termo .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   42             | termo . addop express_soma
+   84 addop: . PLUS_OP
+   85      | . MINUS_OP
 
-    TIMES_OP  shift, and go to state 100
-    OVER_OP   shift, and go to state 101
+    PLUS_OP   shift, and go to state 98
+    MINUS_OP  shift, and go to state 99
 
-    $default  reduce using rule 42 (termo)
+    $default  reduce using rule 41 (express_soma)
 
-    mulop  go to state 102
+    addop  go to state 100
 
 
 State 69
 
-   45 factor: endereco .
+   43 termo: factor .  [LT, GT, LE, GE, EQ, NE, NOT, AND, OR, PLUS_OP, MINUS_OP, FIM_PARAM, FIM_EXPRESS, SEPARA_ARG]
+   44      | factor . mulop termo
+   86 mulop: . TIMES_OP
+   87      | . OVER_OP
 
-    $default  reduce using rule 45 (factor)
+    TIMES_OP  shift, and go to state 101
+    OVER_OP   shift, and go to state 102
+
+    $default  reduce using rule 43 (termo)
+
+    mulop  go to state 103
 
 
 State 70
 
-   47 factor: chamada .
+   46 factor: endereco .
 
-    $default  reduce using rule 47 (factor)
+    $default  reduce using rule 46 (factor)
 
 
 State 71
 
-   51 chamada: nome_func . INI_PARAM arg FIM_PARAM
-
-    INI_PARAM  shift, and go to state 103
-
-
-State 72
-
-   48 factor: num .
+   48 factor: chamada .
 
     $default  reduce using rule 48 (factor)
 
 
+State 72
+
+   52 chamada: nome_func . INI_PARAM arg FIM_PARAM
+
+    INI_PARAM  shift, and go to state 104
+
+
 State 73
 
-   31 instruc_cond: IF INI_PARAM . expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   32             | IF INI_PARAM . expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   49 factor: num .
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    expressao     go to state 104
-    var           go to state 64
-    express_simp  go to state 65
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
+    $default  reduce using rule 49 (factor)
 
 
 State 74
 
-   33 instruc_iterac: FOR INI_PARAM . expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   32 instruc_cond: IF INI_PARAM . expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   33             | IF INI_PARAM . expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
 
     expressao     go to state 105
-    var           go to state 64
-    express_simp  go to state 65
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
+    var           go to state 65
+    express_simp  go to state 66
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
 
 
 State 75
 
-   34 instruc_return: RETURN expressao . FIM_EXPRESS
+   34 instruc_iterac: FOR INI_PARAM . expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    FIM_EXPRESS  shift, and go to state 106
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    expressao     go to state 106
+    var           go to state 65
+    express_simp  go to state 66
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
 
 
 State 76
 
-   44 factor: INI_PARAM expressao . FIM_PARAM
+   35 instruc_return: RETURN expressao . FIM_EXPRESS
 
-    FIM_PARAM  shift, and go to state 107
+    FIM_EXPRESS  shift, and go to state 107
 
 
 State 77
 
-   19 instruc_composta: INI_INSTRUC decl_local lista_instruc FIM_INSTRUC .
+   45 factor: INI_PARAM expressao . FIM_PARAM
 
-    $default  reduce using rule 19 (instruc_composta)
+    FIM_PARAM  shift, and go to state 108
 
 
 State 78
 
-   23 lista_instruc: instrucao lista_instruc .
+   20 instruc_composta: INI_INSTRUC decl_local lista_instruc FIM_INSTRUC .
 
-    $default  reduce using rule 23 (lista_instruc)
+    $default  reduce using rule 20 (instruc_composta)
 
 
 State 79
 
-   29 instruc_expr: expressao FIM_EXPRESS .
+   24 lista_instruc: instrucao lista_instruc .
 
-    $default  reduce using rule 29 (instruc_expr)
+    $default  reduce using rule 24 (lista_instruc)
 
 
 State 80
 
-   68 atrop: ATR .
+   30 instruc_expr: expressao FIM_EXPRESS .
 
-    $default  reduce using rule 68 (atrop)
+    $default  reduce using rule 30 (instruc_expr)
 
 
 State 81
 
-   69 atrop: PLUS_ATR .
+   69 atrop: ATR .
 
     $default  reduce using rule 69 (atrop)
 
 
 State 82
 
-   70 atrop: MINUS_ATR .
+   70 atrop: PLUS_ATR .
 
     $default  reduce using rule 70 (atrop)
 
 
 State 83
 
-   71 atrop: TIMES_ATR .
+   71 atrop: MINUS_ATR .
 
     $default  reduce using rule 71 (atrop)
 
 
 State 84
 
-   72 atrop: OVER_ATR .
+   72 atrop: TIMES_ATR .
 
     $default  reduce using rule 72 (atrop)
 
 
 State 85
 
-   35 expressao: var atrop . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   73 atrop: OVER_ATR .
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    var           go to state 108
-    express_simp  go to state 109
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
+    $default  reduce using rule 73 (atrop)
 
 
 State 86
 
-   73 relop: LT .
+   36 expressao: var atrop . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    $default  reduce using rule 73 (relop)
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    var           go to state 109
+    express_simp  go to state 110
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
 
 
 State 87
 
-   74 relop: GT .
+   74 relop: LT .
 
     $default  reduce using rule 74 (relop)
 
 
 State 88
 
-   75 relop: LE .
+   75 relop: GT .
 
     $default  reduce using rule 75 (relop)
 
 
 State 89
 
-   76 relop: GE .
+   76 relop: LE .
 
     $default  reduce using rule 76 (relop)
 
 
 State 90
 
-   77 relop: EQ .
+   77 relop: GE .
 
     $default  reduce using rule 77 (relop)
 
 
 State 91
 
-   78 relop: NE .
+   78 relop: EQ .
 
     $default  reduce using rule 78 (relop)
 
 
 State 92
 
-   80 logop: NOT .
+   79 relop: NE .
 
-    $default  reduce using rule 80 (logop)
+    $default  reduce using rule 79 (relop)
 
 
 State 93
 
-   81 logop: AND .
+   81 logop: NOT .
 
     $default  reduce using rule 81 (logop)
 
 
 State 94
 
-   82 logop: OR .
+   82 logop: AND .
 
     $default  reduce using rule 82 (logop)
 
 
 State 95
 
-   37 var: . ID
-   39 express_simp: express_soma relop . express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   83 logop: OR .
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    var           go to state 108
-    express_soma  go to state 110
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
+    $default  reduce using rule 83 (logop)
 
 
 State 96
 
-   79 relop: logop .
+   38 var: . ID
+   40 express_simp: express_soma relop . express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    $default  reduce using rule 79 (relop)
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    var           go to state 109
+    express_soma  go to state 111
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
 
 
 State 97
 
-   83 addop: PLUS_OP .
+   80 relop: logop .
 
-    $default  reduce using rule 83 (addop)
+    $default  reduce using rule 80 (relop)
 
 
 State 98
 
-   84 addop: MINUS_OP .
+   84 addop: PLUS_OP .
 
     $default  reduce using rule 84 (addop)
 
 
 State 99
 
-   37 var: . ID
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   41             | termo addop . express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   85 addop: MINUS_OP .
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    var           go to state 108
-    express_soma  go to state 111
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
+    $default  reduce using rule 85 (addop)
 
 
 State 100
 
-   85 mulop: TIMES_OP .
+   38 var: . ID
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   42             | termo addop . express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    $default  reduce using rule 85 (mulop)
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    var           go to state 109
+    express_soma  go to state 112
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
 
 
 State 101
 
-   86 mulop: OVER_OP .
+   86 mulop: TIMES_OP .
 
     $default  reduce using rule 86 (mulop)
 
 
 State 102
 
-   37 var: . ID
-   42 termo: . factor
-   43      | . factor mulop termo
-   43      | factor mulop . termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   87 mulop: OVER_OP .
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    var        go to state 108
-    termo      go to state 112
-    factor     go to state 68
-    endereco   go to state 69
-    chamada    go to state 70
-    nome_func  go to state 71
-    num        go to state 72
+    $default  reduce using rule 87 (mulop)
 
 
 State 103
 
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   51        | nome_func INI_PARAM . arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   64 arg: . %empty  [FIM_PARAM]
-   65    | . lista_arg
-   66 lista_arg: . expressao
-   67          | . expressao SEPARA_ARG lista_arg
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   38 var: . ID
+   43 termo: . factor
+   44      | . factor mulop termo
+   44      | factor mulop . termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
 
-    $default  reduce using rule 64 (arg)
-
-    expressao     go to state 113
-    var           go to state 64
-    express_simp  go to state 65
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    arg           go to state 114
-    lista_arg     go to state 115
-    num           go to state 72
+    var        go to state 109
+    termo      go to state 113
+    factor     go to state 69
+    endereco   go to state 70
+    chamada    go to state 71
+    nome_func  go to state 72
+    num        go to state 73
 
 
 State 104
 
-   31 instruc_cond: IF INI_PARAM expressao . FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   32             | IF INI_PARAM expressao . FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   52        | nome_func INI_PARAM . arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   65 arg: . %empty  [FIM_PARAM]
+   66    | . lista_arg
+   67 lista_arg: . expressao
+   68          | . expressao SEPARA_ARG lista_arg
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    FIM_PARAM  shift, and go to state 116
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    $default  reduce using rule 65 (arg)
+
+    expressao     go to state 114
+    var           go to state 65
+    express_simp  go to state 66
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    arg           go to state 115
+    lista_arg     go to state 116
+    num           go to state 73
 
 
 State 105
 
-   33 instruc_iterac: FOR INI_PARAM expressao . FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   32 instruc_cond: IF INI_PARAM expressao . FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   33             | IF INI_PARAM expressao . FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
 
-    FIM_EXPRESS  shift, and go to state 117
+    FIM_PARAM  shift, and go to state 117
 
 
 State 106
 
-   34 instruc_return: RETURN expressao FIM_EXPRESS .
+   34 instruc_iterac: FOR INI_PARAM expressao . FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
 
-    $default  reduce using rule 34 (instruc_return)
+    FIM_EXPRESS  shift, and go to state 118
 
 
 State 107
 
-   44 factor: INI_PARAM expressao FIM_PARAM .
+   35 instruc_return: RETURN expressao FIM_EXPRESS .
 
-    $default  reduce using rule 44 (factor)
+    $default  reduce using rule 35 (instruc_return)
 
 
 State 108
 
-   46 factor: var .
+   45 factor: INI_PARAM expressao FIM_PARAM .
 
-    $default  reduce using rule 46 (factor)
+    $default  reduce using rule 45 (factor)
 
 
 State 109
 
-   35 expressao: var atrop express_simp .
+   47 factor: var .
 
-    $default  reduce using rule 35 (expressao)
+    $default  reduce using rule 47 (factor)
 
 
 State 110
 
-   39 express_simp: express_soma relop express_soma .
+   36 expressao: var atrop express_simp .
 
-    $default  reduce using rule 39 (express_simp)
+    $default  reduce using rule 36 (expressao)
 
 
 State 111
 
-   41 express_soma: termo addop express_soma .
+   40 express_simp: express_soma relop express_soma .
 
-    $default  reduce using rule 41 (express_soma)
+    $default  reduce using rule 40 (express_simp)
 
 
 State 112
 
-   43 termo: factor mulop termo .
+   42 express_soma: termo addop express_soma .
 
-    $default  reduce using rule 43 (termo)
+    $default  reduce using rule 42 (express_soma)
 
 
 State 113
 
-   66 lista_arg: expressao .  [FIM_PARAM]
-   67          | expressao . SEPARA_ARG lista_arg
+   44 termo: factor mulop termo .
 
-    SEPARA_ARG  shift, and go to state 118
-
-    $default  reduce using rule 66 (lista_arg)
+    $default  reduce using rule 44 (termo)
 
 
 State 114
 
-   51 chamada: nome_func INI_PARAM arg . FIM_PARAM
+   67 lista_arg: expressao .  [FIM_PARAM]
+   68          | expressao . SEPARA_ARG lista_arg
 
-    FIM_PARAM  shift, and go to state 119
-
-
-State 115
-
-   65 arg: lista_arg .
-
-    $default  reduce using rule 65 (arg)
-
-
-State 116
-
-   31 instruc_cond: IF INI_PARAM expressao FIM_PARAM . INI_INSTRUC instrucao FIM_INSTRUC
-   32             | IF INI_PARAM expressao FIM_PARAM . INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
-
-    INI_INSTRUC  shift, and go to state 120
-
-
-State 117
-
-   33 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS . express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
-
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    var           go to state 108
-    express_simp  go to state 121
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
-
-
-State 118
-
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   66 lista_arg: . expressao
-   67          | . expressao SEPARA_ARG lista_arg
-   67          | expressao SEPARA_ARG . lista_arg
-   87 num: . INTEIRO
-   88    | . DECIMAL
-
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    expressao     go to state 113
-    var           go to state 64
-    express_simp  go to state 65
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    lista_arg     go to state 122
-    num           go to state 72
-
-
-State 119
-
-   51 chamada: nome_func INI_PARAM arg FIM_PARAM .
-
-    $default  reduce using rule 51 (chamada)
-
-
-State 120
-
-   19 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
-   24 instrucao: . instruc_expr
-   25          | . instruc_composta
-   26          | . instruc_cond
-   27          | . instruc_iterac
-   28          | . instruc_return
-   29 instruc_expr: . expressao FIM_EXPRESS
-   30             | . FIM_EXPRESS
-   31 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   31             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC
-   32             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
-   32             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
-   33 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   34 instruc_return: . RETURN expressao FIM_EXPRESS
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
-
-    IF             shift, and go to state 48
-    FOR            shift, and go to state 49
-    RETURN         shift, and go to state 50
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    INI_INSTRUC    shift, and go to state 42
-    FIM_EXPRESS    shift, and go to state 55
-    ACESSO_END     shift, and go to state 34
-
-    instruc_composta  go to state 56
-    instrucao         go to state 123
-    instruc_expr      go to state 59
-    instruc_cond      go to state 60
-    instruc_iterac    go to state 61
-    instruc_return    go to state 62
-    expressao         go to state 63
-    var               go to state 64
-    express_simp      go to state 65
-    express_soma      go to state 66
-    termo             go to state 67
-    factor            go to state 68
-    endereco          go to state 69
-    chamada           go to state 70
-    nome_func         go to state 71
-    num               go to state 72
-
-
-State 121
-
-   33 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp . FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-
-    FIM_EXPRESS  shift, and go to state 124
-
-
-State 122
-
-   67 lista_arg: expressao SEPARA_ARG lista_arg .
+    SEPARA_ARG  shift, and go to state 119
 
     $default  reduce using rule 67 (lista_arg)
 
 
+State 115
+
+   52 chamada: nome_func INI_PARAM arg . FIM_PARAM
+
+    FIM_PARAM  shift, and go to state 120
+
+
+State 116
+
+   66 arg: lista_arg .
+
+    $default  reduce using rule 66 (arg)
+
+
+State 117
+
+   32 instruc_cond: IF INI_PARAM expressao FIM_PARAM . INI_INSTRUC instrucao FIM_INSTRUC
+   33             | IF INI_PARAM expressao FIM_PARAM . INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+
+    INI_INSTRUC  shift, and go to state 121
+
+
+State 118
+
+   34 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS . express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
+
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    var           go to state 109
+    express_simp  go to state 122
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
+
+
+State 119
+
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   67 lista_arg: . expressao
+   68          | . expressao SEPARA_ARG lista_arg
+   68          | expressao SEPARA_ARG . lista_arg
+   88 num: . INTEIRO
+   89    | . DECIMAL
+
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
+
+    expressao     go to state 114
+    var           go to state 65
+    express_simp  go to state 66
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    lista_arg     go to state 123
+    num           go to state 73
+
+
+State 120
+
+   52 chamada: nome_func INI_PARAM arg FIM_PARAM .
+
+    $default  reduce using rule 52 (chamada)
+
+
+State 121
+
+   20 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
+   25 instrucao: . instruc_expr
+   26          | . instruc_composta
+   27          | . instruc_cond
+   28          | . instruc_iterac
+   29          | . instruc_return
+   30 instruc_expr: . expressao FIM_EXPRESS
+   31             | . FIM_EXPRESS
+   32 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   32             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC
+   33             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   33             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   34 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   35 instruc_return: . RETURN expressao FIM_EXPRESS
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
+
+    IF             shift, and go to state 49
+    FOR            shift, and go to state 50
+    RETURN         shift, and go to state 51
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    INI_INSTRUC    shift, and go to state 43
+    FIM_EXPRESS    shift, and go to state 56
+    ACESSO_END     shift, and go to state 35
+
+    instruc_composta  go to state 57
+    instrucao         go to state 124
+    instruc_expr      go to state 60
+    instruc_cond      go to state 61
+    instruc_iterac    go to state 62
+    instruc_return    go to state 63
+    expressao         go to state 64
+    var               go to state 65
+    express_simp      go to state 66
+    express_soma      go to state 67
+    termo             go to state 68
+    factor            go to state 69
+    endereco          go to state 70
+    chamada           go to state 71
+    nome_func         go to state 72
+    num               go to state 73
+
+
+State 122
+
+   34 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp . FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+
+    FIM_EXPRESS  shift, and go to state 125
+
+
 State 123
 
-   31 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao . FIM_INSTRUC
-   32             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao . FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   68 lista_arg: expressao SEPARA_ARG lista_arg .
 
-    FIM_INSTRUC  shift, and go to state 125
+    $default  reduce using rule 68 (lista_arg)
 
 
 State 124
 
-   33 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS . expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   32 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao . FIM_INSTRUC
+   33             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao . FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
 
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    ACESSO_END     shift, and go to state 34
-
-    expressao     go to state 126
-    var           go to state 64
-    express_simp  go to state 65
-    express_soma  go to state 66
-    termo         go to state 67
-    factor        go to state 68
-    endereco      go to state 69
-    chamada       go to state 70
-    nome_func     go to state 71
-    num           go to state 72
+    FIM_INSTRUC  shift, and go to state 126
 
 
 State 125
 
-   31 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC .  [IF, FOR, RETURN, PRINTINT, PRINTFLOAT, PRINTPOINT, PRINTSHAPE, SCANINT, SCANFLOAT, CONSTROIPOINT, CONSTROISHAPE, PERIMETRO, ISIN, ISCOLLIDED, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
-   32             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC . ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   34 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS . expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    ELSE  shift, and go to state 127
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    ACESSO_END     shift, and go to state 35
 
-    $default  reduce using rule 31 (instruc_cond)
+    expressao     go to state 127
+    var           go to state 65
+    express_simp  go to state 66
+    express_soma  go to state 67
+    termo         go to state 68
+    factor        go to state 69
+    endereco      go to state 70
+    chamada       go to state 71
+    nome_func     go to state 72
+    num           go to state 73
 
 
 State 126
 
-   33 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao . FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   32 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC .  [IF, FOR, RETURN, PRINTINT, PRINTFLOAT, PRINTPOINT, PRINTSHAPE, SCANINT, SCANFLOAT, CONSTROIPOINT, CONSTROISHAPE, PERIMETRO, ISIN, ISCOLLIDED, LITERAL, INTEIRO, DECIMAL, ID, INI_PARAM, INI_INSTRUC, FIM_INSTRUC, FIM_EXPRESS, ACESSO_END]
+   33             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC . ELSE INI_INSTRUC instrucao FIM_INSTRUC
 
-    FIM_PARAM  shift, and go to state 128
+    ELSE  shift, and go to state 128
+
+    $default  reduce using rule 32 (instruc_cond)
 
 
 State 127
 
-   32 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE . INI_INSTRUC instrucao FIM_INSTRUC
+   34 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao . FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
 
-    INI_INSTRUC  shift, and go to state 129
+    FIM_PARAM  shift, and go to state 129
 
 
 State 128
 
-   33 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM . INI_INSTRUC instrucao FIM_INSTRUC
+   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE . INI_INSTRUC instrucao FIM_INSTRUC
 
     INI_INSTRUC  shift, and go to state 130
 
 
 State 129
 
-   19 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
-   24 instrucao: . instruc_expr
-   25          | . instruc_composta
-   26          | . instruc_cond
-   27          | . instruc_iterac
-   28          | . instruc_return
-   29 instruc_expr: . expressao FIM_EXPRESS
-   30             | . FIM_EXPRESS
-   31 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   32             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
-   32             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC . instrucao FIM_INSTRUC
-   33 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   34 instruc_return: . RETURN expressao FIM_EXPRESS
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   34 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM . INI_INSTRUC instrucao FIM_INSTRUC
 
-    IF             shift, and go to state 48
-    FOR            shift, and go to state 49
-    RETURN         shift, and go to state 50
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    INI_INSTRUC    shift, and go to state 42
-    FIM_EXPRESS    shift, and go to state 55
-    ACESSO_END     shift, and go to state 34
-
-    instruc_composta  go to state 56
-    instrucao         go to state 131
-    instruc_expr      go to state 59
-    instruc_cond      go to state 60
-    instruc_iterac    go to state 61
-    instruc_return    go to state 62
-    expressao         go to state 63
-    var               go to state 64
-    express_simp      go to state 65
-    express_soma      go to state 66
-    termo             go to state 67
-    factor            go to state 68
-    endereco          go to state 69
-    chamada           go to state 70
-    nome_func         go to state 71
-    num               go to state 72
+    INI_INSTRUC  shift, and go to state 131
 
 
 State 130
 
-   19 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
-   24 instrucao: . instruc_expr
-   25          | . instruc_composta
-   26          | . instruc_cond
-   27          | . instruc_iterac
-   28          | . instruc_return
-   29 instruc_expr: . expressao FIM_EXPRESS
-   30             | . FIM_EXPRESS
-   31 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   32             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
-   33 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
-   33               | FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC
-   34 instruc_return: . RETURN expressao FIM_EXPRESS
-   35 expressao: . var atrop express_simp
-   36          | . express_simp
-   37 var: . ID
-   38 express_simp: . express_soma
-   39             | . express_soma relop express_soma
-   40 express_soma: . termo
-   41             | . termo addop express_soma
-   42 termo: . factor
-   43      | . factor mulop termo
-   44 factor: . INI_PARAM expressao FIM_PARAM
-   45       | . endereco
-   46       | . var
-   47       | . chamada
-   48       | . num
-   49       | . LITERAL
-   50 endereco: . ACESSO_END ID
-   51 chamada: . nome_func INI_PARAM arg FIM_PARAM
-   52 nome_func: . PRINTINT
-   53          | . PRINTFLOAT
-   54          | . PRINTPOINT
-   55          | . PRINTSHAPE
-   56          | . SCANINT
-   57          | . SCANFLOAT
-   58          | . CONSTROIPOINT
-   59          | . CONSTROISHAPE
-   60          | . PERIMETRO
-   61          | . ISIN
-   62          | . ISCOLLIDED
-   63          | . ID
-   87 num: . INTEIRO
-   88    | . DECIMAL
+   20 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
+   25 instrucao: . instruc_expr
+   26          | . instruc_composta
+   27          | . instruc_cond
+   28          | . instruc_iterac
+   29          | . instruc_return
+   30 instruc_expr: . expressao FIM_EXPRESS
+   31             | . FIM_EXPRESS
+   32 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   33             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   33             | IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC . instrucao FIM_INSTRUC
+   34 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   35 instruc_return: . RETURN expressao FIM_EXPRESS
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    IF             shift, and go to state 48
-    FOR            shift, and go to state 49
-    RETURN         shift, and go to state 50
-    PRINTINT       shift, and go to state 13
-    PRINTFLOAT     shift, and go to state 14
-    PRINTPOINT     shift, and go to state 15
-    PRINTSHAPE     shift, and go to state 16
-    SCANINT        shift, and go to state 17
-    SCANFLOAT      shift, and go to state 18
-    CONSTROIPOINT  shift, and go to state 19
-    CONSTROISHAPE  shift, and go to state 20
-    PERIMETRO      shift, and go to state 21
-    ISIN           shift, and go to state 22
-    ISCOLLIDED     shift, and go to state 23
-    LITERAL        shift, and go to state 51
-    INTEIRO        shift, and go to state 52
-    DECIMAL        shift, and go to state 53
-    ID             shift, and go to state 24
-    INI_PARAM      shift, and go to state 54
-    INI_INSTRUC    shift, and go to state 42
-    FIM_EXPRESS    shift, and go to state 55
-    ACESSO_END     shift, and go to state 34
+    IF             shift, and go to state 49
+    FOR            shift, and go to state 50
+    RETURN         shift, and go to state 51
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    INI_INSTRUC    shift, and go to state 43
+    FIM_EXPRESS    shift, and go to state 56
+    ACESSO_END     shift, and go to state 35
 
-    instruc_composta  go to state 56
+    instruc_composta  go to state 57
     instrucao         go to state 132
-    instruc_expr      go to state 59
-    instruc_cond      go to state 60
-    instruc_iterac    go to state 61
-    instruc_return    go to state 62
-    expressao         go to state 63
-    var               go to state 64
-    express_simp      go to state 65
-    express_soma      go to state 66
-    termo             go to state 67
-    factor            go to state 68
-    endereco          go to state 69
-    chamada           go to state 70
-    nome_func         go to state 71
-    num               go to state 72
+    instruc_expr      go to state 60
+    instruc_cond      go to state 61
+    instruc_iterac    go to state 62
+    instruc_return    go to state 63
+    expressao         go to state 64
+    var               go to state 65
+    express_simp      go to state 66
+    express_soma      go to state 67
+    termo             go to state 68
+    factor            go to state 69
+    endereco          go to state 70
+    chamada           go to state 71
+    nome_func         go to state 72
+    num               go to state 73
 
 
 State 131
 
-   32 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao . FIM_INSTRUC
+   20 instruc_composta: . INI_INSTRUC decl_local lista_instruc FIM_INSTRUC
+   25 instrucao: . instruc_expr
+   26          | . instruc_composta
+   27          | . instruc_cond
+   28          | . instruc_iterac
+   29          | . instruc_return
+   30 instruc_expr: . expressao FIM_EXPRESS
+   31             | . FIM_EXPRESS
+   32 instruc_cond: . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   33             | . IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC
+   34 instruc_iterac: . FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC
+   34               | FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC . instrucao FIM_INSTRUC
+   35 instruc_return: . RETURN expressao FIM_EXPRESS
+   36 expressao: . var atrop express_simp
+   37          | . express_simp
+   38 var: . ID
+   39 express_simp: . express_soma
+   40             | . express_soma relop express_soma
+   41 express_soma: . termo
+   42             | . termo addop express_soma
+   43 termo: . factor
+   44      | . factor mulop termo
+   45 factor: . INI_PARAM expressao FIM_PARAM
+   46       | . endereco
+   47       | . var
+   48       | . chamada
+   49       | . num
+   50       | . LITERAL
+   51 endereco: . ACESSO_END ID
+   52 chamada: . nome_func INI_PARAM arg FIM_PARAM
+   53 nome_func: . PRINTINT
+   54          | . PRINTFLOAT
+   55          | . PRINTPOINT
+   56          | . PRINTSHAPE
+   57          | . SCANINT
+   58          | . SCANFLOAT
+   59          | . CONSTROIPOINT
+   60          | . CONSTROISHAPE
+   61          | . PERIMETRO
+   62          | . ISIN
+   63          | . ISCOLLIDED
+   64          | . ID
+   88 num: . INTEIRO
+   89    | . DECIMAL
 
-    FIM_INSTRUC  shift, and go to state 133
+    IF             shift, and go to state 49
+    FOR            shift, and go to state 50
+    RETURN         shift, and go to state 51
+    PRINTINT       shift, and go to state 14
+    PRINTFLOAT     shift, and go to state 15
+    PRINTPOINT     shift, and go to state 16
+    PRINTSHAPE     shift, and go to state 17
+    SCANINT        shift, and go to state 18
+    SCANFLOAT      shift, and go to state 19
+    CONSTROIPOINT  shift, and go to state 20
+    CONSTROISHAPE  shift, and go to state 21
+    PERIMETRO      shift, and go to state 22
+    ISIN           shift, and go to state 23
+    ISCOLLIDED     shift, and go to state 24
+    LITERAL        shift, and go to state 52
+    INTEIRO        shift, and go to state 53
+    DECIMAL        shift, and go to state 54
+    ID             shift, and go to state 25
+    INI_PARAM      shift, and go to state 55
+    INI_INSTRUC    shift, and go to state 43
+    FIM_EXPRESS    shift, and go to state 56
+    ACESSO_END     shift, and go to state 35
+
+    instruc_composta  go to state 57
+    instrucao         go to state 133
+    instruc_expr      go to state 60
+    instruc_cond      go to state 61
+    instruc_iterac    go to state 62
+    instruc_return    go to state 63
+    expressao         go to state 64
+    var               go to state 65
+    express_simp      go to state 66
+    express_soma      go to state 67
+    termo             go to state 68
+    factor            go to state 69
+    endereco          go to state 70
+    chamada           go to state 71
+    nome_func         go to state 72
+    num               go to state 73
 
 
 State 132
 
-   33 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao . FIM_INSTRUC
+   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao . FIM_INSTRUC
 
     FIM_INSTRUC  shift, and go to state 134
 
 
 State 133
 
-   32 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC .
+   34 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao . FIM_INSTRUC
 
-    $default  reduce using rule 32 (instruc_cond)
+    FIM_INSTRUC  shift, and go to state 135
 
 
 State 134
 
-   33 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC .
+   33 instruc_cond: IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC .
 
-    $default  reduce using rule 33 (instruc_iterac)
+    $default  reduce using rule 33 (instruc_cond)
+
+
+State 135
+
+   34 instruc_iterac: FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC .
+
+    $default  reduce using rule 34 (instruc_iterac)
