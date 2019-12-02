@@ -7,3 +7,4 @@ sintatico.tab.c
 sintatico.tab.h
 *.output
 sintatico.output
+tac/
