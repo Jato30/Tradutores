@@ -283,10 +283,10 @@ decl_func:
 				}
 
 				
-				if(strcmp(item->nome, "main") == 0){
-					// Novo label main
-					tac("main:");
-				}
+				char* val_fim = (char*) malloc(sizeof(char) * (strlen(item->nome) + 1) + 1);
+				strcat(val_fim, item->nome);
+				strcat(val_fim, ":");
+				tac(val_fim);
 
 
 
