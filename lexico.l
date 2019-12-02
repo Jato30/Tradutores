@@ -56,10 +56,9 @@ LE				"<="
 GE				">="
 EQ				"=="
 NE				"!="
-NOT				"!"
 AND				"&&"
 OR				"||"
-RELOP			{LT}|{GT}|{LE}|{GE}|{EQ}|{NE}|{NOT}|{AND}|{OR}
+RELOP			{LT}|{GT}|{LE}|{GE}|{EQ}|{NE}|{AND}|{OR}
 
 ATR				"="
 PLUS_ATR		"+="
@@ -313,12 +312,6 @@ ERRO			{INTEIRO}{ID}|{RELOP}{RELOP}+|{OPERATOR}{OPERATOR}+|{DECIMAL}{DECIMAL}+|{
 					return (NE);
 				}
 
-{NOT} 			{
-					printf("Operador Logico: %s\n", yytext);
-					num_char += strlen(yytext);
-
-					return (NOT);
-				}
 
 {AND} 			{
 					printf("Operador Logico: %s\n", yytext);

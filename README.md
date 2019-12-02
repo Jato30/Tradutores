@@ -5,13 +5,19 @@ Implementação de uma linguagem a partir de C e um compilador para ela (sem mon
 
 ## Compilação
 
-- Certifique-se que está no diretório raiz e que este se chama ./170052427_Semantico/
+- Certifique-se que está no diretório raiz
 - Utilize o comando make help para mais comandos
-- Em caso de falha na permissão, digite chmod 777 -R ../170052427/
+
+- Comandos:
+- - make all
+- - make gdb
+- - make clean
+- - make again (o mesmo de usar make clean seguido de make all)
+
 - Em caso de falha, compile utilizando:
 - - bison -dv sintatico.y --report=all
-	flex lexico.l
-	gcc ./lib/TabSimbolo.c sintatico.tab.c lex.yy.c -o exec -lfl
+- - flex lexico.l
+- - gcc ./lib/TabSimbolo.c sintatico.tab.c lex.yy.c -o exec -lfl
 
 ## Execução
 

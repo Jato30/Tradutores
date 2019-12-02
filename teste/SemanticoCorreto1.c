@@ -4,7 +4,7 @@ int main(){
 	float per;
 
 	int x;
-	x = 2;
+	x = 2.2;
 
 	per = 53.2;
 	if(per != 3.71293){

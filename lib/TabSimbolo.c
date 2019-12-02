@@ -6,6 +6,7 @@
 
 extern Contexto ctx_global;
 extern Contexto* ctx_atual;
+extern FILE* tac_input;
 
 void criaTab(){
 	ctx_global.criador = NULL;

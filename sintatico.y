@@ -17,6 +17,8 @@
 	Node* novaFolhaFloat(float val);
 	Node* novaFolhaInt(int val);
 	Node* novaFolhaText(char* val);
+	int tac_tab(TYPE tipo, const char* nome);
+	int tac(const char* val);
 	
 	void yyerror(char const *s);
 
@@ -32,7 +34,13 @@
 
 	Contexto ctx_global;
 	Contexto* ctx_atual;
-
+	FILE* tac_input;
+	FILE* tac_ftab;
+	int tac_id = 0;
+	int tac_if = 0;
+	int tac_else = 0;
+	int tac_for = 0;
+	int tac_return = 0;
 	Node* raiz = NULL;
 	extern int num_lin;
 	extern int num_char;
@@ -49,7 +57,7 @@
 %token <DECIMAL> DECIMAL
 %token <ID> ID
 
-%token <ID> LT GT LE GE EQ NE NOT AND OR ATR PLUS_ATR MINUS_ATR TIMES_ATR OVER_ATR PLUS_OP MINUS_OP TIMES_OP OVER_OP
+%token <ID> LT GT LE GE EQ NE AND OR ATR PLUS_ATR MINUS_ATR TIMES_ATR OVER_ATR PLUS_OP MINUS_OP TIMES_OP OVER_OP
 
 %token INI_PARAM
 %token FIM_PARAM
@@ -65,7 +73,7 @@
 %type <node> num addop mulop logop relop atrop
 %type <node> lista_arg arg nome_func chamada endereco factor termo
 %type <node> express_soma express_simp var expressao instruc_return
-%type <node> instruc_iterac instruc_cond instruc_expr instrucao lista_instruc
+%type <node> instruc_iterac instruc_cond instruc_else instruc_expr instrucao lista_instruc
 %type <node> decl_local instruc_composta param lista_param params
 %type <node> tipo_especif decl_func decl_var declaracao lista_decl programa
 
@@ -186,6 +194,7 @@ decl_var:
 				}
 
 				strcat(val, strdup($2->valor));
+				tac_tab(type, strdup($2->valor));
 				strcat(val, ";");
 				$$ = novoNo(2, lista, val, NULL);
 				$$->tipo = $1->tipo;
@@ -194,6 +203,8 @@ decl_var:
 
 				free(val);
 				val = NULL;
+
+
 			}
 			;
 
@@ -270,6 +281,14 @@ decl_func:
 					insere(temp->nome, "", VAR, temp->tipo, 0, NULL);
 					temp = temp->prox;
 				}
+
+				
+				if(strcmp(item->nome, "main") == 0){
+					// Novo label main
+					tac("main:");
+				}
+
+
 
 				free(val);
 				val = NULL;
@@ -465,10 +484,11 @@ param:
 			;
 
 instruc_composta:
-			INI_INSTRUC decl_local lista_instruc FIM_INSTRUC {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 2);
+			INI_INSTRUC decl_local lista_instruc instruc_return FIM_INSTRUC {
+				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
 				lista[0] = $2;
 				lista[1] = $3;
+				lista[2] = $4;
 
 				int size = 1;
 				size += ($2 != NULL ? ($2->valor != NULL ? strlen($2->valor) : 0) : 0);
@@ -483,7 +503,7 @@ instruc_composta:
 					strcat(val, strdup($3->valor));
 				}
 				strcat(val, "}");
-				$$ = novoNo(2, lista, strdup(val), NULL);
+				$$ = novoNo(3, lista, strdup(val), NULL);
 
 				free(val);
 				val = NULL;
@@ -549,22 +569,12 @@ instrucao:
 				lista[0] = $1;
 				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
-			| instruc_composta {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = $1;
-				$$ = novoNo(1, lista, strdup($1->valor), NULL);
-			}
 			| instruc_cond {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, strdup($1->valor), NULL);
 			}
 			| instruc_iterac {
-				Node** lista = (Node**) malloc(sizeof(Node*));
-				lista[0] = $1;
-				$$ = novoNo(1, lista, strdup($1->valor), NULL);
-			}
-			| instruc_return {
 				Node** lista = (Node**) malloc(sizeof(Node*));
 				lista[0] = $1;
 				$$ = novoNo(1, lista, strdup($1->valor), NULL);
@@ -594,47 +604,68 @@ instruc_expr:
 
 
 instruc_cond:
-			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 3);
+			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC {
+				tac("// Instrucao if");
+				// ifFalse $0
+				// goto L1
+				char* label = (char*) malloc(sizeof(char) * (8 + 2) + 1);
+				strcat(label, "ifFalse ");
+				strcat(label, "$0");
+				tac(label);
+
+				char* go = (char*) malloc(sizeof(char) * (5 + 2 + contDigf(tac_if)) + 1);
+				strcat(go, "goto ");
+				strcat(go, "IF");
+
+				char* num_if = (char*) malloc(sizeof(char) * contDigf(tac_if) + 1);
+				sprintf(num_if, "%d", tac_if);
+
+				strcat(go, num_if);
+				tac(go);
+				num_if++;
+			} instrucao FIM_INSTRUC instruc_else {
+				Node** lista = (Node**) malloc(sizeof(Node*) * ($<node>8 != NULL ? 5 : 3));
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("if");
-				lista[1] = $3;
-				lista[2] = $6;
+				lista[1] = $<node>3;
+				lista[2] = $<node>6;
 
-				char* val = (char*) malloc(sizeof(char) * (3 + strlen($3->valor) + 1) + 1);
+				size_t tam = 3 + strlen($<node>3->valor) + 1;
+				// if($<node>8 == NULL){
+				// 	lista[3] = (Node*) malloc(sizeof(Node));
+				// 	lista[3] = novaFolhaText("else");
+				// 	lista[4] = $<node>8;
+				// 	tam += 5;
+				// 	if(strcmp($<node>8->valor != NULL ? $<node>8->valor : "", "") != 0){
+				// 		tam += strlen($<node>8->valor != NULL ? $<node>8->valor : "");
+				// 	}
+				// }
+				char* val = (char*) malloc(sizeof(char) * (tam) + 1);
 				strcat(val, "if(");
-				strcat(val, strdup($3->valor));
+				strcat(val, strdup($<node>3->valor));
 				strcat(val, ")");
+				// if($<node>8 == NULL){
+				// 	strcat(val, "else ");
+				// 	strcat(val, $<node>8->valor != NULL ? $<node>8->valor : "");
+				// }
 				$$ = novoNo(3, lista, strdup(val), NULL);
 
 				free(val);
 				val = NULL;
 
 
+				// L1
+
 				$$ = novoNo(3, lista, "IF ( expressao ) { instrucao } ", NULL);
 			}
-			| IF INI_PARAM expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC ELSE INI_INSTRUC instrucao FIM_INSTRUC {
-				Node** lista = (Node**) malloc(sizeof(Node*) * 5);
-				lista[0] = (Node*) malloc(sizeof(Node));
-				lista[0] = novaFolhaText("if");
-				lista[1] = $3;
-				lista[2] = $6;
-				lista[3] = (Node*) malloc(sizeof(Node));
-				lista[3] = novaFolhaText("else");
-				lista[4] = $10;
+			;
 
-
-				char* val = (char*) malloc(sizeof(char) * (3 + strlen($3->valor) + 8) + 1);
-				strcat(val, "if(");
-				strcat(val, strdup($3->valor));
-				strcat(val, ")...else");
-				$$ = novoNo(5, lista, strdup(val), NULL);
-
-				free(val);
-				val = NULL;
-
-
-
+instruc_else:
+			/* empty */ {
+				$$ = NULL;
+			}
+			| ELSE INI_INSTRUC instrucao FIM_INSTRUC {
+				$$ = $3;
 			}
 			;
 
@@ -686,7 +717,7 @@ instruc_return:
 				val = NULL;
 
 
-
+				tac("return $0");
 			}
 			;
 
@@ -696,6 +727,9 @@ expressao:
 				lista[0] = $1;
 				lista[1] = $2;
 				lista[2] = $3;
+
+				char* op = (char*) malloc(sizeof(char) * strlen($2->valor) + 1);
+				op = strdup($2->valor);
 
 				char* val = (char*) malloc(sizeof(char) * (strlen($1->valor) + strlen($2->valor) + strlen($3->valor)) + 1);
 				strcat(val, strdup($1->valor));
@@ -723,33 +757,234 @@ expressao:
 						$$->tipo = Literal;
 					}
 
+					char* val1;
+					char* val2;
+					int tmpi;
+					float tmpf;
+
 					TYPE tipo_express_simp = $3->tipo;
 					if(item->tipo == Inteiro && tipo_express_simp == Decimal){
 						printf("\t### ADVERTENCIA: [%s] expressao truncada para atribuicao. [%d][%d]\n", item->nome, $1->linha, $1->coluna);
+
+
+						tmpf = atof(item2->valor);
+						tmpi = (int) tmpf;
+						val2 = (char*) malloc(sizeof(char) * contDigf(tmpi) + 1);
+						sprintf(val2, "%d", tmpi);
+
+						val1 = (char*) malloc(sizeof(char) * strlen(item->valor != NULL ? item->valor : "") + 1);
+						val1 = strdup(item->valor != NULL ? item->valor : "");
+
 					}
+					else if(item->tipo == Decimal && tipo_express_simp == Inteiro){
+						// Converte tipos
+						tmpi = atoi(item2->valor);
+						tmpf = (float) tmpi;
+						val2 = (char*) malloc(sizeof(char) * contDigf(tmpf) + 1);
+						gcvt(tmpf, contDigf(tmpf) + 1, val2);
+
+						val1 = (char*) malloc(sizeof(char) * strlen(item->valor != NULL ? item->valor : "") + 1);
+						val1 = strdup(item->valor != NULL ? item->valor : "");
+					}
+					else{
+						val1 = (char*) malloc(sizeof(char) * strlen(item->valor != NULL ? item->valor : "") + 1);
+						val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
+						val1 = strdup(item->valor != NULL ? item->valor : "");
+						val2 = strdup(item2->valor);
+					}
+
 					if((item->tipo != Decimal && item->tipo != Inteiro) || (tipo_express_simp != Inteiro && tipo_express_simp != Decimal)){
 						printf("\t### ERRO: [%s] tipo incompativel para atribuicao. [%d][%d]\n", item->nome, $1->linha, $1->coluna);
 					}
 					else{
-						if(item2 != NULL){
-							if(strcmp(item->valor != NULL ? item->valor : "", "") == 0){
-								if(strcmp(item2->valor != NULL ? item2->valor : "", "") != 0){
-									item->valor = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
-									strcpy(item->valor, item2->valor != NULL ? item2->valor : "");
-								}
-								else{
-									//printf("\t\t### ADVERTENCIA: [%s] atribuicao de valor vazio. [%d][%d]\n", $3->valor, $3->linha, $3->coluna);
-								}
+						if(strcmp(item2->valor != NULL ? item2->valor : "", "") != 0){
+							float temp_val_f;
+							int temp_val_i;
+							char* tmp_nom;
+							char* temp_add;
+
+							if(item2->tipo == Inteiro){
+								temp_val_i = atoi(item2->valor);
 							}
-							else{
-								free(item->valor);
-								if(strcmp(item2->valor != NULL ? item2->valor : "", "") != 0){
-									item->valor = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
-									strcpy(item->valor, item2->valor != NULL ? item2->valor : "");
-								}
-								else{
-									//printf("\t\t### ADVERTENCIA: [%s] atribuicao de valor vazio. [%d][%d]\n", $3->valor, $3->linha, $3->coluna);
-								}
+							if(item2->tipo == Decimal){
+								temp_val_f = atof(item2->valor);
+							}
+
+
+							// TAC ATRIBUI
+							switch($2->valor[0]){
+								case '=':
+									if(strcmp(item->valor != NULL ? item->valor : "", "") != 0){
+										free(item->valor);
+									}
+									item->valor = (char*) malloc(sizeof(char) * strlen(val2) + 1);
+									item->valor = strdup(val2);
+
+									// mov dest, val
+									tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + strlen(item->valor)) + 1);
+									strcat(tmp_nom, "mov ");
+									strcat(tmp_nom, item->nome);
+									strcat(tmp_nom, ", ");
+									strcat(tmp_nom, item->valor);
+									tac(tmp_nom);
+									break;
+
+								case '+':
+									if(item->tipo == Decimal || item2->tipo == Decimal){
+										temp_val_f = atof(val1) + atof(val2);
+										item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_f) + 1);
+										gcvt(temp_val_f, contDigf(temp_val_f) + 1, item->valor);
+									}
+									else{
+										temp_val_i = atoi(val1) + atoi(val2);
+										if(strcmp(item->valor != NULL ? item->valor : "", "") == 0){
+											free(item->valor);
+										}
+										item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_i) + 1);
+										sprintf(item->valor, "%d", temp_val_i);
+									}
+
+									// add $0, item, val
+									// mov item, $0
+									temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + 2 + strlen(item->valor)) + 1);
+									strcat(temp_add, "add $0, ");
+									strcat(tmp_nom, item->nome);
+									strcat(tmp_nom, ", ");
+									strcat(tmp_nom, item->valor);
+									tac(temp_add);
+
+									tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + 2) + 1);
+									strcat(tmp_nom, "mov ");
+									strcat(tmp_nom, item->nome);
+									strcat(tmp_nom, ", ");
+									strcat(tmp_nom, "$0");
+									tac(tmp_nom);
+									break;
+
+								case '-':
+									if(item->tipo == Decimal || item2->tipo == Decimal){
+										temp_val_f = atof(val1) - atof(val2);
+										item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_f) + 1);
+										gcvt(temp_val_f, contDigf(temp_val_f) + 1, item->valor);
+									}
+									else{
+										temp_val_i = atoi(val1) - atoi(val2);
+										if(strcmp(item->valor != NULL ? item->valor : "", "") == 0){
+											free(item->valor);
+										}
+										item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_i) + 1);
+										sprintf(item->valor, "%d", temp_val_i);
+									}
+
+									// sub $0, item, val
+									// mov item, $0
+									temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + 2 + strlen(item->valor)) + 1);
+									strcat(temp_add, "sub $0, ");
+									strcat(tmp_nom, item->nome);
+									strcat(tmp_nom, ", ");
+									strcat(tmp_nom, item->valor);
+									tac(temp_add);
+
+									tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + 2) + 1);
+									strcat(tmp_nom, "mov ");
+									strcat(tmp_nom, item->nome);
+									strcat(tmp_nom, ", ");
+									strcat(tmp_nom, "$0");
+									tac(tmp_nom);
+									break;
+
+								case '*':
+									if(item->tipo == Decimal || item2->tipo == Decimal){
+										temp_val_f = atof(val1) * atof(val2);
+										item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_f) + 1);
+										gcvt(temp_val_f, contDigf(temp_val_f) + 1, item->valor);
+									}
+									else{
+										temp_val_i = atoi(val1) * atoi(val2);
+										if(strcmp(item->valor != NULL ? item->valor : "", "") == 0){
+											free(item->valor);
+										}
+										item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_i) + 1);
+										sprintf(item->valor, "%d", temp_val_i);
+									}
+
+									// mul $0, item, val
+									// mov item, $0
+									temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + 2 + strlen(item->valor)) + 1);
+									strcat(temp_add, "mul $0, ");
+									strcat(tmp_nom, item->nome);
+									strcat(tmp_nom, ", ");
+									strcat(tmp_nom, item->valor);
+									tac(temp_add);
+									tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + 2) + 1);
+									strcat(tmp_nom, "mov ");
+									strcat(tmp_nom, item->nome);
+									strcat(tmp_nom, ", ");
+									strcat(tmp_nom, "$0");
+									tac(tmp_nom);
+									break;
+
+								case '/':
+									if(atof(val2) == 0){
+										printf("\t\t### ERRO: [%s] divisao por 0. [%d][%d]\n", item2->valor, $2->linha, $2->coluna);
+										free(item->valor);
+										if(item->tipo == Decimal || item2->tipo == Decimal){
+											temp_val_f = atof(val2);
+											item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_f) + 1);
+											gcvt(temp_val_f, contDigf(temp_val_f) + 1, item->valor);
+										}
+										else{
+											temp_val_i = atoi(val2);
+											if(strcmp(item->valor != NULL ? item->valor : "", "") == 0){
+												free(item->valor);
+											}
+											item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_i) + 1);
+											sprintf(item->valor, "%d", temp_val_i);
+										}
+
+										// mov dest, val
+										char* tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + strlen(item->valor)) + 1);
+										strcat(tmp_nom, "mov ");
+										strcat(tmp_nom, item->nome);
+										strcat(tmp_nom, ", ");
+										strcat(tmp_nom, item->valor);
+										tac(tmp_nom);
+									}
+									else{
+										if(item->tipo == Decimal || item2->tipo == Decimal){
+										temp_val_f = atof(val1) / atof(val2);
+										item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_f) + 1);
+										gcvt(temp_val_f, contDigf(temp_val_f) + 1, item->valor);
+										}
+										else{
+											temp_val_i = atoi(val1) / atoi(val2);
+											if(strcmp(item->valor != NULL ? item->valor : "", "") == 0){
+												free(item->valor);
+											}
+											item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_i) + 1);
+											sprintf(item->valor, "%d", temp_val_i);
+										}
+
+										// div $0, item, val
+										// mov item, $0
+										temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + 2 + strlen(item->valor)) + 1);
+										strcat(temp_add, "div $0, ");
+										strcat(tmp_nom, item->nome);
+										strcat(tmp_nom, ", ");
+										strcat(tmp_nom, item->valor);
+										tac(temp_add);
+										tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + 2) + 1);
+										strcat(tmp_nom, "mov ");
+										strcat(tmp_nom, item->nome);
+										strcat(tmp_nom, ", ");
+										strcat(tmp_nom, "$0");
+										tac(tmp_nom);
+									}
+									break;
+
+								default:
+									printf("[[ERRO INTERNO]]: nao encontrei o operador de atribuicao correto...\n");
+									break;
 							}
 						}
 						else{
@@ -802,14 +1037,170 @@ express_simp:
 
 				$$ = novoNo(3, lista, strdup(val), NULL);
 
-				if(($1->tipo == Decimal && ($3->tipo == Inteiro || $3->tipo == Decimal)) || ($3->tipo == Decimal && ($1->tipo == Inteiro || $1->tipo == Decimal))){
-					$$->tipo = Decimal;
-					if($1->tipo != $3->tipo){
-						printf("\t### ADVERTENCIA: [%s %s %s] Operacao relacional sobre tipos distintos, inteiro e decimal. [%d][%d]\n", $1->tipo == Inteiro ? "int" : "float", $2->valor, $3->tipo == Inteiro ? "int" : "float", $2->linha, $2->coluna);
+				if(($1->tipo == Inteiro || $1->tipo == Decimal) && ($3->tipo == Inteiro || $3->tipo == Decimal)){
+					Simbolo* item = buscaTabNome($1->valor);
+					if(item == NULL){
+						item = buscaTabVal($1->valor);
 					}
-				}
-				else if($1->tipo == Inteiro && $3->tipo == Inteiro){
-					$$->tipo = Inteiro;
+					Simbolo* item2 = buscaTabNome($3->valor);
+					if(item2 == NULL){
+						item2 = buscaTabVal($3->valor);
+					}
+					char* tmp_nom;
+					char* tmp_add;
+					char* val1;
+					char* val2;
+					int tmpi;
+					float tmpf;
+
+
+
+					if(($1->tipo == Decimal && ($3->tipo == Inteiro || $3->tipo == Decimal)) || ($3->tipo == Decimal && ($1->tipo == Inteiro || $1->tipo == Decimal))){
+						$$->tipo = Decimal;
+						if($1->tipo != $3->tipo){
+							printf("\t### ADVERTENCIA: [%s %s %s] Operacao relacional sobre tipos distintos, inteiro e decimal. [%d][%d]\n", $1->tipo == Inteiro ? "int" : "float", $2->valor, $3->tipo == Inteiro ? "int" : "float", $2->linha, $2->coluna);
+
+							// Converte tipos
+							if($1->tipo == Decimal){
+								tmpi = atoi(item2->valor);
+								tmpf = (float) tmpi;
+								val2 = (char*) malloc(sizeof(char) * contDigf(tmpf) + 1);
+								gcvt(tmpf, contDigf(tmpf) + 1, val2);
+
+								val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
+								val1 = strdup(item->valor);
+							}
+							else{
+								tmpi = atoi(item->valor);
+								tmpf = (float) tmpi;
+								val1 = (char*) malloc(sizeof(char) * contDigf(tmpf) + 1);
+								gcvt(tmpf, contDigf(tmpf) + 1, val1);
+
+								val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
+								val2 = strdup(item2->valor);
+							}
+						}
+						else{
+							val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
+							val1 = strdup(item->valor);
+							val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
+							val2 = strdup(item2->valor);
+						}
+
+
+
+					}
+					else if($1->tipo == Inteiro && $3->tipo == Inteiro){
+						$$->tipo = Inteiro;
+
+						val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
+						val1 = strdup(item->valor);
+						val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
+						val2 = strdup(item2->valor);
+					}
+
+
+
+
+					// TAC COMPARA
+					if(strcmp($2->valor, "<=") == 0){
+						tac("// Menor ou igual a");
+						// sleq $0, item, item2
+						tmp_nom = (char*) malloc(sizeof(char) * (5 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
+						strcat(tmp_nom, "sleq $0, ");
+						strcat(tmp_nom, val1);
+						strcat(tmp_nom, ", ");
+						strcat(tmp_nom, val2);
+						tac(tmp_nom);
+					}
+					else if(strcmp($2->valor, ">=") == 0){
+						tac("// Maior ou igual a");
+						// slt $1, item, item2
+						// not $0, $1
+						tmp_nom = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
+						strcat(tmp_nom, "slt $0, ");
+						strcat(tmp_nom, val1);
+						strcat(tmp_nom, ", ");
+						strcat(tmp_nom, val2);
+						tac(tmp_nom);
+
+						tmp_add = (char*) malloc(sizeof(char) * (10) + 1);
+						strcat(tmp_add, "not $0, $1");
+						tac(tmp_add);
+					}
+					else if(strcmp($2->valor, "==") == 0){
+						tac("// Igual a");
+						// seq $0, item, item2
+						tmp_nom = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
+						strcat(tmp_nom, "seq $0, ");
+						strcat(tmp_nom, val1);
+						strcat(tmp_nom, ", ");
+						strcat(tmp_nom, val2);
+						tac(tmp_nom);
+					}
+					else if(strcmp($2->valor, "!=") == 0){
+						tac("// Diferente de");
+						// seq $1, item, item2
+						// not $0, $1
+						tmp_nom = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
+						strcat(tmp_nom, "seq $1, ");
+						strcat(tmp_nom, val1);
+						strcat(tmp_nom, ", ");
+						strcat(tmp_nom, val2);
+						tac(tmp_nom);
+
+						tmp_add = (char*) malloc(sizeof(char) * (10) + 1);
+						strcat(tmp_add, "not $0, $1");
+						tac(tmp_add);
+					}
+					else if(strcmp($2->valor, "&&") == 0){
+						tac("// And logico");
+						// and $0, item, item2
+						tmp_nom = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
+						strcat(tmp_nom, "and $0, ");
+						strcat(tmp_nom, val1);
+						strcat(tmp_nom, ", ");
+						strcat(tmp_nom, val2);
+						tac(tmp_nom);
+					}
+					else if(strcmp($2->valor, "||") == 0){
+						tac("// Ou logico");
+						// or $0, item, item2
+						tmp_nom = (char*) malloc(sizeof(char) * (3 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
+						strcat(tmp_nom, "or $0, ");
+						strcat(tmp_nom, val1);
+						strcat(tmp_nom, ", ");
+						strcat(tmp_nom, val2);
+						tac(tmp_nom);
+					}
+					else if(strcmp($2->valor, "<") == 0){
+						tac("// Menor que");
+						// slt $0, item, item2
+						tmp_nom = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
+						strcat(tmp_nom, "slt $0, ");
+						strcat(tmp_nom, val1);
+						strcat(tmp_nom, ", ");
+						strcat(tmp_nom, val2);
+						tac(tmp_nom);
+					}
+					else if(strcmp($2->valor, ">") == 0){
+						tac("// Maior que");
+						// sleq $1, item, item2
+						// not $0, $1
+						tmp_nom = (char*) malloc(sizeof(char) * (5 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
+						strcat(tmp_nom, "sleq $0, ");
+						strcat(tmp_nom, val1);
+						strcat(tmp_nom, ", ");
+						strcat(tmp_nom, val2);
+						tac(tmp_nom);
+
+						tmp_add = (char*) malloc(sizeof(char) * (10) + 1);
+						strcat(tmp_add, "not $0, $1");
+						tac(tmp_add);
+					}
+
+
+
 				}
 				else{
 					printf("\t### ERRO: operacao relacional [%s] com tipos incorretos. [%d][%d]\n", $2->valor, $2->linha, $2->coluna);
@@ -903,11 +1294,11 @@ express_soma:
 				/*char* val2;
 				if(erro != 1){
 					if(isInt == 1){
-						val2 = (char*) malloc(sizeof(char) * contDigtf(ivalfinal) + 1);
+						val2 = (char*) malloc(sizeof(char) * contDigf(ivalfinal) + 1);
 						sprintf(val2, "%d", ivalfinal);
 					}
 					else{
-						val2 = (char*) malloc(sizeof(char) * contDigtf(fvalfinal) + 1);
+						val2 = (char*) malloc(sizeof(char) * contDigf(fvalfinal) + 1);
 						sprintf(val2, "%lf", fvalfinal);
 					}
 				}
@@ -1006,11 +1397,11 @@ termo:
 				/*char* val2;
 				if(erro != 1){
 					if(isInt == 1){
-						val2 = (char*) malloc(sizeof(char) * contDigtf(ivalfinal) + 1);
+						val2 = (char*) malloc(sizeof(char) * contDigf(ivalfinal) + 1);
 						sprintf(val2, "%d", ivalfinal);
 					}
 					else{
-						val2 = (char*) malloc(sizeof(char) * contDigtf(fvalfinal) + 1);
+						val2 = (char*) malloc(sizeof(char) * contDigf(fvalfinal) + 1);
 						sprintf(val2, "%lf", fvalfinal);
 					}
 				}
@@ -1081,6 +1472,7 @@ factor:
 				$$ = novaFolhaText(strdup($1));
 				$$->tipo = Literal;
 				insere("texto", strdup($$->valor), OTHER, Literal, 0, NULL);
+				
 			}
 			;
 
@@ -1134,6 +1526,13 @@ chamada:
 				}
 				else{
 					$$->tipo = item->tipo;
+
+					// TAC CRIA LABEL PRA CHAMADA
+					tac("// Chamada de funcao");
+					char* oper = (char*) malloc(sizeof(char) * (1 + strlen(item->nome)) + 1);
+					strcat(oper, item->nome);
+					strcat(oper, ":");
+					tac(oper);
 
 
 					if(item->params != NULL && ($3 != NULL ? ($3->valor != NULL ? $3->valor : NULL) : NULL) == NULL ){ // se param eh nulo e os agrs nao
@@ -1260,6 +1659,10 @@ chamada:
 												}
 
 											}
+
+
+											
+
 
 											ctx_atual = ctx_temp;
 										}
@@ -1482,50 +1885,50 @@ lista_arg:
 
 atrop:
 			ATR { 
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("=");
 				$$->tipo = other;
 			}
 			| PLUS_ATR {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("+=");
 				$$->tipo = other;
 			}
 			| MINUS_ATR {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("-=");
 				$$->tipo = other;
 			}
 			| TIMES_ATR {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("*=");
 				$$->tipo = other;
 			}
 			| OVER_ATR {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("/=");
 				$$->tipo = other;
 			}
 			;
 
 relop:
 			LT {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("<");
 				$$->tipo = other;
 			}
 			| GT {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText(">");
 				$$->tipo = other;
 			}
 			| LE {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("<=");
 				$$->tipo = other;
 			}
 			| GE {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText(">=");
 				$$->tipo = other;
 			}
 			| EQ {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("==");
 				$$->tipo = other;
 			}
 			| NE {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("!=");
 				$$->tipo = other;
 			}
 			| logop {
@@ -1536,38 +1939,34 @@ relop:
 			;
 
 logop:
-			NOT {
-				$$ = novaFolhaText($1);
-				$$->tipo = other;
-			}
-			| AND {
-				$$ = novaFolhaText($1);
+			AND {
+				$$ = novaFolhaText("&&");
 				$$->tipo = other;
 			}
 			| OR {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("||");
 				$$->tipo = other;
 			}
 			;
 
 addop:
 			PLUS_OP {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("+");
 				$$->tipo = other;
 			}
 			| MINUS_OP {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("-");
 				$$->tipo = other;
 			}
 			;
 
 mulop:
 			TIMES_OP {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("*");
 				$$->tipo = other;
 			}
 			| OVER_OP {
-				$$ = novaFolhaText($1);
+				$$ = novaFolhaText("/");
 				$$->tipo = other;
 			}
 			;
@@ -1665,6 +2064,106 @@ void destroiArvore(Node *raiz){
 }
 
 
+int tac_tab(TYPE tipo, const char* nome){
+	int ret = 0;
+
+
+	// Simbolo* ctx_temp = ctx_atual->primeiro;
+	// while(ctx_temp != NULL){
+	// 	if(ctx_temp->isVar == VAR){
+	// 		if(strcmp(ctx_temp->nome != NULL ? ctx_temp->nome : "", "") != 0){
+	// 			switch(ctx_temp->tipo){
+	// 				case Inteiro:
+	// 					fputs("int ", tac_input);
+	// 					break;
+
+	// 				case Decimal:
+	// 					fputs("float ", tac_input);
+	// 					break;
+
+	// 				case Ponto:
+	// 					fputs("point ", tac_input);
+	// 					break;
+
+	// 				case Forma:
+	// 					fputs("shape ", tac_input);
+	// 					break;
+
+	// 			}
+
+	// 			fputs(ctx_temp->nome, tac_input);
+	// 			fputs("\n", tac_input);
+	// 		}
+	// 	}
+	// 	ctx_temp = ctx_temp->prox;
+	// }
+
+
+
+
+	// fclose(tac_input);
+	// tac_input = fopen("./tac_input.txt", "wr");
+	// if(tac_input == NULL){
+	// 	printf("\nERRO AO ABRIR O ARQUIVO\n\n");
+	// 	return 1;
+	// }
+	// rewind(tac_input);
+	// char* linha = (char*) malloc(sizeof(char) * 100 + 1);
+	// fscanf(tac_input, "%[/n]s", linha);
+	// while(strcmp(linha, ".code") != 0){
+	// 	if(strcmp(linha != NULL ? linha : "", "") == 0){
+	// 		printf("\n\n\nACHEI!\n\n\n");
+	// 		fputs("ACHEI", tac_input);
+	// 		break;
+	// 	}
+	// 	fscanf(tac_input, "%[/n]s", linha);
+	// }
+
+
+
+	switch(tipo){
+		case Inteiro:
+			fputs("int ", tac_ftab);
+			break;
+
+		case Decimal:
+			fputs("float ", tac_ftab);
+			break;
+
+		case Ponto:
+			fputs("point ", tac_ftab);
+			break;
+
+		case Forma:
+			fputs("shape ", tac_ftab);
+			break;
+
+	}
+	fputs(nome, tac_ftab);
+	fputs("\n", tac_ftab);
+
+
+	return 0;
+}
+
+int tac(const char* val){
+	char* valor = (char*) malloc(sizeof(char) * (strlen(val) + 2) + 1);
+	strcat(valor, val);
+	strcat(valor, "\n");
+	return fputs((valor != NULL ? valor : ""), tac_input);
+}
+
+void fim_tac(){
+	fclose(tac_input);
+	fclose(tac_ftab);
+
+	char ch;
+	tac_input = fopen("tac_input.txt", "r");
+	tac_ftab = fopen("tac_tab.txt", "a");
+	while((ch = getc (tac_input)) != EOF){
+		putc (ch, tac_ftab);
+	}
+}
 
 Node* novoNo(int quantidade, Filhos* filhos, char* valor, Parametro* params){
 	Node* novo = (Node*) malloc(sizeof(Node));
@@ -1723,12 +2222,23 @@ void yyerror(char const *s){
 }
 
 int main(void){
+	tac_input = fopen("./tac_input.txt", "w");
+	tac_ftab = fopen("./tac_tab.txt", "w");
+	if(tac_input == NULL || tac_ftab == NULL){
+		printf("\nERRO AO ABRIR O ARQUIVO\n\n");
+		return 1;
+	}
+	fputs(".table\n", tac_ftab);
+	fputs(".code\n", tac_input);
 	criaTab();
 	yyparse();
+	fim_tac();
 	printArvore(raiz, 0);
 	printTab();
 	destroiArvore(raiz);
 	destroiTab();
+	fclose(tac_input);
+	free(tac_input);
 	return 0;
 }
 

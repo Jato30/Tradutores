@@ -1,10 +1,9 @@
-main
-lex.yy.c
 *.out
 *.exe
+*.txt
 exec
+lex.yy.c
 sintatico.tab.c
 sintatico.tab.h
 *.output
 sintatico.output
-*.output
