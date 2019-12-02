@@ -282,11 +282,12 @@ decl_func:
 					temp = temp->prox;
 				}
 
-				
-				if(strcmp(item->nome, "main") == 0){
-					// Novo label main
-					tac("main:");
-				}
+
+				// Novo label
+				char* val_fim = (char*) malloc(sizeof(char) * (strlen(item->nome) + 1) + 1);
+				strcat(val_fim, item->nome);
+				strcat(val_fim, ":");
+				tac(val_fim);
 
 
 
@@ -1527,13 +1528,6 @@ chamada:
 				else{
 					$$->tipo = item->tipo;
 
-					// TAC CRIA LABEL PRA CHAMADA
-					tac("// Chamada de funcao");
-					char* oper = (char*) malloc(sizeof(char) * (1 + strlen(item->nome)) + 1);
-					strcat(oper, item->nome);
-					strcat(oper, ":");
-					tac(oper);
-
 
 					if(item->params != NULL && ($3 != NULL ? ($3->valor != NULL ? $3->valor : NULL) : NULL) == NULL ){ // se param eh nulo e os agrs nao
 						printf("\t### ERRO: [%s] funcao faltando argumentos [%d][%d]\n", $1->valor, $1->linha, $1->coluna);
@@ -1627,6 +1621,17 @@ chamada:
 									}
 								}
 
+
+
+								// TAC EMPILHA parametros
+								char* val_fim = (char*) malloc(sizeof(char) * (6 + strlen(parametro->nome)) + 1);
+								strcat(val_fim, "param ");
+								strcat(val_fim, parametro->nome);
+								tac(val_fim);
+
+
+
+
 								Contexto* ctx_temp = ctx_atual;
 								int isNome = 1; // Sim, por nome
 								Simbolo* arg_passado = buscaAquiNome(argumento->nome);
@@ -1660,8 +1665,6 @@ chamada:
 
 											}
 
-
-											
 
 
 											ctx_atual = ctx_temp;
@@ -1753,6 +1756,25 @@ chamada:
 							printf(") [%d][%d]\n", $3->linha, $3->coluna);
 						}
 					}
+
+
+
+					// TAC CRIA LABEL PRA CHAMADA
+					char* oper = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + contDigf(item->qtdParams)) + 1);
+					strcat(oper, "call ");
+					strcat(oper, item->nome);
+					strcat(oper, ", ");
+
+					char* qtdParams = (char*) malloc(sizeof(char) * contDigf(item->qtdParams) + 1);
+					sprintf(qtdParams, "%d", item->qtdParams);
+					strcat(oper, qtdParams);
+					tac(oper);
+
+
+					// TAC Desempilha retorno
+					tac("pop $0");
+
+
 				}
 			}
 			;
