@@ -911,11 +911,45 @@ expressao:
 					char* val2;
 					int tmpi;
 					float tmpf;
+					char* item1_nome;
+					char* item2_nome;
+					char* item1_chave;
+					char* item2_chave;
+					char* tac_converte;
+					char* tac_move;
+
+					item1_chave = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+					sprintf(item1_chave, "%d", item->chave);
+					item2_chave = (char*) malloc(sizeof(char) * contDigf(item2->chave) + 1);
+					sprintf(item2_chave, "%d", item2->chave);
+					item1_nome = (char*) malloc(sizeof(char) * (strlen(item->nome) + contDigf(item->chave)) + 1);
+					strcat(item1_nome, item->nome);
+					strcat(item1_nome, item1_chave);
+					if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+						item2_nome = (char*) malloc(sizeof(char) * (strlen(item2->nome) + contDigf(item2->chave)) + 1);
+						strcat(item2_nome, item2->nome);
+						strcat(item2_nome, item2_chave);
+					}
 
 					TYPE tipo_express_simp = $3->tipo;
 					if(item->tipo == Inteiro && tipo_express_simp == Decimal){
 						printf("\t### ADVERTENCIA: [%s] expressao truncada para atribuicao. [%d][%d]\n", item->nome, $1->linha, $1->coluna);
 
+						if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+							// TAC Converte float to int (trunca expressao a direita)
+							// mov $0, item2
+							// fltoint item2, $0
+							tac_move = (char*) malloc(sizeof(char) * (4 + 4 + strlen(item2_nome)) + 1);
+							strcat(tac_move, "mov $0, ");
+							strcat(tac_move, item2_nome);
+							tac(tac_move);
+
+							tac_converte = (char*) malloc(sizeof(char) * (8 + strlen(item2_nome) + 4) + 1);
+							strcat(tac_converte, "fltoint ");
+							strcat(tac_converte, item2_nome);
+							strcat(tac_converte, ", $0");
+							tac(tac_converte);
+						}
 
 						tmpf = atof(item2->valor);
 						tmpi = (int) tmpf;
@@ -928,6 +962,22 @@ expressao:
 					}
 					else if(item->tipo == Decimal && tipo_express_simp == Inteiro){
 						// Converte tipos
+						if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+							// TAC Converte int to float (so acrescenta ponto flutuante)
+							// mov $0, item2
+							// inttofl item2, $0
+							tac_move = (char*) malloc(sizeof(char) * (4 + 4 + strlen(item2_nome)) + 1);
+							strcat(tac_move, "mov $0, ");
+							strcat(tac_move, item2_nome);
+							tac(tac_move);
+
+							tac_converte = (char*) malloc(sizeof(char) * (8 + strlen(item2_nome) + 4) + 1);
+							strcat(tac_converte, "inttofl ");
+							strcat(tac_converte, item2_nome);
+							strcat(tac_converte, ", $0");
+							tac(tac_converte);
+						}
+
 						tmpi = atoi(item2->valor);
 						tmpf = (float) tmpi;
 						val2 = (char*) malloc(sizeof(char) * contDigf(tmpf) + 1);
@@ -938,8 +988,9 @@ expressao:
 					}
 					else{
 						val1 = (char*) malloc(sizeof(char) * strlen(item->valor != NULL ? item->valor : "") + 1);
-						val2 = (char*) malloc(sizeof(char) * strlen(item2->valor != NULL ? item2->valor : "") + 1);
 						val1 = strdup(item->valor != NULL ? item->valor : "");
+
+						val2 = (char*) malloc(sizeof(char) * strlen(item2->valor != NULL ? item2->valor : "") + 1);
 						val2 = strdup(item2->valor != NULL ? item2->valor : "");
 					}
 
