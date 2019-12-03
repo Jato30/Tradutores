@@ -213,6 +213,9 @@ void criaTab(){
 }
 
 Simbolo* buscaAquiNome(char* nome){
+	if(ctx_atual == NULL){
+		ctx_atual = &ctx_global;
+	}
 	if(ctx_atual->primeiro != NULL){
 		TabSimbolos atual = ctx_atual->primeiro;
 
@@ -241,6 +244,9 @@ Simbolo* buscaAquiNome(char* nome){
 }
 
 Simbolo* buscaAquiVal(char* valor){
+	if(ctx_atual == NULL){
+		ctx_atual = &ctx_global;
+	}
 	if(ctx_atual->primeiro != NULL){
 		TabSimbolos atual = ctx_atual->primeiro;
 		
@@ -259,6 +265,9 @@ Simbolo* buscaAquiVal(char* valor){
 
 // RETORNO: retorna a chave do elemento encontrado, -1 se nao existir
 Simbolo* buscaTabNome(char* nome){
+	if(ctx_atual == NULL){
+		ctx_atual = &ctx_global;
+	}
 	TabSimbolos atual = ctx_atual->primeiro;
 	Contexto* contexto = ctx_atual;
 	
@@ -288,7 +297,7 @@ Simbolo* buscaTabNome(char* nome){
 	}
 	atual = contexto->primeiro;
 	while(atual != NULL){
-		if(strcmp(atual->nome, nome) == 0){
+		if(strcmp(atual->nome != NULL ? atual->nome : "", nome) == 0){
 			return atual;
 		}
 		atual = atual->prox;
@@ -310,6 +319,9 @@ Simbolo* buscaTabNome(char* nome){
 
 // RETORNO: retorna a chave do elemento encontrado, -1 se nao existir
 Simbolo* buscaTabVal(char* valor){
+	if(ctx_atual == NULL){
+		ctx_atual = &ctx_global;
+	}
 	TabSimbolos atual = ctx_atual->primeiro;
 	Contexto* contexto = ctx_atual;
 	
