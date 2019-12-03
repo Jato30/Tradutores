@@ -1738,8 +1738,13 @@ chamada:
 
 								// TAC EMPILHA parametros
 								char* tac_val;
+								char* se_lit;
 								Simbolo* item = buscaTabNome(argumento->nome);
 								if(item == NULL){
+									// if(argumento->nome[0] == '\"'){
+									// 	tac("param texto");
+
+									// }
 									tac_val = (char*) malloc(sizeof(char) * (7 + strlen(argumento->nome)) + 1);
 									strcat(tac_val, "param ");
 									strcat(tac_val, strdup(argumento->nome));
