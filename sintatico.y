@@ -2557,7 +2557,7 @@ int tac_tab(TYPE tipo, const char* nome){
 
 
 	// fclose(tac_input);
-	// tac_input = fopen("./tac_input.txt", "wr");
+	// tac_input = fopen("./tac_code.txt", "wr");
 	// if(tac_input == NULL){
 	// 	printf("\nERRO AO ABRIR O ARQUIVO\n\n");
 	// 	return 1;
@@ -2613,8 +2613,8 @@ void fim_tac(){
 	fclose(tac_ftab);
 
 	char ch;
-	tac_input = fopen("tac_input.txt", "r");
-	tac_ftab = fopen("tac_tab.txt", "a");
+	tac_input = fopen("tac_code.txt", "r");
+	tac_ftab = fopen("tac_tab.tac", "a");
 	while((ch = getc (tac_input)) != EOF){
 		putc (ch, tac_ftab);
 	}
@@ -2700,8 +2700,8 @@ void yyerror(char const *s){
 }
 
 int main(void){
-	tac_input = fopen("./tac_input.txt", "w");
-	tac_ftab = fopen("./tac_tab.txt", "w");
+	tac_input = fopen("./tac_code.txt", "w");
+	tac_ftab = fopen("./tac_tab.tac", "w");
 	if(tac_input == NULL || tac_ftab == NULL){
 		printf("\nERRO AO ABRIR O ARQUIVO\n\n");
 		return 1;
