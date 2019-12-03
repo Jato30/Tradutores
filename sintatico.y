@@ -714,31 +714,78 @@ instruc_else:
 
 
 instruc_iterac:
-			FOR INI_PARAM expressao FIM_EXPRESS express_simp FIM_EXPRESS expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC {
+			FOR INI_PARAM {
+				// TAC inicia for
+				tac("// Laco FOR");
+			} expressao FIM_EXPRESS express_simp FIM_EXPRESS{
+				// TAC cria label para loop
+				char* tac_label1 = (char*) malloc(sizeof(char) * (6 + contDigf(tac_for) + 1) + 1);
+				char* label_id = (char*) malloc(sizeof(char) * contDigf(tac_for) + 1);
+				sprintf(label_id, "%d", tac_for);
+				strcat(tac_label1, "INIFOR");
+				strcat(tac_label1, label_id);
+				strcat(tac_label1, ":");
+				tac(tac_label1);
+
+				// TAC Cria label para checar condicao
+				// goto 
+				// ifFalse $0
+				// goto FOR (tac_for)
+				char* tac_label2 = (char*) malloc(sizeof(char) * (7 + contDigf(tac_for) + 1) + 1);
+				sprintf(label_id, "%d", tac_for);
+				strcat(tac_label2, "CONDFOR");
+				strcat(tac_label2, label_id);
+				strcat(tac_label2, ":");
+				tac(tac_label2);
+
+
+
+				tac("ifFalse $0");
+
+				char* num_for = (char*) malloc(sizeof(char) * contDigf(tac_for) + 1);
+				sprintf(num_for, "%d", tac_for);
+				char* go = (char*) malloc(sizeof(char) * (5 + 6 + strlen(num_for)) + 1);
+				strcat(go, "goto FIMFOR");
+				strcat(go, num_for);
+				tac(go);
+
+			} expressao FIM_PARAM INI_INSTRUC instrucao FIM_INSTRUC {
 				Node** lista = (Node**) malloc(sizeof(Node*) * 5);
 				lista[0] = (Node*) malloc(sizeof(Node));
 				lista[0] = novaFolhaText("for");
-				lista[1] = $3;
-				lista[2] = $5;
-				lista[3] = $7;
-				lista[4] = $10;
+				lista[1] = $<node>3;
+				lista[2] = $<node>5;
+				lista[3] = $<node>7;
+				lista[4] = $<node>10;
 
 
-				char* val = (char*) malloc(sizeof(char) * (4 + strlen($3->valor) + strlen($5->valor) + strlen($7->valor) + 3) + 1);
-				strcat(val, "for(");
-				strcat(val, strdup($3->valor));
-				strcat(val, ";");
-				strcat(val, strdup($5->valor));
-				strcat(val, ";");
-				strcat(val, strdup($7->valor));
-				strcat(val, ")");
+				char* val = (char*) malloc(sizeof(char) * (3)+1); /*+
+												strlen($<node>3 != NULL ? (strcmp($<node>3->valor != NULL ? $<node>3->valor : "", "") != 0 ? $<node>3->valor : "") : "")
+												+ strlen($<node>5 != NULL ? (strcmp($<node>5->valor != NULL ? $<node>5->valor : "", "") != 0 ? $<node>5->valor : "") : "")
+												+ strlen($<node>7 != NULL ? (strcmp($<node>7->valor != NULL ? $<node>7->valor : "", "") != 0 ? $<node>7->valor : "") : "")
+												+ 3) + 1);*/
+				strcat(val, "for");
+				// strcat(val, "(");
+				// strcat(val, strdup($<node>3 != NULL ? (strcmp($<node>3->valor != NULL ? $<node>3->valor : "", "") != 0 ? $<node>3->valor : "") : ""));
+				// strcat(val, ";");
+				// strcat(val, strdup($<node>5 != NULL ? (strcmp($<node>5->valor != NULL ? $<node>5->valor : "", "") != 0 ? $<node>5->valor : "") : ""));
+				// strcat(val, ";");
+				// strcat(val, strdup($<node>7 != NULL ? (strcmp($<node>7->valor != NULL ? $<node>7->valor : "", "") != 0 ? $<node>7->valor : "") : ""));
+				// strcat(val, ")");
 				$$ = novoNo(5, lista, strdup(val), NULL);
 
 				free(val);
 				val = NULL;
 
 
-
+				// TAC cria label de saida do for
+				char* tac_label = (char*) malloc(sizeof(char) * (6 + contDigf(tac_for) + 1) + 1);
+				char* label_id = (char*) malloc(sizeof(char) * contDigf(tac_for) + 1);
+				sprintf(label_id, "%d", tac_for);
+				strcat(tac_label, "FIMFOR");
+				strcat(tac_label, label_id);
+				strcat(tac_label, ":");
+				tac(tac_label++);
 
 			}
 			;
