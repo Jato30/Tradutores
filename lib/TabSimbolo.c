@@ -346,7 +346,7 @@ Simbolo* buscaTabVal(char* valor){
 }
 
 Simbolo* insere(char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params){
-	static unsigned int prox_chave = 0;
+	static unsigned int prox_chave = -18;
 	Simbolo* busca = NULL;
 	if(tipo != Literal){
 		if(strcmp(nome != NULL ? nome : "", "") == 0){

@@ -195,7 +195,7 @@ decl_var:
 						break;
 				}
 
-				Simbolo* item;
+				Simbolo* item = NULL;
 				Simbolo* novo = buscaAquiNome(strdup($2->valor));
 				if(novo != NULL){
 					printf("\t\t### ERRO: [%s] declaracao de variavel ja existente. [%d][%d]\n", strdup($2->valor), $2->linha, $2->coluna);
@@ -215,13 +215,15 @@ decl_var:
 				val = NULL;
 
 
-
-				char* tac_nom = (char*) malloc(sizeof(char) * (strlen($2->valor) + contDigf(item->chave)) + 1);
-				strcat(tac_nom, strdup($2->valor));
-				char* id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-				sprintf(id_tac_nom, "%d", item->chave);
-				strcat(tac_nom, id_tac_nom);
-				tac_tab(type, tac_nom);
+				// TAC insere na tabela de simbolos
+				if(item != NULL){
+					char* tac_nom = (char*) malloc(sizeof(char) * (strlen($2->valor) + contDigf(item->chave)) + 1);
+					strcat(tac_nom, strdup($2->valor));
+					char* id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+					sprintf(id_tac_nom, "%d", item->chave);
+					strcat(tac_nom, id_tac_nom);
+					tac_tab(type, tac_nom);
+				}
 
 			}
 			;
@@ -758,6 +760,8 @@ instruc_return:
 				val = NULL;
 
 
+
+
 				char* tac_val;
 				Simbolo* item = buscaTabNome(strdup($2->valor));
 				if(item == NULL){
@@ -774,6 +778,14 @@ instruc_return:
 					sprintf(id_tac_nom, "%d", item->chave);
 					strcat(tac_val, id_tac_nom);
 					tac(tac_val);
+				}
+
+				if(ctx_atual != NULL && ctx_atual->criador != NULL){
+					if(strcmp(ctx_atual->criador->valor != NULL ? ctx_atual->criador->valor : "", "") != 0){
+						free(ctx_atual->criador->valor);
+					}
+					ctx_atual->criador->valor = (char*) malloc(sizeof(char) * strlen(item != NULL ? (item->valor != NULL ? item->valor : "") : $2->valor) + 1);
+					strcpy(ctx_atual->criador->valor, item != NULL ? (strcmp(item->valor != NULL ? item->valor : "", "") != 0 ? item->valor : "") : $2->valor);
 				}
 			}
 			;
@@ -901,15 +913,31 @@ expressao:
 										item->valor = strdup(val2);
 
 										// mov dest, val
-										tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
-										strcat(tmp_nom, "mov ");
-										strcat(tmp_nom, item->nome);
-										id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-										sprintf(id_tac_nom, "%d", item->chave);
-										strcat(tmp_nom, id_tac_nom);
-										strcat(tmp_nom, ", ");
-										strcat(tmp_nom, item->valor);
-										tac(tmp_nom);
+										if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+											tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item2->nome) + contDigf(item2->chave)) + 1);
+											strcat(tmp_nom, "mov ");
+											strcat(tmp_nom, item->nome);
+											id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+											sprintf(id_tac_nom, "%d", item->chave);
+											strcat(tmp_nom, id_tac_nom);
+											strcat(tmp_nom, ", ");
+											strcat(tmp_nom, item2->nome);
+											id_tac_nom2 = (char*) malloc(sizeof(char) * contDigf(item2->chave) + 1);
+											sprintf(id_tac_nom2, "%d", item2->chave);
+											strcat(tmp_nom, id_tac_nom2);
+											tac(tmp_nom);
+										}
+										else{
+											tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
+											strcat(tmp_nom, "mov ");
+											strcat(tmp_nom, item->nome);
+											id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+											sprintf(id_tac_nom, "%d", item->chave);
+											strcat(tmp_nom, id_tac_nom);
+											strcat(tmp_nom, ", ");
+											strcat(tmp_nom, item->valor);
+											tac(tmp_nom);
+										}
 										break;
 
 									case '+':
@@ -927,27 +955,37 @@ expressao:
 											sprintf(item->valor, "%d", temp_val_i);
 										}
 
-										// add $0, item, val
-										// mov item, $0
-										temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
-										strcat(temp_add, "add $0, ");
-										strcat(tmp_nom, item->nome);
-										id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-										sprintf(id_tac_nom, "%d", item->chave);
-										strcat(tmp_nom, id_tac_nom);
-										strcat(tmp_nom, ", ");
-										strcat(tmp_nom, item->valor);
-										tac(temp_add);
+										// add $0, item1, item2 (nome ou valor)
+										// mov item1, $0
+										if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+											temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item2->nome)) + 1);
+											strcat(temp_add, "add $0, ");
+											strcat(temp_add, item->nome);
+											id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+											sprintf(id_tac_nom, "%d", item->chave);
+											strcat(temp_add, id_tac_nom);
+											strcat(temp_add, ", ");
+											strcat(temp_add, item2->nome);
+											tac(temp_add);
+										}
+										else{
+											temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
+											strcat(temp_add, "add $0, ");
+											strcat(temp_add, item->nome);
+											id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+											sprintf(id_tac_nom, "%d", item->chave);
+											strcat(temp_add, id_tac_nom);
+											strcat(temp_add, ", ");
+											strcat(temp_add, item->valor);
+											tac(temp_add);
+										}
 
+										// TAC mov item1, $0
 										tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + contDigf(item->chave) + 2 + 2) + 1);
 										strcat(tmp_nom, "mov ");
 										strcat(tmp_nom, item->nome);
-										id_tac_nom2 = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-										sprintf(id_tac_nom2, "%d", item->chave);
-										strcat(tmp_nom, id_tac_nom2);
-										strcat(tmp_nom, ", ");
-										strcat(tmp_nom, "$0");
-										tac(tmp_nom);
+										strcat(tmp_nom, ", $0");
+
 										break;
 
 									case '-':
@@ -965,27 +1003,37 @@ expressao:
 											sprintf(item->valor, "%d", temp_val_i);
 										}
 
-										// sub $0, item, val
-										// mov item, $0
-										temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
-										strcat(temp_add, "sub $0, ");
-										strcat(tmp_nom, item->nome);
-										id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-										sprintf(id_tac_nom, "%d", item->chave);
-										strcat(tmp_nom, id_tac_nom);
-										strcat(tmp_nom, ", ");
-										strcat(tmp_nom, item->valor);
-										tac(temp_add);
+										// sub $0, item1, item2 (nome ou valor)
+										// mov item1, $0
+										if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+											temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item2->nome)) + 1);
+											strcat(temp_add, "sub $0, ");
+											strcat(temp_add, item->nome);
+											id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+											sprintf(id_tac_nom, "%d", item->chave);
+											strcat(temp_add, id_tac_nom);
+											strcat(temp_add, ", ");
+											strcat(temp_add, item2->nome);
+											tac(temp_add);
+										}
+										else{
+											temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
+											strcat(temp_add, "sub $0, ");
+											strcat(temp_add, item->nome);
+											id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+											sprintf(id_tac_nom, "%d", item->chave);
+											strcat(temp_add, id_tac_nom);
+											strcat(temp_add, ", ");
+											strcat(temp_add, item->valor);
+											tac(temp_add);
+										}
 
+										// TAC mov item1, $0
 										tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + contDigf(item->chave) + 2 + 2) + 1);
 										strcat(tmp_nom, "mov ");
 										strcat(tmp_nom, item->nome);
-										id_tac_nom2 = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-										sprintf(id_tac_nom2, "%d", item->chave);
-										strcat(tmp_nom, id_tac_nom2);
-										strcat(tmp_nom, ", ");
-										strcat(tmp_nom, "$0");
-										tac(tmp_nom);
+										strcat(tmp_nom, ", $0");
+
 										break;
 
 									case '*':
@@ -1003,26 +1051,37 @@ expressao:
 											sprintf(item->valor, "%d", temp_val_i);
 										}
 
-										// mul $0, item, val
-										// mov item, $0
-										temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
-										strcat(temp_add, "mul $0, ");
-										strcat(tmp_nom, item->nome);
-										id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-										sprintf(id_tac_nom, "%d", item->chave);
-										strcat(tmp_nom, id_tac_nom);
-										strcat(tmp_nom, ", ");
-										strcat(tmp_nom, item->valor);
-										tac(temp_add);
+										// mul $0, item1, item2 (nome ou valor)
+										// mov item1, $0
+										if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+											temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item2->nome)) + 1);
+											strcat(temp_add, "mul $0, ");
+											strcat(temp_add, item->nome);
+											id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+											sprintf(id_tac_nom, "%d", item->chave);
+											strcat(temp_add, id_tac_nom);
+											strcat(temp_add, ", ");
+											strcat(temp_add, item2->nome);
+											tac(temp_add);
+										}
+										else{
+											temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
+											strcat(temp_add, "mul $0, ");
+											strcat(temp_add, item->nome);
+											id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+											sprintf(id_tac_nom, "%d", item->chave);
+											strcat(temp_add, id_tac_nom);
+											strcat(temp_add, ", ");
+											strcat(temp_add, item->valor);
+											tac(temp_add);
+										}
+
+										// TAC mov item1, $0
 										tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + contDigf(item->chave) + 2 + 2) + 1);
 										strcat(tmp_nom, "mov ");
 										strcat(tmp_nom, item->nome);
-										id_tac_nom2 = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-										sprintf(id_tac_nom2, "%d", item->chave);
-										strcat(tmp_nom, id_tac_nom2);
-										strcat(tmp_nom, ", ");
-										strcat(tmp_nom, "$0");
-										tac(tmp_nom);
+										strcat(tmp_nom, ", $0");
+
 										break;
 
 									case '/':
@@ -1056,9 +1115,9 @@ expressao:
 										}
 										else{
 											if(item->tipo == Decimal || item2->tipo == Decimal){
-											temp_val_f = atof(val1) / atof(val2);
-											item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_f) + 1);
-											gcvt(temp_val_f, contDigf(temp_val_f) + 1, item->valor);
+												temp_val_f = atof(val1) / atof(val2);
+												item->valor = (char*) malloc(sizeof(char) * contDigf(temp_val_f) + 1);
+												gcvt(temp_val_f, contDigf(temp_val_f) + 1, item->valor);
 											}
 											else{
 												temp_val_i = atoi(val1) / atoi(val2);
@@ -1069,27 +1128,38 @@ expressao:
 												sprintf(item->valor, "%d", temp_val_i);
 											}
 
-											// div $0, item, val
-											// mov item, $0
-											temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
-											strcat(temp_add, "div $0, ");
-											strcat(tmp_nom, item->nome);
-											char* id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-											sprintf(id_tac_nom, "%d", item->chave);
-											strcat(tmp_nom, id_tac_nom);
-											strcat(tmp_nom, ", ");
-											strcat(tmp_nom, item->valor);
-											tac(temp_add);
+											// div $0, item1, item2 (nome ou valor)
+											// mov item1, $0
+											if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+												temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item2->nome)) + 1);
+												strcat(temp_add, "div $0, ");
+												strcat(temp_add, item->nome);
+												id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+												sprintf(id_tac_nom, "%d", item->chave);
+												strcat(temp_add, id_tac_nom);
+												strcat(temp_add, ", ");
+												strcat(temp_add, item2->nome);
+												tac(temp_add);
+											}
+											else{
+												temp_add = (char*) malloc(sizeof(char) * (4 + 2 + 2 + strlen(item->nome) + contDigf(item->chave) + 2 + strlen(item->valor)) + 1);
+												strcat(temp_add, "div $0, ");
+												strcat(temp_add, item->nome);
+												id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+												sprintf(id_tac_nom, "%d", item->chave);
+												strcat(temp_add, id_tac_nom);
+												strcat(temp_add, ", ");
+												strcat(temp_add, item->valor);
+												tac(temp_add);
+											}
+
+											// TAC mov item1, $0
 											tmp_nom = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + contDigf(item->chave) + 2 + 2) + 1);
 											strcat(tmp_nom, "mov ");
 											strcat(tmp_nom, item->nome);
-											char* id_tac_nom2 = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-											sprintf(id_tac_nom2, "%d", item->chave);
-											strcat(tmp_nom, id_tac_nom2);
-											strcat(tmp_nom, ", ");
-											strcat(tmp_nom, "$0");
-											tac(tmp_nom);
+											strcat(tmp_nom, ", $0");
 										}
+
 										break;
 
 									default:
@@ -1163,6 +1233,8 @@ express_simp:
 					char* val2;
 					int tmpi;
 					float tmpf;
+					char* aux_nom1;
+					char* aux_nom2;
 
 
 
@@ -1173,29 +1245,86 @@ express_simp:
 
 							// Converte tipos
 							if($1->tipo == Decimal){
-								tmpi = atoi(item2->valor);
-								tmpf = (float) tmpi;
-								val2 = (char*) malloc(sizeof(char) * contDigf(tmpf) + 1);
-								gcvt(tmpf, contDigf(tmpf) + 1, val2);
+								if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+									aux_nom2 = (char*) malloc(sizeof(char) * contDigf(item2->chave) + 1);
+									sprintf(aux_nom2, "%d", item2->chave);
+									val2 = (char*) malloc(sizeof(char) * (strlen(item2->nome) + contDigf(item2->chave)) + 1);
+									strcat(val2, item2->nome);
+									strcat(val2, aux_nom2);
+								}
+								else{
+									// TAC converte (no caso, convertendo aqui e passando pro tac ja convertido)
+									tmpi = atoi(item2->valor);
+									tmpf = (float) tmpi;
+									val2 = (char*) malloc(sizeof(char) * contDigf(tmpf) + 1);
+									gcvt(tmpf, contDigf(tmpf) + 1, val2);
+								}
 
-								val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
-								val1 = strdup(item->valor);
+								if(strcmp(item->nome != NULL ? item->nome : "", "") != 0){
+									aux_nom1 = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+									sprintf(aux_nom1, "%d", item->chave);
+									val1 = (char*) malloc(sizeof(char) * (strlen(item->nome) + contDigf(item->chave)) + 1);
+									strcat(val1, item->nome);
+									strcat(val1, aux_nom1);
+								}
+								else{
+									val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
+									val1 = strdup(item->valor);
+								}
 							}
 							else{
-								tmpi = atoi(item->valor);
-								tmpf = (float) tmpi;
-								val1 = (char*) malloc(sizeof(char) * contDigf(tmpf) + 1);
-								gcvt(tmpf, contDigf(tmpf) + 1, val1);
+								if(strcmp(item->nome != NULL ? item->nome : "", "") != 0){
+									aux_nom1 = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+									sprintf(aux_nom1, "%d", item->chave);
+									val1 = (char*) malloc(sizeof(char) * (strlen(item->nome) + contDigf(item->chave)) + 1);
+									strcat(val1, item->nome);
+									strcat(val1, aux_nom1);
+								}
+								else{
+									// TAC converte (no caso, convertendo aqui e passando pro tac ja convertido)
+									tmpi = atoi(item->valor);
+									tmpf = (float) tmpi;
+									val1 = (char*) malloc(sizeof(char) * contDigf(tmpf) + 1);
+									gcvt(tmpf, contDigf(tmpf) + 1, val1);
+								}
 
-								val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
-								val2 = strdup(item2->valor);
+								if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+									aux_nom2 = (char*) malloc(sizeof(char) * contDigf(item2->chave) + 1);
+									sprintf(aux_nom2, "%d", item2->chave);
+									val2 = (char*) malloc(sizeof(char) * (strlen(item2->nome) + contDigf(item2->chave)) + 1);
+									strcat(val2, item2->nome);
+									strcat(val2, aux_nom2);
+								}
+								else{
+									val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
+									val2 = strdup(item2->valor);
+								}
 							}
 						}
 						else{
-							val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
-							val1 = strdup(item->valor);
-							val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
-							val2 = strdup(item2->valor);
+							if(strcmp(item->nome != NULL ? item->nome : "", "") != 0){
+								aux_nom1 = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+								sprintf(aux_nom1, "%d", item->chave);
+								val1 = (char*) malloc(sizeof(char) * (strlen(item->nome) + contDigf(item->chave)) + 1);
+								strcat(val1, item->nome);
+								strcat(val1, aux_nom1);
+							}
+							else{
+								val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
+								val1 = strdup(item->valor);
+							}
+
+							if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+								aux_nom2 = (char*) malloc(sizeof(char) * contDigf(item2->chave) + 1);
+								sprintf(aux_nom2, "%d", item2->chave);
+								val2 = (char*) malloc(sizeof(char) * (strlen(item2->nome) + contDigf(item2->chave)) + 1);
+								strcat(val2, item2->nome);
+								strcat(val2, aux_nom2);
+							}
+							else{
+								val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
+								val2 = strdup(item2->valor);
+							}
 						}
 
 
@@ -1204,10 +1333,29 @@ express_simp:
 					else if($1->tipo == Inteiro && $3->tipo == Inteiro){
 						$$->tipo = Inteiro;
 
-						val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
-						val1 = strdup(item->valor);
-						val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
-						val2 = strdup(item2->valor);
+						if(strcmp(item->nome != NULL ? item->nome : "", "") != 0){
+							aux_nom1 = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+							sprintf(aux_nom1, "%d", item->chave);
+							val1 = (char*) malloc(sizeof(char) * (strlen(item->nome) + contDigf(item->chave)) + 1);
+							strcat(val1, item->nome);
+							strcat(val1, aux_nom1);
+						}
+						else{
+							val1 = (char*) malloc(sizeof(char) * strlen(item->valor) + 1);
+							val1 = strdup(item->valor);
+						}
+						
+						if(strcmp(item2->nome != NULL ? item2->nome : "", "") != 0){
+							aux_nom2 = (char*) malloc(sizeof(char) * contDigf(item2->chave) + 1);
+							sprintf(aux_nom2, "%d", item2->chave);
+							val2 = (char*) malloc(sizeof(char) * (strlen(item2->nome) + contDigf(item2->chave)) + 1);
+							strcat(val2, item2->nome);
+							strcat(val2, aux_nom2);
+						}
+						else{
+							val2 = (char*) malloc(sizeof(char) * strlen(item2->valor) + 1);
+							val2 = strdup(item2->valor);
+						}
 					}
 
 
@@ -1882,7 +2030,7 @@ chamada:
 									printf(", ");
 								}
 							}
-							printf(") [%d][%d]\n", $3->linha, $3->coluna);
+							printf(") [%d][%d]\n", num_lin, num_char);
 						}
 					}
 

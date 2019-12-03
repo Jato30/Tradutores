@@ -13,14 +13,13 @@ int oi(shape oi){
 int main(){
 
 	float per;
-	int per;
-	float per;
+	int retoi;
 
 	int x;
 	x = 2;
 	func(12); // funcao nao declarada
-	Perimetro("qw", 2, 1); // tipo param errado && quantidade de params errados
-	oi(20); // qtd de params errados
+	Perimetro(2, 1); // tipo param errado && quantidade de params errados
+	retoi = oi(); // qtd de params errados
 	x = dobra(x, 2); // func nao declarada
 	printInt("x = ", x);
 	per = 53.2;
