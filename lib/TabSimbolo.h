@@ -6,6 +6,17 @@
 #define KEYWORD 100007
 #define OTHER -100000
 
+
+typedef struct point{
+	float x;
+	float y;
+} point;
+
+typedef struct shape{
+	point* p;
+	int qtd;
+} shape;
+
 typedef enum TYPE{
 	Inteiro = 10000,
 	Decimal,
@@ -35,6 +46,10 @@ typedef struct Simbolo{
 	int isEnd; // flag que determina se endereco ou valor (1: endereco / 0: valor)
 	TYPE tipo; // para definir os tipos basicos (se funcao, tipo do retorno)
 	int qtdParams;
+	point* p;
+	int qtdpts;
+	float x;
+	float y;
 	Parametro *params; // para ser usado somente se for funcao
 	struct Simbolo *prox;
 	struct Contexto *meu;

@@ -34,16 +34,6 @@
 		Parametro* params;
 	};
 
-	typedef struct point{
-		float x;
-		float y;
-	} point;
-
-	typedef struct shape{
-		point* p;
-		int qtd;
-	} shape;
-
 	Contexto ctx_global;
 	Contexto* ctx_atual;
 	FILE* tac_input;
@@ -221,12 +211,31 @@ decl_var:
 
 				// TAC insere na tabela de simbolos
 				if(item != NULL){
-					char* tac_nom = (char*) malloc(sizeof(char) * (strlen($2->valor) + contDigf(item->chave)) + 1);
-					strcat(tac_nom, strdup($2->valor));
-					char* id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-					sprintf(id_tac_nom, "%d", item->chave);
-					strcat(tac_nom, id_tac_nom);
-					tac_tab(type, tac_nom);
+					if(item->tipo == Inteiro || item->tipo == Decimal){
+						char* tac_nom = (char*) malloc(sizeof(char) * (strlen($2->valor) + contDigf(item->chave)) + 1);
+						strcat(tac_nom, strdup($2->valor));
+						char* id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+						sprintf(id_tac_nom, "%d", item->chave);
+						strcat(tac_nom, id_tac_nom);
+						tac_tab(type, tac_nom);
+					}
+					else if(item->tipo == Ponto){
+						char* tac_nom_x = (char*) malloc(sizeof(char) * (strlen($2->valor) + 1 + contDigf(item->chave)) + 1);
+						char* tac_nom_y = (char*) malloc(sizeof(char) * (strlen($2->valor) + 1 + contDigf(item->chave)) + 1);
+						strcat(tac_nom_x, strdup($2->valor));
+						strcat(tac_nom_y, strdup($2->valor));
+						strcat(tac_nom_x, "X");
+						strcat(tac_nom_y, "Y");
+						char* id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+						sprintf(id_tac_nom, "%d", item->chave);
+						strcat(tac_nom_x, id_tac_nom);
+						strcat(tac_nom_y, id_tac_nom);
+						tac_tab(type, tac_nom_x);
+						tac_tab(type, tac_nom_y);
+					}
+					else if(item->tipo == Forma){
+
+					}
 				}
 
 			}
@@ -1991,11 +2000,11 @@ chamada:
 							strcat(tac_tam, " = ");
 							strcat(tac_tam, tamanho);
 							tac_tab(Inteiro, tac_tam);
+							char* size_nom = (char*) malloc(sizeof(char) * (4 + strlen(aux_key)) + 1);
+							strcat(size_nom, "size");
+							strcat(size_nom, aux_key);
 
 							tac("mov $0, 0");
-								char* size_nom = (char*) malloc(sizeof(char) * (4 + strlen(aux_key)) + 1);
-								strcat(size_nom, "size");
-								strcat(size_nom, aux_key);
 								char* sub = (char*) malloc(sizeof(char) * (4 + 4 + strlen(size_nom) + 3) + 1);
 								strcat(sub, "sub $1, ");
 								strcat(sub, size_nom);
@@ -2008,9 +2017,9 @@ chamada:
 								strcat(label, aux_key);
 								strcat(label, ":");
 							tac(label);
-								char* slt = (char*) malloc(sizeof(char) * (12 + strlen(tac_tam)) + 1);
+								char* slt = (char*) malloc(sizeof(char) * (12 + strlen(size_nom)) + 1);
 								strcat(slt, "slt $2, $0, ");
-								strcat(slt, tac_tam);
+								strcat(slt, size_nom);
 							tac(slt);
 								auxlabel2 = (char*) malloc(sizeof(char) * contDigf(tac_str2) + 1);
 								sprintf(auxlabel2, "%d", tac_str2++);
@@ -2079,11 +2088,155 @@ chamada:
 							tac("// Fim print");
 						}
 
-						else if(strcmp(item->nome != NULL ? item->nome : "", "printPoint") == 0 && argument->prox != NULL){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "printPoint") == 0 && argument->prox != NULL){
+							tac("// Ini print");
+							// TAC cria nova var na tab de simbolos do tac pra armazenar a string
+							// char str K = "texto"
+							nova_var = (char*) malloc(sizeof(char) * (5 + contDigf(tac_str) + 3 + strlen(argument->nome)) + 1);
+							aux_key = (char*) malloc(sizeof(char) * contDigf(tac_str) + 1);
+							sprintf(aux_key, "%d", tac_str);
+							strcat(nova_var, "str");
+							strcat(nova_var, aux_key);
+							strcat(nova_var, "[]");
+							strcat(nova_var, " = ");
+							strcat(nova_var, argument->nome);
+							tac_tab(Literal, nova_var);
+
+							// Cria var tamanho da strg
+							int tam_aux = strlen(argument->nome) - 2;
+							tamanho = (char*) malloc(sizeof(char) * contDigf(tam_aux) + 1);
+							sprintf(tamanho, "%d", tam_aux);
+							tac_tam = (char*) malloc(sizeof(char) * (4 + strlen(aux_key) + 3 + strlen(tamanho)) + 1);
+							strcat(tac_tam, "size");
+							strcat(tac_tam, aux_key);
+							strcat(tac_tam, " = ");
+							strcat(tac_tam, tamanho);
+							tac_tab(Inteiro, tac_tam);
+							char* size_nom = (char*) malloc(sizeof(char) * (4 + strlen(aux_key)) + 1);
+							strcat(size_nom, "size");
+							strcat(size_nom, aux_key);
+
+							tac("mov $0, 0");
+								char* sub = (char*) malloc(sizeof(char) * (4 + 4 + strlen(size_nom) + 3) + 1);
+								strcat(sub, "sub $1, ");
+								strcat(sub, size_nom);
+								strcat(sub, ", 1");
+							tac(sub);
+							// while $0 < size
+								// TAC cria label pra impressão
+								label = (char*) malloc(sizeof(char) * (7 + strlen(aux_key) + 1) + 1);
+								strcat(label, "IMPRIME");
+								strcat(label, aux_key);
+								strcat(label, ":");
+							tac(label);
+								char* slt = (char*) malloc(sizeof(char) * (12 + strlen(size_nom)) + 1);
+								strcat(slt, "slt $2, $0, ");
+								strcat(slt, size_nom);
+							tac(slt);
+								auxlabel2 = (char*) malloc(sizeof(char) * contDigf(tac_str2) + 1);
+								sprintf(auxlabel2, "%d", tac_str2++);
+								char* label2p2 = (char*) malloc(sizeof(char) * (7 + strlen(aux_key) + 1 + strlen(auxlabel2)) + 1);
+								strcat(label2p2, "IMPRIME");
+								strcat(label2p2, aux_key);
+								strcat(label2p2, "p");
+								strcat(label2p2, auxlabel2);
+								char* brz = (char*) malloc(sizeof(char) * (4 + strlen(label2p2) + 4) + 1);
+								strcat(brz, "brz ");
+								strcat(brz, label2p2);
+								strcat(brz, ", $2");
+							tac(brz);
+								char* v = (char*) malloc(sizeof(char) * (3 + strlen(aux_key) + 4) + 1);
+								strcat(v, "str");
+								strcat(v, aux_key);
+								strcat(v, "[$0]");
+							// print v[$0]
+								char* strK = (char*) malloc(sizeof(char) * (3 + strlen(aux_key)) + 1);
+								strcat(strK, "str");
+								strcat(strK, aux_key);
+								char* mov1 = (char*) malloc(sizeof(char) * (4 + 4 + 1 + strlen(strK)) + 1);
+								strcat(mov1, "mov $2, &");
+								strcat(mov1, strK);
+							tac(mov1);
+							tac("mov $2, $2[$0]");
+							tac("print $2");
+							tac("add $0, $0, 1");
+								char* jmp = (char*) malloc(sizeof(char) * (5 + strlen(label)) + 1);
+								strcat(jmp, "jump ");
+								char* nom_label = (char*) malloc(sizeof(char) * (7 + strlen(aux_key)) + 1);
+								strcat(nom_label, "IMPRIME");
+								strcat(nom_label, aux_key);
+								strcat(jmp, nom_label);
+							tac(jmp);
+								label2 = (char*) malloc(sizeof(char) * (7 + strlen(aux_key) + 1 + strlen(auxlabel2) + 1) + 1);
+								strcat(label2, "IMPRIME");
+								strcat(label2, aux_key);
+								strcat(label2, "p");
+								strcat(label2, auxlabel2);
+								strcat(label2, ":");
+							tac(label2);
+
+
+							Simbolo* tac_val_item = buscaTabNome(argument->prox->nome);
+
+							char* x = (char*) malloc(sizeof(char) * contDigf(tac_val_item->x) + 1);
+							char* y = (char*) malloc(sizeof(char) * contDigf(tac_val_item->y) + 1);
+							gcvt(tac_val_item->x, contDigf(tac_val_item->x) + 1, x);
+							gcvt(tac_val_item->y, contDigf(tac_val_item->y) + 1, y);
+							tac_val = (char*) malloc(sizeof(char) * (4 + strlen(x) + 5 + strlen(y) + 1) + 1);
+							strcat(tac_val, "(x: ");
+							strcat(tac_val, x);
+							strcat(tac_val, ", y: ");
+							strcat(tac_val, y);
+							strcat(tac_val, ")");
+							println = (char*) malloc(sizeof(char) * (8 + strlen(tac_val)) + 1);
+							strcat(println, "println ");
+							strcat(println, tac_val);
+							tac(println);
+
+
+							tac_str++;
+							tac_str2 = 0;
+							tac("// Fim print");
+						}
+
 						else if(strcmp(item->nome != NULL ? item->nome : "", "printShape") == 0 && argument->prox != NULL){}
 						else if(strcmp(item->nome != NULL ? item->nome : "", "scanInt") == 0 && argument->prox != NULL){}
 						else if(strcmp(item->nome != NULL ? item->nome : "", "scanFloat") == 0 && argument->prox != NULL){}
-						else if(strcmp(item->nome != NULL ? item->nome : "", "constroiPoint") == 0 && argument->prox != NULL){}
+
+						else if(strcmp(item->nome != NULL ? item->nome : "", "constroiPoint") == 0 && argument->prox != NULL && argument->prox->prox != NULL){
+							Simbolo* item = buscaTabNome(argument->nome);
+							item->x = atof(argument->prox->nome);
+							item->y = atof(argument->prox->prox->nome);
+
+							// TAC atribui valores para X
+							aux_key = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+							sprintf(aux_key, "%d", item->chave);
+							nova_var = (char*) malloc(sizeof(char) * (strlen(item->nome) + 1 + strlen(aux_key)) + 1);
+							strcat(nova_var, item->nome);
+							strcat(nova_var, "X");
+							strcat(nova_var, aux_key);
+							mov = (char*) malloc(sizeof(char) * (4 + strlen(nova_var) + 2 + strlen(argument->prox->nome)) + 1);
+							strcat(mov, "mov ");
+							strcat(mov, nova_var);
+							strcat(mov, ", ");
+							strcat(mov, argument->prox->nome);
+							tac(mov);
+
+							// TAC atribui valores para Y
+							val_chave = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+							sprintf(val_chave, "%d", item->chave);
+							nom_var = (char*) malloc(sizeof(char) * (strlen(item->nome) + 1 + strlen(val_chave)) + 1);
+							strcat(nom_var, item->nome);
+							strcat(nom_var, "Y");
+							strcat(nom_var, val_chave);
+							tac_val = (char*) malloc(sizeof(char) * (4 + strlen(nom_var) + 2 + strlen(argument->prox->prox->nome)) + 1);
+							strcat(tac_val, "mov ");
+							strcat(tac_val, nom_var);
+							strcat(tac_val, ", ");
+							strcat(tac_val, argument->prox->prox->nome);
+							tac(tac_val);
+						}
+
 						else if(strcmp(item->nome != NULL ? item->nome : "", "constroiShape") == 0 && argument->prox != NULL){}
 						else if(strcmp(item->nome != NULL ? item->nome : "", "Perimetro") == 0){}
 						else if(strcmp(item->nome != NULL ? item->nome : "", "IsCollided") == 0 && argument->prox != NULL){}
@@ -2193,72 +2346,74 @@ chamada:
 								}
 
 
+								// SE NAO EH FUNCAO PROPRIA DA LINGUAGEM
+								if(NFUNCLING){
+									// TAC EMPILHA parametros
+									char* tac_val;
+									char* se_lit;
+									Simbolo* item = buscaTabNome(argumento->nome);
+									if(item == NULL){
+										// if(argumento->nome[0] == '\"'){
+										// 	tac("param texto");
 
-								// TAC EMPILHA parametros
-								char* tac_val;
-								char* se_lit;
-								Simbolo* item = buscaTabNome(argumento->nome);
-								if(item == NULL){
-									// if(argumento->nome[0] == '\"'){
-									// 	tac("param texto");
-
-									// }
-									tac_val = (char*) malloc(sizeof(char) * (7 + strlen(argumento->nome)) + 1);
-									strcat(tac_val, "param ");
-									strcat(tac_val, strdup(argumento->nome));
-									tac(tac_val);
-								}
-								else{
-									tac_val = (char*) malloc(sizeof(char) * (7 + strlen(item->nome) + contDigf(item->chave)) + 1);
-									strcat(tac_val, "param ");
-									strcat(tac_val, strdup(item->nome));
-									char* id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
-									sprintf(id_tac_nom, "%d", item->chave);
-									strcat(tac_val, id_tac_nom);
-									tac(tac_val);
-								}
+										// }
+										tac_val = (char*) malloc(sizeof(char) * (7 + strlen(argumento->nome)) + 1);
+										strcat(tac_val, "param ");
+										strcat(tac_val, strdup(argumento->nome));
+										tac(tac_val);
+									}
+									else{
+										tac_val = (char*) malloc(sizeof(char) * (7 + strlen(item->nome) + contDigf(item->chave)) + 1);
+										strcat(tac_val, "param ");
+										strcat(tac_val, strdup(item->nome));
+										char* id_tac_nom = (char*) malloc(sizeof(char) * contDigf(item->chave) + 1);
+										sprintf(id_tac_nom, "%d", item->chave);
+										strcat(tac_val, id_tac_nom);
+										tac(tac_val);
+									}
 
 
-								Contexto* ctx_temp = ctx_atual;
-								int isNome = 1; // Sim, por nome
-								Simbolo* arg_passado = buscaAquiNome(argumento->nome);
-								if(arg_passado == NULL){
-									isNome = 0; // Nao, por valor
-									arg_passado = buscaAquiVal(argumento->nome);
-								}
-								if(arg_passado != NULL){
-									if(strcmp(arg_passado->nome != NULL ? arg_passado->nome : "" , "") == 0 ){
+									Contexto* ctx_temp = ctx_atual;
+									int isNome = 1; // Sim, por nome
+									Simbolo* arg_passado = buscaAquiNome(argumento->nome);
+									if(arg_passado == NULL){
 										isNome = 0; // Nao, por valor
+										arg_passado = buscaAquiVal(argumento->nome);
 									}
-									if(isNome == 0 && strcmp(arg_passado->valor != NULL ? arg_passado->valor : "" , "") == 0 ){
-										isNome = -1; // Nao, nenhum
-									}
-									if(isNome == 1){
-										if(item->interno != NULL){
-											ctx_atual = item->interno;
-
-											Simbolo* arg_recebido;
-											arg_recebido = buscaAquiNome(parametro->nome);
-
-											if(arg_recebido != NULL){
-												if(arg_recebido->isEnd == 1){
-													arg_recebido = arg_passado;
-												}
-
-												if(strcmp(arg_passado->valor != NULL ? arg_passado->valor : "", "") != 0){
-													arg_recebido->valor = (char*) malloc(sizeof(char) * strlen(arg_passado->valor) + 1);
-													strcpy(arg_recebido->valor, arg_passado->valor != NULL ? arg_passado->valor : "");
-												}
-
-											}
-
-
-
-											ctx_atual = ctx_temp;
+									if(arg_passado != NULL){
+										if(strcmp(arg_passado->nome != NULL ? arg_passado->nome : "" , "") == 0 ){
+											isNome = 0; // Nao, por valor
 										}
+										if(isNome == 0 && strcmp(arg_passado->valor != NULL ? arg_passado->valor : "" , "") == 0 ){
+											isNome = -1; // Nao, nenhum
+										}
+										if(isNome == 1){
+											if(item->interno != NULL){
+												ctx_atual = item->interno;
+
+												Simbolo* arg_recebido;
+												arg_recebido = buscaAquiNome(parametro->nome);
+
+												if(arg_recebido != NULL){
+													if(arg_recebido->isEnd == 1){
+														arg_recebido = arg_passado;
+													}
+
+													if(strcmp(arg_passado->valor != NULL ? arg_passado->valor : "", "") != 0){
+														arg_recebido->valor = (char*) malloc(sizeof(char) * strlen(arg_passado->valor) + 1);
+														strcpy(arg_recebido->valor, arg_passado->valor != NULL ? arg_passado->valor : "");
+													}
+
+												}
+
+
+
+												ctx_atual = ctx_temp;
+											}
+										}
+
+
 									}
-
-
 								}
 
 
@@ -2345,21 +2500,23 @@ chamada:
 					}
 
 
+					// SE NAO EH FUNCAO PROPRIA DA LINGUAGEM
+					if(NFUNCLING){
+						// TAC CRIA LABEL PRA CHAMADA
+						char* oper = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + contDigf(item->qtdParams)) + 1);
+						strcat(oper, "call ");
+						strcat(oper, item->nome);
+						strcat(oper, ", ");
 
-					// TAC CRIA LABEL PRA CHAMADA
-					char* oper = (char*) malloc(sizeof(char) * (4 + strlen(item->nome) + 2 + contDigf(item->qtdParams)) + 1);
-					strcat(oper, "call ");
-					strcat(oper, item->nome);
-					strcat(oper, ", ");
-
-					char* qtdParams = (char*) malloc(sizeof(char) * contDigf(item->qtdParams) + 1);
-					sprintf(qtdParams, "%d", item->qtdParams);
-					strcat(oper, qtdParams);
-					tac(oper);
+						char* qtdParams = (char*) malloc(sizeof(char) * contDigf(item->qtdParams) + 1);
+						sprintf(qtdParams, "%d", item->qtdParams);
+						strcat(oper, qtdParams);
+						tac(oper);
 
 
-					// TAC Desempilha retorno
-					tac("pop $0");
+						// TAC Desempilha retorno
+						tac("pop $0");
+					}
 
 
 				}
@@ -2834,7 +2991,7 @@ Node* novaFolhaInt(int val){
 	novo->qtdFi = 0;
 	novo->linha = num_lin;
 	novo->coluna = num_char;
-	sprintf(novo->valor, "%i", val);
+	sprintf(novo->valor, "%d", val);
 	// printf("\t\t\t\t ################ %s\n", novo->valor);
 	novo->fi = NULL;
 	novo->params = NULL;
