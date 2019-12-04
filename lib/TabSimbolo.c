@@ -251,10 +251,8 @@ Simbolo* buscaAquiVal(char* valor){
 		TabSimbolos atual = ctx_atual->primeiro;
 		
 		while(atual != NULL){
-			if(strcmp(atual->valor != NULL ? atual->valor : "", "")){
-				if(strcmp(atual->valor != NULL ? atual->valor : "", valor) == 0){
-					return atual;
-				}
+			if(strcmp(atual->valor != NULL ? atual->valor : "", valor) == 0 && (strcmp(atual->nome != NULL ? atual->nome : "", "") == 0 || atual->tipo == Literal)){
+				return atual;
 			}
 			atual = atual->prox;
 		}
@@ -327,7 +325,7 @@ Simbolo* buscaTabVal(char* valor){
 	
 	while(contexto->criador != NULL){
 		while(atual != NULL){
-			if(strcmp(atual->valor != NULL ? atual->valor : "", valor) == 0){
+			if(strcmp(atual->valor != NULL ? atual->valor : "", valor) == 0 && (strcmp(atual->nome != NULL ? atual->nome : "", "") == 0 || atual->tipo == Literal)){
 				return atual;
 			}
 			atual = atual->prox;
@@ -346,7 +344,7 @@ Simbolo* buscaTabVal(char* valor){
 }
 
 Simbolo* insere(char* nome, char* valor, int isVar, TYPE tipo, int qtdParams, Parametro* params){
-	static unsigned int prox_chave = -18;
+	static unsigned int prox_chave = -19;
 	Simbolo* busca = NULL;
 	if(tipo != Literal){
 		if(strcmp(nome != NULL ? nome : "", "") == 0){
