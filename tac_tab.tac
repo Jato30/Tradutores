@@ -3,7 +3,8 @@ int x1
 int x3
 int per6
 int x7
-char str[]0[] = "per = "
+char str0[] = "per = "
+int size0 = 6
 .code
 func:
 mov x3, 3
@@ -17,16 +18,19 @@ mov per6, 53
 seq $1, per6, 3.71293
 not $0, $1
 // Instrucao if
-brz $0, IF0
+brz IF0, $0
 // Ini print
-mema $2, 1
-mov $2, '\0'
-mov $1, str0[]
+mov $0, 0
+sub $1, size0, 1
 IMPRIME0:
-print $1
-add $1, 1
-sec $0, $2, $1
-brnz $0, IMPRIME0
+slt $2, $0, size0 = 6
+brz IMPRIME0p0, $2
+mov $2, &str0
+mov $2, $2[$0]
+print $2
+add $0, $0, 1
+jump IMPRIME0
+IMPRIME0p0:
 println 2.2
 // Fim print
 param "per = "

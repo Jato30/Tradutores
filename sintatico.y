@@ -50,6 +50,7 @@
 	FILE* tac_ftab;
 	int tac_id = 0;
 	int tac_str = 0;
+	int tac_str2 = 0;
 	int tac_if = 0;
 	int tac_else = 0;
 	int tac_for = 0;
@@ -1959,7 +1960,12 @@ chamada:
 						char* println;
 						char* mov;
 						char* label;
+						char* label2;
+						char* auxlabel2;
+						char* label3;
 						char* aux;
+						char* tamanho;
+						char* tac_tam;
 
 						if((strcmp(item->nome != NULL ? item->nome : "", "printInt") == 0 || strcmp(item->nome != NULL ? item->nome : "", "printFloat") == 0) && argument->prox != NULL){
 							tac("// Ini print");
@@ -1968,45 +1974,85 @@ chamada:
 							nova_var = (char*) malloc(sizeof(char) * (5 + contDigf(tac_str) + 3 + strlen(argument->nome)) + 1);
 							aux_key = (char*) malloc(sizeof(char) * contDigf(tac_str) + 1);
 							sprintf(aux_key, "%d", tac_str);
-							strcat(nova_var, "str[]");
+							strcat(nova_var, "str");
 							strcat(nova_var, aux_key);
 							strcat(nova_var, "[]");
 							strcat(nova_var, " = ");
 							strcat(nova_var, argument->nome);
 							tac_tab(Literal, nova_var);
 
-							nom_var = (char*) malloc(sizeof(char) * (5 + strlen(aux_key)) + 1);
-							strcat(nom_var, "str");
-							strcat(nom_var, aux_key);
-							strcat(nom_var, "[]");
+							// Cria var tamanho da strg
+							int tam_aux = strlen(argument->nome) - 2;
+							tamanho = (char*) malloc(sizeof(char) * contDigf(tam_aux) + 1);
+							sprintf(tamanho, "%d", tam_aux);
+							tac_tam = (char*) malloc(sizeof(char) * (4 + strlen(aux_key) + 3 + strlen(tamanho)) + 1);
+							strcat(tac_tam, "size");
+							strcat(tac_tam, aux_key);
+							strcat(tac_tam, " = ");
+							strcat(tac_tam, tamanho);
+							tac_tab(Inteiro, tac_tam);
 
-							// TAC cria label pra impressão
-							// mema $2, 1
-							// mov $2, '\0'
-							// mov $1, str
-							tac("mema $2, 1");
-							tac("mov $2, '\\0'");
-							mov = (char*) malloc(sizeof(char) * (4 + 4 + strlen(nom_var)) + 1);
-							strcat(mov, "mov $1, ");
-							strcat(mov, nom_var);
-							tac(mov);
-
-							// label
-							label = (char*) malloc(sizeof(char) * (7 + strlen(aux_key) + 1) + 1);
-							strcat(label, "IMPRIME");
-							strcat(label, aux_key);
-							strcat(label, ":");
+							tac("mov $0, 0");
+								char* size_nom = (char*) malloc(sizeof(char) * (4 + strlen(aux_key)) + 1);
+								strcat(size_nom, "size");
+								strcat(size_nom, aux_key);
+								char* sub = (char*) malloc(sizeof(char) * (4 + 4 + strlen(size_nom) + 3) + 1);
+								strcat(sub, "sub $1, ");
+								strcat(sub, size_nom);
+								strcat(sub, ", 1");
+							tac(sub);
+							// while $0 < size
+								// TAC cria label pra impressão
+								label = (char*) malloc(sizeof(char) * (7 + strlen(aux_key) + 1) + 1);
+								strcat(label, "IMPRIME");
+								strcat(label, aux_key);
+								strcat(label, ":");
 							tac(label);
-							tac("print $1");
-							tac("add $1, 1");
-							tac("sec $0, $2, $1");
-
-							// volta para imprimir proximo caractere
-							aux = (char*) malloc(sizeof(char) * (4 + 4 + 7 + strlen(aux_key)) + 1);
-							strcat(aux, "brnz IMPRIME");
-							strcat(aux, aux_key);
-							strcat(aux, ", $0");
-							tac(aux);
+								char* slt = (char*) malloc(sizeof(char) * (12 + strlen(tac_tam)) + 1);
+								strcat(slt, "slt $2, $0, ");
+								strcat(slt, tac_tam);
+							tac(slt);
+								auxlabel2 = (char*) malloc(sizeof(char) * contDigf(tac_str2) + 1);
+								sprintf(auxlabel2, "%d", tac_str2++);
+								char* label2p2 = (char*) malloc(sizeof(char) * (7 + strlen(aux_key) + 1 + strlen(auxlabel2)) + 1);
+								strcat(label2p2, "IMPRIME");
+								strcat(label2p2, aux_key);
+								strcat(label2p2, "p");
+								strcat(label2p2, auxlabel2);
+								char* brz = (char*) malloc(sizeof(char) * (4 + strlen(label2p2) + 4) + 1);
+								strcat(brz, "brz ");
+								strcat(brz, label2p2);
+								strcat(brz, ", $2");
+							tac(brz);
+								char* v = (char*) malloc(sizeof(char) * (3 + strlen(aux_key) + 4) + 1);
+								strcat(v, "str");
+								strcat(v, aux_key);
+								strcat(v, "[$0]");
+							// print v[$0]
+								char* strK = (char*) malloc(sizeof(char) * (3 + strlen(aux_key)) + 1);
+								strcat(strK, "str");
+								strcat(strK, aux_key);
+								char* mov1 = (char*) malloc(sizeof(char) * (4 + 4 + 1 + strlen(strK)) + 1);
+								strcat(mov1, "mov $2, &");
+								strcat(mov1, strK);
+							tac(mov1);
+							tac("mov $2, $2[$0]");
+							tac("print $2");
+							tac("add $0, $0, 1");
+								char* jmp = (char*) malloc(sizeof(char) * (5 + strlen(label)) + 1);
+								strcat(jmp, "jump ");
+								char* nom_label = (char*) malloc(sizeof(char) * (7 + strlen(aux_key)) + 1);
+								strcat(nom_label, "IMPRIME");
+								strcat(nom_label, aux_key);
+								strcat(jmp, nom_label);
+							tac(jmp);
+								label2 = (char*) malloc(sizeof(char) * (7 + strlen(aux_key) + 1 + strlen(auxlabel2) + 1) + 1);
+								strcat(label2, "IMPRIME");
+								strcat(label2, aux_key);
+								strcat(label2, "p");
+								strcat(label2, auxlabel2);
+								strcat(label2, ":");
+							tac(label2);
 
 
 							Simbolo* tac_val_item = buscaTabNome(argument->prox->nome);
@@ -2029,6 +2075,7 @@ chamada:
 							}
 
 							tac_str++;
+							tac_str2 = 0;
 							tac("// Fim print");
 						}
 
