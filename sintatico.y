@@ -5,6 +5,8 @@
 	#include <string.h>
 	#include "./lib/TabSimbolo.h"
 
+	#define NFUNCLING (strcmp(item->nome != NULL ? item->nome : "", "printFloat") != 0 && strcmp(item->nome != NULL ? item->nome : "", "printPoint") != 0 && strcmp(item->nome != NULL ? item->nome : "", "printShape") != 0 && strcmp(item->nome != NULL ? item->nome : "", "scanInt") != 0 && strcmp(item->nome != NULL ? item->nome : "", "scanFloat") != 0 && strcmp(item->nome != NULL ? item->nome : "", "constroiPoint") != 0 && strcmp(item->nome != NULL ? item->nome : "", "constroiShape") != 0 && strcmp(item->nome != NULL ? item->nome : "", "Perimetro") != 0 && strcmp(item->nome != NULL ? item->nome : "", "IsCollided") != 0 && strcmp(item->nome != NULL ? item->nome : "", "IsIn") != 0)
+
 	int yylex();
 
 	typedef struct Arvore Node;
@@ -47,6 +49,7 @@
 	FILE* tac_input;
 	FILE* tac_ftab;
 	int tac_id = 0;
+	int tac_str = 0;
 	int tac_if = 0;
 	int tac_else = 0;
 	int tac_for = 0;
@@ -637,12 +640,13 @@ instruc_cond:
 			IF INI_PARAM expressao FIM_PARAM INI_INSTRUC {
 				// TAC condicional
 				tac("// Instrucao if");
-				// brz $0 L1
+				// brz L1, $0
 				char* label = (char*) malloc(sizeof(char) * (10 + contDigf(tac_if)) + 1);
-				strcat(label, "brz $0, IF");
+				strcat(label, "brz IF");
 				char* num_if = (char*) malloc(sizeof(char) * contDigf(tac_if) + 1);
 				sprintf(num_if, "%d", tac_if);
 				strcat(label, num_if);
+				strcat(label, ", $0");
 				tac(label);
 
 
@@ -727,10 +731,11 @@ instruc_iterac:
 				sprintf(label_id, "%d", tac_for);
 
 				// TAC se a condicao for falsa, sai do loop
-				// brz $0, FIMFOR
+				// brz FIMFOR, $0
 				char* tac_label2 = (char*) malloc(sizeof(char) * (4 + 4 + 6 + contDigf(tac_for)) + 1);
-				strcat(tac_label2, "brz $0, FIMFOR");
+				strcat(tac_label2, "brz FIMFOR");
 				strcat(tac_label2, label_id);
+				strcat(tac_label2, ", $0");
 				tac(tac_label2);
 
 				// TAC se a condicao for verdadeira, vai pro corpo
@@ -1943,6 +1948,108 @@ chamada:
 					$$->tipo = item->tipo;
 
 
+
+					Parametro* argument = $3 != NULL ? ($3->params != NULL ? $3->params : NULL) : NULL;
+					if(argument != NULL){
+						char* nova_var;
+						char* aux_key;
+						char* nom_var;
+						char* tac_val;
+						char* val_chave;
+						char* println;
+						char* mov;
+						char* label;
+						char* aux;
+
+						if((strcmp(item->nome != NULL ? item->nome : "", "printInt") == 0 || strcmp(item->nome != NULL ? item->nome : "", "printFloat") == 0) && argument->prox != NULL){
+							tac("// Ini print");
+							// TAC cria nova var na tab de simbolos do tac pra armazenar a string
+							// char str K = "texto"
+							nova_var = (char*) malloc(sizeof(char) * (5 + contDigf(tac_str) + 3 + strlen(argument->nome)) + 1);
+							aux_key = (char*) malloc(sizeof(char) * contDigf(tac_str) + 1);
+							sprintf(aux_key, "%d", tac_str);
+							strcat(nova_var, "str[]");
+							strcat(nova_var, aux_key);
+							strcat(nova_var, "[]");
+							strcat(nova_var, " = ");
+							strcat(nova_var, argument->nome);
+							tac_tab(Literal, nova_var);
+
+							nom_var = (char*) malloc(sizeof(char) * (5 + strlen(aux_key)) + 1);
+							strcat(nom_var, "str");
+							strcat(nom_var, aux_key);
+							strcat(nom_var, "[]");
+
+							// TAC cria label pra impressão
+							// mema $2, 1
+							// mov $2, '\0'
+							// mov $1, str
+							tac("mema $2, 1");
+							tac("mov $2, '\\0'");
+							mov = (char*) malloc(sizeof(char) * (4 + 4 + strlen(nom_var)) + 1);
+							strcat(mov, "mov $1, ");
+							strcat(mov, nom_var);
+							tac(mov);
+
+							// label
+							label = (char*) malloc(sizeof(char) * (7 + strlen(aux_key) + 1) + 1);
+							strcat(label, "IMPRIME");
+							strcat(label, aux_key);
+							strcat(label, ":");
+							tac(label);
+							tac("print $1");
+							tac("add $1, 1");
+							tac("sec $0, $2, $1");
+
+							// volta para imprimir proximo caractere
+							aux = (char*) malloc(sizeof(char) * (4 + 4 + 7 + strlen(aux_key)) + 1);
+							strcat(aux, "brnz IMPRIME");
+							strcat(aux, aux_key);
+							strcat(aux, ", $0");
+							tac(aux);
+
+
+							Simbolo* tac_val_item = buscaTabNome(argument->prox->nome);
+							if(tac_val_item != NULL){
+								val_chave = (char*) malloc(sizeof(char) * contDigf(tac_val_item->chave) + 1);
+								sprintf(val_chave, "%d", tac_val_item->chave);
+								tac_val = (char*) malloc(sizeof(char) * (strlen(tac_val_item->nome) + contDigf(tac_val_item->chave)) + 1);
+								strcat(tac_val, tac_val_item->nome);
+								strcat(tac_val, val_chave);
+								println = (char*) malloc(sizeof(char) * (8 + strlen(tac_val)) + 1);
+								strcat(println, "println ");
+								strcat(println, tac_val);
+								tac(println);
+							}
+							else{
+								println = (char*) malloc(sizeof(char) * strlen(argument->prox->nome) + 1);
+								strcat(println, "println ");
+								strcat(println, argument->prox->nome);
+								tac(println);
+							}
+
+							tac_str++;
+							tac("// Fim print");
+						}
+
+						else if(strcmp(item->nome != NULL ? item->nome : "", "printPoint") == 0 && argument->prox != NULL){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "printShape") == 0 && argument->prox != NULL){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "scanInt") == 0 && argument->prox != NULL){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "scanFloat") == 0 && argument->prox != NULL){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "constroiPoint") == 0 && argument->prox != NULL){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "constroiShape") == 0 && argument->prox != NULL){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "Perimetro") == 0){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "IsCollided") == 0 && argument->prox != NULL){}
+						else if(strcmp(item->nome != NULL ? item->nome : "", "IsIn") == 0 && argument->prox != NULL){}
+					}
+
+
+
+
+
+
+
+
 					if(item->params != NULL && ($3 != NULL ? ($3->valor != NULL ? $3->valor : NULL) : NULL) == NULL ){ // se param eh nulo e os agrs nao
 						printf("\t### ERRO: [%s] funcao faltando argumentos [%d][%d]\n", $1->valor, $1->linha, $1->coluna);
 					}
@@ -2591,6 +2698,10 @@ int tac_tab(TYPE tipo, const char* nome){
 
 		case Forma:
 			fputs("shape ", tac_ftab);
+			break;
+
+		case Literal:
+			fputs("char ", tac_ftab);
 			break;
 
 	}

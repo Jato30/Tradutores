@@ -1,36 +1,36 @@
 .table
-float per2
+int x1
 int x3
-int i4
+int per6
+int x7
+char str[]0[] = "per = "
 .code
+func:
+mov x3, 3
+return x3
 main:
-mov x3, 2
-mov per2, 9153.2
-// Laco FOR
-mov i4, 0
-CONDFOR0:
-// Comparacao: Menor que
-slt $0, i4, 10
-brz $0, FIMFOR0
-jump CORPOFOR0
-INCRFOR0:
-add $0, i4, 1
-mov i4, $0
-jump CONDFOR0
-CORPOFOR0:
-mov $0, x3
-inttofl x3, $0
-div $0, per2, x3
-mov per2, $0
-jump INCRFOR0
-FIMFOR0:
+call func, 0
+pop $0
+mov x7, $0
+mov per6, 53
 // Comparacao: diferente de
-seq $1, per2, 3.71293
+seq $1, per6, 3.71293
 not $0, $1
 // Instrucao if
 brz $0, IF0
+// Ini print
+mema $2, 1
+mov $2, '\0'
+mov $1, str0[]
+IMPRIME0:
+print $1
+add $1, 1
+sec $0, $2, $1
+brnz $0, IMPRIME0
+println 2.2
+// Fim print
 param "per = "
-param per2
+param 2.2
 call printFloat, 2
 pop $0
 IF0:

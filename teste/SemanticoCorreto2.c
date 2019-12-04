@@ -14,7 +14,7 @@ int main(){
 
 	per = 53.2;
 	if(per != 3.71293){
-		printFloat("per = ", per);
+		printFloat("per = ", 2.2);
 	}
 
 	return 0;
