@@ -11,7 +11,7 @@ int main(){
 	int x;
 	x = 2;
 	x = func(7, x);
-	scanInt(&x, 15);
+	scanInt(&x);
 	printInt("x: ", x);
 
 	return 0;

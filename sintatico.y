@@ -50,6 +50,7 @@
 	Node* raiz = NULL;
 	extern int num_lin;
 	extern int num_char;
+	extern int yylex_destroy(void);
 %}
 
 %defines
@@ -3633,6 +3634,7 @@ int main(void){
 	printTab();
 	destroiArvore(raiz);
 	destroiTab();
+	yylex_destroy();
 	fclose(tac_input);
 	fclose(tac_ftab);
 	return 0;
