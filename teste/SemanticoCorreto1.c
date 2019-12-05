@@ -7,7 +7,7 @@ int main(){
 	int i;
 	point p;
 	float quadrado;
-	constroiPoint(&p, 1.0, 3.2);
+	constroiPoint(&p, 7.0, 3.2);
 	printPoint("meu p: ", p);
 	x = 2.2;
 
@@ -18,6 +18,7 @@ int main(){
 	}
 
 	quadrado = x * x;
+	printFloat("quad: ", quadrado);
 
 
 	if(per != 3.71293){

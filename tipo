@@ -1,0 +1,28 @@
+	[ERRO] Caractere nao reconhecido: $ linha[1:1]
+	[ERRO] Caractere nao reconhecido: $ linha[1:2]
+Operador Aditivo: -
+
+
+
+######## TABELA DE SIMBOLOS, CONTEXTO: global ########
+
+CHAVE QTD VAR/FUNC     TIPO	    NOME	CONTEUDO	PARAMETROS
+ -19   1  Keyword       int          int        (nulo)
+ -18   1  Keyword     float        float        (nulo)
+ -17   1  Keyword     point        point        (nulo)
+ -16   1  Keyword     shape        shape        (nulo)
+ -15   1    Outro     Outro       return        (nulo)
+ -14   1    Outro     Outro           if        (nulo)
+ -13   1    Outro     Outro         else        (nulo)
+ -12   1    Outro     Outro          for        (nulo)
+ -11   1     FUNC       int     printInt        (nulo)    (Literal texto, int valor)
+ -10   1     FUNC       int   printFloat        (nulo)    (Literal texto, float valor)
+  -9   1     FUNC       int   printPoint        (nulo)    (Literal texto, point valor)
+  -8   1     FUNC       int   printShape        (nulo)    (Literal texto, shape valor)
+  -7   1     FUNC       int      scanInt        (nulo)    (int &var, int valor)
+  -6   1     FUNC       int    scanFloat        (nulo)    (float &var, float valor)
+  -5   1     FUNC       intconstroiPoint        (nulo)    (point &var, float val_x, float val_y)
+  -4   1     FUNC       intconstroiShape        (nulo)    (shape &var, point valor)
+  -3   1     FUNC     float    Perimetro        (nulo)    (shape var)
+  -2   1     FUNC       int         IsIn        (nulo)    (shape forma, point ponto)
+  -1   1     FUNC       int   IsCollided        (nulo)    (shape forma1, shape forma2)

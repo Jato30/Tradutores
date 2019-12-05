@@ -95,35 +95,21 @@ void criaTab(){
 	Parametro* scanInt = (Parametro*) malloc(sizeof(Parametro));
 	scanInt->nome = (char*) malloc(sizeof(char) * 4);
 	scanInt->nome = "&var";
-	scanInt->qtd = 2;
+	scanInt->qtd = 1;
 	scanInt->tipo = Inteiro;
 	scanInt->isEnd = 1;
-	
-	scanInt->prox = (Parametro*) malloc(sizeof(Parametro));
-	scanInt->prox->nome = (char*) malloc(sizeof(char) * 6);
-	scanInt->prox->nome = "valor";
-	scanInt->prox->qtd = 2;
-	scanInt->prox->tipo = Inteiro;
-	scanInt->prox->isEnd = 0;
 
-	insere("scanInt", "", FUNC, Inteiro, 2, scanInt);
+	insere("scanInt", "", FUNC, Inteiro, 1, scanInt);
 
 
 	Parametro* scanFloat = (Parametro*) malloc(sizeof(Parametro));
 	scanFloat->nome = (char*) malloc(sizeof(char) * 4);
 	scanFloat->nome = "&var";
-	scanFloat->qtd = 2;
+	scanFloat->qtd = 1;
 	scanFloat->tipo = Decimal;
 	scanFloat->isEnd = 1;
-	
-	scanFloat->prox = (Parametro*) malloc(sizeof(Parametro));
-	scanFloat->prox->nome = (char*) malloc(sizeof(char) * 6);
-	scanFloat->prox->nome = "valor";
-	scanFloat->prox->qtd = 2;
-	scanFloat->prox->tipo = Decimal;
-	scanFloat->prox->isEnd = 0;
 
-	insere("scanFloat", "", FUNC, Inteiro, 2, scanFloat);
+	insere("scanFloat", "", FUNC, Inteiro, 1, scanFloat);
 
 
 	Parametro* constroiPoint = (Parametro*) malloc(sizeof(Parametro));

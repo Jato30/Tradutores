@@ -1,21 +1,18 @@
 int x;
 
-int func(){
+int func(int par, int par2){
 	int x;
-	x = 3;
+	x = par;
 	return x;
 }
 
 int main(){
 
-	int per;
 	int x;
-	x = func();
-
-	per = 53.2;
-	if(per != 3.71293){
-		printFloat("per = ", 2.2);
-	}
+	x = 2;
+	x = func(7, x);
+	scanInt(&x, 15);
+	printInt("x: ", x);
 
 	return 0;
 }
