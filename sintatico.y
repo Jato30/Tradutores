@@ -704,11 +704,12 @@ instruc_cond:
 				sprintf(num_if, "%d", tac_if);
 
 				strcpy(go, "IF");
-				strcat(go, num_if++);
+				strcat(go, num_if);
 				strcat(go, ":");
 				tac(go);
 
 				tac("// Fim if");
+				tac_if++;
 			} instruc_else {
 				Node** lista = (Node**) malloc(sizeof(Node*) * ($<node>8 != NULL ? 5 : 3));
 				lista[0] = (Node*) malloc(sizeof(Node));
@@ -1822,7 +1823,7 @@ express_simp:
 						// sleq $1, item, item2
 						// not $0, $1
 						tmp_nom = (char*) malloc(sizeof(char) * (5 + 2 + 2 + strlen(val1) + 2 + strlen(val2)) + 1);
-						strcpy(tmp_nom, "sleq $0, ");
+						strcpy(tmp_nom, "sleq $1, ");
 						strcat(tmp_nom, val1);
 						strcat(tmp_nom, ", ");
 						strcat(tmp_nom, val2);

@@ -1,19 +1,21 @@
 .table
-float pontoX1
-float pontoY1
-char str0[] = "Meu ponto: "
-int size0 = 11
-char str1[] = "(x: "
-int size1 = 4
-char str2[] = ", y: "
-int size2 = 5
-char str3[] = ")"
-int size3 = 1
+int i1
+char str0[] = "i = 3: "
+int size0 = 7
+char str1[] = "i = 3: "
+int size1 = 7
 .code
 main:
-// constroiPoint()
-mov pontoX1, 5.3
-mov pontoY1, 15.2
+mov i1, 1
+// Comparacao: Menor que
+slt $0, i1, 4
+// Instrucao if
+brz IF0, $0
+// Comparacao: Maior que
+sleq $1, i1, 2
+not $0, $1
+// Instrucao if
+brz IF0, $0
 // Ini print
 mov $0, 0
 sub $1, size0, 1
@@ -26,6 +28,10 @@ print $2
 add $0, $0, 1
 jump IMPRIME0
 IMPRIME0p0:
+println i1
+// Fim print
+IF0:
+// Fim if
 // Ini print
 mov $0, 0
 sub $1, size1, 1
@@ -38,32 +44,8 @@ print $2
 add $0, $0, 1
 jump IMPRIME1
 IMPRIME1p0:
-print pontoX1
-// Ini print
-mov $0, 0
-sub $1, size2, 1
-IMPRIME2:
-slt $2, $0, size2
-brz IMPRIME2p0, $2
-mov $2, &str2
-mov $2, $2[$0]
-print $2
-add $0, $0, 1
-jump IMPRIME2
-IMPRIME2p0:
-print pontoY1
-// Ini print
-mov $0, 0
-sub $1, size3, 1
-IMPRIME3:
-slt $2, $0, size3
-brz IMPRIME3p0, $2
-mov $2, &str3
-mov $2, $2[$0]
-print $2
-add $0, $0, 1
-jump IMPRIME3
-IMPRIME3p0:
-println
+println i1
 // Fim print
+IF1:
+// Fim if
 println 0
